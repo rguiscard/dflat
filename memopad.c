@@ -27,6 +27,7 @@ void BarChart(WINDOW);
 #define CHARSLINE 80
 #define LINESPAGE 66
 
+/*
 int main(int argc, char *argv[])
 {
     WINDOW wnd;
@@ -59,6 +60,7 @@ int main(int argc, char *argv[])
         ;
     return 0;
 }
+*/
 
 /* ------- window processing module for the
                     memopad application window ----- */

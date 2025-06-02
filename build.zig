@@ -89,7 +89,35 @@ pub fn build(b: *std.Build) void {
                                 "-Wno-compare-distinct-pointer-types",
                                 "-Wno-invalid-source-encoding"},
     });
-    lib_mod.addIncludePath(b.path("./"));
+
+    // Now, we will create a static library based on the module we created above.
+    // This creates a `std.Build.Step.Compile`, which is the build step responsible
+    // for actually invoking the compiler.
+    const lib = b.addLibrary(.{
+        .linkage = .static,
+        .name = "dflat",
+        .root_module = lib_mod,
+    });
+    lib.linkLibC();
+    lib.installHeader(b.path("dflat.h"), "dflat.h");
+    lib.installHeader(b.path("system.h"), "system.h");
+    lib.installHeader(b.path("dflatmsg.h"), "dflatmsg.h");
+    lib.installHeader(b.path("classes.h"), "classes.h");
+    lib.installHeader(b.path("config.h"), "config.h");
+    lib.installHeader(b.path("rect.h"), "rect.h");
+    lib.installHeader(b.path("keys.h"), "keys.h");
+    lib.installHeader(b.path("unikey.h"), "unikey.h");
+    lib.installHeader(b.path("commands.h"), "commands.h");
+    lib.installHeader(b.path("dialbox.h"), "dialbox.h");
+    lib.installHeader(b.path("helpbox.h"), "helpbox.h");
+    lib.installHeader(b.path("video.h"), "video.h");
+    lib.installHeader(b.path("classdef.h"), "classdef.h");
+    lib.installHeader(b.path("menu.h"), "menu.h");
+
+    // This declares intent for the library to be installed into the standard
+    // location when the user invokes the "install" step (the default step when
+    // running `zig build`).
+    b.installArtifact(lib);
 
     // We will also create a module for our other entry point, 'main.zig'.
     const exe_mod = b.createModule(.{
@@ -101,34 +129,31 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    exe_mod.addCSourceFiles(.{ .files = &.{
+            "memopad.c",
+            "dialogs.c",
+            "menus.c",
+        },
+        .flags = &[_][]const u8{"-DMACOS=1",
+                                "-DBUILD_FULL_DFLAT",
+                                "-g",
+                                "-Wno-pointer-sign",
+                                "-Wno-compare-distinct-pointer-types",
+                                "-Wno-invalid-source-encoding"},
+    });
 
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
     // This is what allows Zig source code to use `@import("foo")` where 'foo' is not a
     // file path. In this case, we set up `exe_mod` to import `lib_mod`.
-    //exe_mod.addImport("dflat_lib", lib_mod);
-
-    // Now, we will create a static library based on the module we created above.
-    // This creates a `std.Build.Step.Compile`, which is the build step responsible
-    // for actually invoking the compiler.
-    const lib = b.addLibrary(.{
-        .linkage = .static,
-        .name = "dflat",
-        .root_module = lib_mod,
-    });
-    lib.linkLibC();
-
-    // This declares intent for the library to be installed into the standard
-    // location when the user invokes the "install" step (the default step when
-    // running `zig build`).
-    b.installArtifact(lib);
+//    exe_mod.addImport("dflat_lib", lib_mod);
 
     // This creates another `std.Build.Step.Compile`, but this one builds an executable
     // rather than a static library.
     const exe = b.addExecutable(.{
-        .name = "dflat",
+        .name = "memopad",
         .root_module = exe_mod,
     });
-    exe.linkLibC();
+    exe.addIncludePath(b.path("./zig-out/include/"));
     exe.linkLibrary(lib);
 
     // This declares intent for the executable to be installed into the
