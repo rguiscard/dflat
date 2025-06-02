@@ -17,6 +17,8 @@ characters are translated to unicode and output for display on
 modern terminal emulators. Currently, D-Flat doesn't work with input unicode that maps
 to larger than 8 bits, but that is being worked on.
 
+**See README.zig.md for reason of fork**
+
 ## How do I compile/run it?
 
 For UNIX, type `make`.
