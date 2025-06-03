@@ -24,3 +24,7 @@ To run the *memopad*,
 ```
 $ ./memopad
 ```
+
+## Examples
+
+For a simple example, please check `src/file-selector.zig` and corresponding `file-selector.c`.

@@ -81,6 +81,8 @@ pub fn build(b: *std.Build) void {
             "tty.c",
             "tty-cp437.c",
             "runshell.c",
+
+            "dialogs.c", // this should belong to library
         },
         .flags = &[_][]const u8{"-DMACOS=1",
                                 "-DBUILD_FULL_DFLAT",
@@ -131,7 +133,6 @@ pub fn build(b: *std.Build) void {
     });
     exe_mod.addCSourceFiles(.{ .files = &.{
             "memopad.c",
-            "dialogs.c",
             "menus.c",
         },
         .flags = &[_][]const u8{"-DMACOS=1",
@@ -145,7 +146,7 @@ pub fn build(b: *std.Build) void {
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
     // This is what allows Zig source code to use `@import("foo")` where 'foo' is not a
     // file path. In this case, we set up `exe_mod` to import `lib_mod`.
-//    exe_mod.addImport("dflat_lib", lib_mod);
+    exe_mod.addImport("dflat_lib", lib_mod);
 
     // This creates another `std.Build.Step.Compile`, but this one builds an executable
     // rather than a static library.
@@ -154,7 +155,7 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
     exe.addIncludePath(b.path("./zig-out/include/"));
-    exe.linkLibrary(lib);
+//    exe.linkLibrary(lib); // this cannot be used with exe_mod.addImport("dflat-lib")
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
@@ -183,6 +184,41 @@ pub fn build(b: *std.Build) void {
     // This will evaluate the `run` step rather than the default, which is "install".
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
+
+    // File selector
+    const fs_mod = b.createModule(.{
+        .root_source_file = b.path("src/file_selector.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    fs_mod.addCSourceFiles(.{ .files = &.{
+            "file-selector.c",
+        },
+        .flags = &[_][]const u8{"-DMACOS=1",
+                                "-DBUILD_FULL_DFLAT",
+                                "-g",
+                                "-Wno-pointer-sign",
+                                "-Wno-compare-distinct-pointer-types",
+                                "-Wno-invalid-source-encoding"},
+    });
+
+    fs_mod.addImport("dflat_lib", lib_mod);
+    const fs_exe = b.addExecutable(.{
+        .name = "file-selector",
+        .root_module = fs_mod,
+    });
+    fs_exe.addIncludePath(b.path("./zig-out/include/"));
+    fs_exe.addIncludePath(b.path("."));
+
+    b.installArtifact(fs_exe);
+
+    const run_fs = b.addRunArtifact(fs_exe);
+    run_fs.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_fs.addArgs(args);
+    }
+    const run_fs_step = b.step("file-select", "Run file selector");
+    run_fs_step.dependOn(&run_fs.step);
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.

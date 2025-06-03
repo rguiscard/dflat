@@ -41,7 +41,7 @@ ifneq ($(COSMO),)
 CFLAGS += -DCOSMO=1
 endif
 
-OBJS = memopad.o dialogs.o menus.o
+OBJS = memopad.o menus.o # dialogs.o is moved to library
 memopad: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJS) -L${DFLAT_LIB} -ldflat
 ifneq ($(COSMO),)
