@@ -50,7 +50,6 @@ void SelectFile(WINDOW wnd)
             }
             wnd1 = NextWindow(wnd1);
         }
-	printf("FileName %s\n", FileName);
 	PostMessage(wnd, CLOSE_WINDOW, 0, 0);
     }
 }

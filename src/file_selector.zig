@@ -3,15 +3,32 @@ const df = @cImport({
     @cInclude("file-selector.h");
 });
 
+var filename: [1024]u8 = undefined;
+var dir: [1024]u8 = undefined;
+
 pub fn main() !void {
-//    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-//    const allocator = gpa.allocator();
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
 
-//    var buffer: [100]u8 = undefined;
-//    const buf = buffer[0..];
-//    const value = df_lib.add(1,2);
-//    const result = try std.fmt.bufPrintZ(buf, "D-Flat MemoPad {d}", .{value});
+    try run_dflat_app();
 
+    // stdout is for the actual output of your application, for example if you
+    // are implementing gzip, then only the compressed bytes should be sent to
+    // stdout, not any debugging messages.
+    const stdout_file = std.io.getStdErr().writer();
+    var bw = std.io.bufferedWriter(stdout_file);
+    const stdout = bw.writer();
+
+    var dir_it = std.mem.splitScalar(u8, &dir, 0);
+    var filename_it = std.mem.splitScalar(u8, &filename, 0);
+
+    const paths = [_][]const u8{ dir_it.first(), filename_it.first() };
+    const path = try std.fs.path.join(allocator, &paths);
+    try stdout.print("{s}\n", .{path});
+    try bw.flush(); // Don't forget to flush!
+}
+
+fn run_dflat_app() !void {
     const init_value = df.init_messages();
     if (init_value == 0)
         return;
@@ -29,7 +46,6 @@ pub fn main() !void {
                         df.HASSTATUSBAR
                         );
     _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
-//    _ = df.SelectFile(wnd);
     try SelectFile(wnd);
 
     while (df.dispatch_message() > 0) {
@@ -39,15 +55,10 @@ pub fn main() !void {
 }
 
 fn SelectFile(wnd: df.WINDOW) !void {
-    var buffer: [100]u8 = undefined;
-    const buf = buffer[0..];
-    const result = try std.fmt.bufPrintZ(buf, "*", .{});
+    var fspec = [_:0]u8{ '*'};
 
-    var filename: [1024]u8 = undefined;
-    var dir: [1024]u8 = undefined;
-    if (df.OpenFileDialogBox(result.ptr, &filename) > 0)    {
+    if (df.OpenFileDialogBox(&fspec, &filename) > 0)    {
         _ = df.getcwd(&dir, 1024);
-        _ = df.printf("filename %s %s\n", &dir, &filename);
         df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
     }
 }
