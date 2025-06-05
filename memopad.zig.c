@@ -10,9 +10,7 @@ static char Untitled[] = "Untitled";
 static int wndpos;
 
 int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
-static void NewFile(WINDOW);
-static void SelectFile(WINDOW);
-static void OpenPadWindow(WINDOW, char *);
+void OpenPadWindow(WINDOW, char *);
 static void LoadFile(WINDOW);
 static void PrintPad(WINDOW);
 static void SaveFile(WINDOW, int);
@@ -26,41 +24,6 @@ void BarChart(WINDOW);
 
 #define CHARSLINE 80
 #define LINESPAGE 66
-
-/*
-int main(int argc, char *argv[])
-{
-    WINDOW wnd;
-    if (!init_messages())
-		return 1;
-    Argv = argv;
-	if (!LoadConfig())
-		cfg.ScreenLines = SCREENHEIGHT;
-    wnd = CreateWindow(APPLICATION,
-                        "D-Flat MemoPad " VERSION,
-                        0, 0, -1, -1,
-                        &MainMenu,
-                        NULL,
-                        MemoPadProc,
-                        MOVEABLE  |
-                        SIZEABLE  |
-                        HASBORDER |
-						MINMAXBOX |
-                        HASSTATUSBAR
-                        );
-
-    LoadHelpFile(DFlatApplication);
-    SendMessage(wnd, SETFOCUS, TRUE, 0);
-    while (argc > 1)    {
-        OpenPadWindow(wnd, argv[1]);
-        --argc;
-        argv++;
-    }
-    while (dispatch_message())
-        ;
-    return 0;
-}
-*/
 
 /* ------- window processing module for the
                     memopad application window ----- */
@@ -78,12 +41,6 @@ int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 			return rtn;
         case COMMAND:
             switch ((int)p1)    {
-                case ID_NEW:
-                    NewFile(wnd);
-                    return TRUE;
-                case ID_OPEN:
-                    SelectFile(wnd);
-                    return TRUE;
                 case ID_SAVE:
                     SaveFile(inFocus, FALSE);
                     return TRUE;
@@ -160,32 +117,9 @@ int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
     }
     return DefaultWndProc(wnd, msg, p1, p2);
 }
-/* --- The New command. Open an empty editor window --- */
-static void NewFile(WINDOW wnd)
-{
-    OpenPadWindow(wnd, Untitled);
-}
-/* --- The Open... command. Select a file  --- */
-static void SelectFile(WINDOW wnd)
-{
-    char FileName[MAXPATH];
-    if (OpenFileDialogBox("*", FileName))    {
-        /* --- see if the document is already in a window --- */
-        WINDOW wnd1 = FirstWindow(wnd);
-        while (wnd1 != NULL)    {
-            if (wnd1->extension && strcasecmp(FileName, wnd1->extension) == 0)    {
-                SendMessage(wnd1, SETFOCUS, TRUE, 0);
-                SendMessage(wnd1, RESTORE, 0, 0);
-                return;
-            }
-            wnd1 = NextWindow(wnd1);
-        }
-        OpenPadWindow(wnd, FileName);
-    }
-}
 
 /* --- open a document window and load a file --- */
-static void OpenPadWindow(WINDOW wnd, char *FileName)
+void OpenPadWindow(WINDOW wnd, char *FileName)
 {
     static WINDOW wnd1 = NULL;
 	WINDOW wwnd;
