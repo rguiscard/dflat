@@ -9,7 +9,7 @@ char DFlatApplication[] = "MemoPad";
 static char Untitled[] = "Untitled";
 static int wndpos;
 
-static int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
+int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
 static void NewFile(WINDOW);
 static void SelectFile(WINDOW);
 static void OpenPadWindow(WINDOW, char *);
@@ -27,6 +27,7 @@ void BarChart(WINDOW);
 #define CHARSLINE 80
 #define LINESPAGE 66
 
+/*
 int main(int argc, char *argv[])
 {
     WINDOW wnd;
@@ -59,10 +60,11 @@ int main(int argc, char *argv[])
         ;
     return 0;
 }
+*/
 
 /* ------- window processing module for the
                     memopad application window ----- */
-static int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
+int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 {
 	int rtn;
     switch (msg)    {

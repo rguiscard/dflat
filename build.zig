@@ -132,7 +132,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe_mod.addCSourceFiles(.{ .files = &.{
-            "memopad.c",
+            "memopad.zig.c",
             "menus.c",
         },
         .flags = &[_][]const u8{"-DMACOS=1",
@@ -146,7 +146,7 @@ pub fn build(b: *std.Build) void {
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
     // This is what allows Zig source code to use `@import("foo")` where 'foo' is not a
     // file path. In this case, we set up `exe_mod` to import `lib_mod`.
-    exe_mod.addImport("dflat_lib", lib_mod);
+    //exe_mod.addImport("dflat_lib", lib_mod);
 
     // This creates another `std.Build.Step.Compile`, but this one builds an executable
     // rather than a static library.
@@ -154,8 +154,9 @@ pub fn build(b: *std.Build) void {
         .name = "memopad",
         .root_module = exe_mod,
     });
-    exe.addIncludePath(b.path("./zig-out/include/"));
-//    exe.linkLibrary(lib); // this cannot be used with exe_mod.addImport("dflat-lib")
+    // exe.addIncludePath(b.path("./zig-out/include/"));
+    exe.addIncludePath(b.path("."));
+    exe.linkLibrary(lib); // this cannot be used with exe_mod.addImport("dflat-lib")
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
@@ -192,7 +193,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     fs_mod.addCSourceFiles(.{ .files = &.{
-            "file-selector.c",
+            "file-selector.zig.c",
         },
         .flags = &[_][]const u8{"-DMACOS=1",
                                 "-DBUILD_FULL_DFLAT",
@@ -202,13 +203,14 @@ pub fn build(b: *std.Build) void {
                                 "-Wno-invalid-source-encoding"},
     });
 
-    fs_mod.addImport("dflat_lib", lib_mod);
+    //fs_mod.addImport("dflat_lib", lib_mod);
     const fs_exe = b.addExecutable(.{
         .name = "file-selector",
         .root_module = fs_mod,
     });
-    fs_exe.addIncludePath(b.path("./zig-out/include/"));
+    //fs_exe.addIncludePath(b.path("./zig-out/include/"));
     fs_exe.addIncludePath(b.path("."));
+    fs_exe.linkLibrary(lib); // this cannot be used with exe_mod.addImport("dflat-lib")
 
     b.installArtifact(fs_exe);
 

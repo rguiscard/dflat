@@ -1,5 +1,6 @@
 const df = @cImport({
     @cInclude("dflat.h");
+    @cInclude("memopad.zig.h");
 });
 
 pub fn main() !void {
@@ -12,7 +13,7 @@ pub fn main() !void {
                         0, 0, -1, -1,
                         &df.MainMenu,
                         null,
-                        MemoPadProc,
+                        df.MemoPadProc,
                         df.MOVEABLE  |
                         df.SIZEABLE  |
                         df.HASBORDER |
@@ -27,11 +28,11 @@ pub fn main() !void {
     return;
 }
 
-fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
-    return df.ApplicationProc(wnd, msg, p1, p2);
-}
+//fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+//    return df.ApplicationProc(wnd, msg, p1, p2);
+//}
 
 const std = @import("std");
 
-/// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
-const df_lib = @import("dflat_lib");
+// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
+// const df_lib = @import("dflat_lib");

@@ -30,7 +30,7 @@ $ zig build file-select
 
 It will output selected file with path to stderr, which can be used with other unix tool.
 
-For example, this will print the selected file:
+For example, in bash, this will print the selected file:
 
 `
 $ zig build file-select 2> >(xargs cat)

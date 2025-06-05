@@ -1,6 +1,6 @@
 const df = @cImport({
     @cInclude("dflat.h");
-    @cInclude("file-selector.h");
+    @cInclude("file-selector.zig.h");
 });
 
 var filename: [1024]u8 = undefined;
