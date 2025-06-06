@@ -1,15 +1,9 @@
-//const df = @cImport({
-//    @cInclude("dflat.h");
-//    @cInclude("memopad.zig.h");
-//});
-
 const df = mp.df;
 
 var untitled = [_:0]u8{'U', 'n', 't', 'i', 't', 'l', 'e', 'd'};
 
 pub fn main() !void {
-    const init_value = df.init_messages();
-    if (init_value == 0)
+    if (mp.msg.init_messages() == false)
         return;
 
     // Argv = argv;
@@ -29,12 +23,11 @@ pub fn main() !void {
                         df.HASSTATUSBAR
                         );
 
-    const z_win = mp.Window.init(wnd);
-    _ = z_win;
+    const win = mp.Window.init(wnd);
 
     // LoadHelpFile(DFlatApplication);
 
-    _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
+    _ = mp.msg.SendMessage(win, df.SETFOCUS, df.TRUE, 0);
 
     // while (argc > 1)    {
     //     OpenPadWindow(wnd, argv[1]);
@@ -42,7 +35,7 @@ pub fn main() !void {
     //     argv++;
     // }
 
-    while (df.dispatch_message() > 0) {
+    while (mp.msg.dispatch_message()) {
     }
 
     return;
