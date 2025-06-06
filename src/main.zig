@@ -1,10 +1,11 @@
-const df = @cImport({
-    @cInclude("dflat.h");
-    @cInclude("memopad.zig.h");
-});
+//const df = @cImport({
+//    @cInclude("dflat.h");
+//    @cInclude("memopad.zig.h");
+//});
+
+const df = mp.df;
 
 var untitled = [_:0]u8{'U', 'n', 't', 'i', 't', 'l', 'e', 'd'};
-
 
 pub fn main() !void {
     const init_value = df.init_messages();
@@ -27,6 +28,10 @@ pub fn main() !void {
                         df.MINMAXBOX |
                         df.HASSTATUSBAR
                         );
+
+    const z_win = mp.Window.init(wnd);
+    _ = z_win;
+
     // LoadHelpFile(DFlatApplication);
 
     _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
@@ -79,7 +84,7 @@ fn SelectFile(wnd: df.WINDOW) void {
     var fspec = [_:0]u8{ '*'};
     var filename: [df.MAXPATH]u8 = undefined;
 
-    if (df.OpenFileDialogBox(&fspec, &filename) > 0) {
+   if (df.OpenFileDialogBox(&fspec, &filename) > 0) {
         // --- see if the document is already in a window ---
         var wnd1:df.WINDOW = df.FirstWindow(wnd);
         while (wnd1 != null)    {
@@ -101,4 +106,4 @@ fn SelectFile(wnd: df.WINDOW) void {
 const std = @import("std");
 
 // This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
-// const df_lib = @import("dflat_lib");
+const mp = @import("memopad");

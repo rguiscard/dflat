@@ -1,0 +1,7 @@
+pub const df = @cImport({
+    @cInclude("dflat.h");
+    @cInclude("memopad.zig.h");
+});
+
+// All zig codes which need C should import this file so that the C struct is not import multiple times.
+// Each @import creates different types even though underneath C struct is the same.
