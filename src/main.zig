@@ -50,6 +50,15 @@ pub fn main() !void {
 //                    memopad application window -----
 fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch(msg) {
+        df.CREATE_WINDOW => {
+            const rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
+            if (df.cfg.InsertMode == df.TRUE)
+                df.SetCommandToggle(&df.MainMenu, df.ID_INSERT);
+            if (df.cfg.WordWrap == df.TRUE)
+                df.SetCommandToggle(&df.MainMenu, df.ID_WRAP);
+            df.FixTabMenu();
+            return rtn;
+        },
         df.COMMAND => {
             switch(p1) {
                 df.ID_NEW => {
@@ -69,10 +78,10 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
             }
         },
         else => {
-            return df.MemoPadProc(wnd, msg, p1, p2);
+            //return df.MemoPadProc(wnd, msg, p1, p2);
         }
     }
-    return df.FALSE;
+    return mp.DefaultWndProc(wnd, msg, p1, p2);
 }
 
 // --- The New command. Open an empty editor window ---

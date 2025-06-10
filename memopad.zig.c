@@ -14,7 +14,7 @@ static void SaveFile(WINDOW, int);
 static void DeleteFile(WINDOW);
 int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
 static char *NameComponent(char *);
-static void FixTabMenu(void);
+void FixTabMenu(void);
 void Calendar(WINDOW);
 void BarChart(WINDOW);
 
@@ -238,13 +238,7 @@ static char *NameComponent(char *FileName)
     return Fname + 1;
 }
 
-static char *ports[] = {
-	"Lpt1",	"Lpt2",	"Lpt3",
-	"Com1",	"Com2",	"Com3",	"Com4",
- 	 NULL
-};
-
-static void FixTabMenu(void)
+void FixTabMenu(void)
 {
 	char *cp = GetCommandText(&MainMenu, ID_TABS);
 	if (cp != NULL)	{
