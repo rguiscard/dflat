@@ -135,7 +135,7 @@ pub fn build(b: *std.Build) void {
     });
     memopad_mod.addCSourceFiles(.{ .files = &.{
             "memopad.zig.c",
-            "menus.c",
+            "menus.zig.c",
         },
         .flags = &flags,
     });
