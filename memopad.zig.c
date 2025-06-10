@@ -11,11 +11,11 @@ static int wndpos;
 
 int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
 void OpenPadWindow(WINDOW, char *);
-static void LoadFile(WINDOW);
+void SendTextMessage(WINDOW, char *);
 static void PrintPad(WINDOW);
 static void SaveFile(WINDOW, int);
 static void DeleteFile(WINDOW);
-static int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
+int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
 static char *NameComponent(char *);
 static int PrintSetupProc(WINDOW, MESSAGE, PARAM, PARAM);
 static void FixTabMenu(void);
@@ -118,68 +118,12 @@ int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
     return DefaultWndProc(wnd, msg, p1, p2);
 }
 
-/* --- open a document window and load a file --- */
-void OpenPadWindow(WINDOW wnd, char *FileName)
+/* Caller is reponsible for free buf
+ * Keep this in c because casting to PARAM does not work. */
+void SendTextMessage(WINDOW wnd, char *buf)
 {
-    static WINDOW wnd1 = NULL;
-	WINDOW wwnd;
-    char *Fname = FileName;
-    if (strcmp(FileName, Untitled) != 0) {
-        struct stat sb;
-        if (stat(FileName, &sb) < 0 || !S_ISREG(sb.st_mode)) {
-            char errmsg[MAXPATH];
-            sprintf(errmsg, "No such file as\n%s", FileName);
-            ErrorMessage(errmsg);
-            return;
-        }
-        Fname = NameComponent(FileName);
-    }
-	wwnd = WatchIcon();
-    wndpos += 2;
-    if (wndpos == 20)
-        wndpos = 2;
-    wnd1 = CreateWindow(EDITBOX,
-                Fname,
-                (wndpos-1)*2, wndpos, 10, 40,
-                NULL, wnd, OurEditorProc,
-                SHADOW     |
-                MINMAXBOX  |
-                CONTROLBOX |
-                VSCROLLBAR |
-                HSCROLLBAR |
-                MOVEABLE   |
-                HASBORDER  |
-                SIZEABLE   |
-                MULTILINE
-    );
-    if (strcmp(FileName, Untitled))    {
-        wnd1->extension = DFmalloc(strlen(FileName)+1);
-        strcpy(wnd1->extension, FileName);
-        LoadFile(wnd1);
-    }
-	SendMessage(wwnd, CLOSE_WINDOW, 0, 0);
-    SendMessage(wnd1, SETFOCUS, TRUE, 0);
-}
-/* --- Load the notepad file into the editor text buffer --- */
-static void LoadFile(WINDOW wnd)
-{
-    char *Buf = NULL;
-	int recptr = 0;
-    FILE *fp;
-
-    if ((fp = fopen(wnd->extension, "rt")) != NULL)    {
-		while (!feof(fp))	{
-			handshake();
-			Buf = DFrealloc(Buf, recptr+150);       //FIXME rewrite for ELKS
-			memset(Buf+recptr, 0, 150);
-        	fgets(Buf+recptr, 150, fp);
-			recptr += strlen(Buf+recptr);
-		}
-        fclose(fp);
-		if (Buf != NULL)	{
-	        SendMessage(wnd, SETTEXT, (PARAM) Buf, 0);
-		    free(Buf);
-		}
+    if (buf != NULL)	{
+        SendMessage(wnd, SETTEXT, (PARAM) buf, 0);
     }
 }
 
@@ -303,7 +247,7 @@ static void ShowPosition(WINDOW wnd)
     SendMessage(GetParent(wnd), ADDSTATUS, (PARAM) status, 0);
 }
 /* ----- window processing module for the editboxes ----- */
-static int OurEditorProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
+int OurEditorProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 {
     int rtn;
     switch (msg)    {
