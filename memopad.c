@@ -4,7 +4,7 @@
 
 extern DBOX PrintSetup;
 
-char DFlatApplication[] = "MemoPad";
+char DFlatApplication[] = "memopad"; // lowercase for help file
 
 static char Untitled[] = "Untitled";
 static int wndpos;

@@ -465,10 +465,12 @@ CONFIG cfg = {
 
 void BuildFileName(char *path, const char *fn, const char *ext)
 {
-    char *cp;
+    char *cp = NULL;
 
+    if(Argv) {
 	strcpy(path, Argv[0]);
 	cp = strrchr(path, '\\');
+    }
 	if (cp == NULL)
 		cp = path;
 	else 

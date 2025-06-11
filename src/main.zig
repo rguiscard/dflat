@@ -1,5 +1,6 @@
 const df = mp.df;
 
+var DFlatApplication = [_:0]u8{'m', 'e', 'm', 'o', 'p', 'a', 'd'};
 var untitled = [_:0]u8{'U', 'n', 't', 'i', 't', 'l', 'e', 'd'};
 const sUntitled = "Untitled";
 var wndpos: c_int = 0;
@@ -12,6 +13,7 @@ pub fn main() !void {
         return;
 
     // Argv = argv;
+    df.Argv = null;
     // if (!LoadConfig())
     //     cfg.ScreenLines = SCREENHEIGHT;
 
@@ -30,7 +32,7 @@ pub fn main() !void {
 
     const win = mp.Window.init(wnd);
 
-    // LoadHelpFile(DFlatApplication);
+    df.LoadHelpFile(&DFlatApplication);
 
     _ = mp.msg.SendMessage(win, df.SETFOCUS, df.TRUE, 0);
 
