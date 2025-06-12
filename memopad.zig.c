@@ -10,103 +10,21 @@ static int wndpos;
 int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
 void OpenPadWindow(WINDOW, char *);
 void SendTextMessage(WINDOW, char *);
-static void SaveFile(WINDOW, int);
-static void DeleteFile(WINDOW);
+void SaveFile(WINDOW, int);
+void DeleteFile(WINDOW);
 int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
 static char *NameComponent(char *);
 void FixTabMenu(void);
 void Calendar(WINDOW);
 void BarChart(WINDOW);
 
-#define CHARSLINE 80
-#define LINESPAGE 66
+extern DBOX MsgBox;
+int MessageBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
-/* ------- window processing module for the
-                    memopad application window ----- */
-int MemoPadProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
-{
-	int rtn;
-    switch (msg)    {
-		case CREATE_WINDOW:
-		    rtn = DefaultWndProc(wnd, msg, p1, p2);
-			if (cfg.InsertMode)
-				SetCommandToggle(&MainMenu, ID_INSERT);
-			if (cfg.WordWrap)
-				SetCommandToggle(&MainMenu, ID_WRAP);
-			FixTabMenu();
-			return rtn;
-        case COMMAND:
-            switch ((int)p1)    {
-                case ID_SAVE:
-                    SaveFile(inFocus, FALSE);
-                    return TRUE;
-                case ID_SAVEAS:
-                    SaveFile(inFocus, TRUE);
-                    return TRUE;
-                case ID_DELETEFILE:
-                    DeleteFile(inFocus);
-                    return TRUE;
-				case ID_EXIT:	
-					if (!YesNoBox("Exit Memopad?"))
-						return FALSE;
-					break;
-				case ID_WRAP:
-			        cfg.WordWrap = GetCommandToggle(&MainMenu, ID_WRAP);
-    	            return TRUE;
-				case ID_INSERT:
-			        cfg.InsertMode = GetCommandToggle(&MainMenu, ID_INSERT);
-    	            return TRUE;
-				case ID_TAB2:
-					cfg.Tabs = 2;
-					FixTabMenu();
-                    return TRUE;
-				case ID_TAB4:
-					cfg.Tabs = 4;
-					FixTabMenu();
-                    return TRUE;
-				case ID_TAB6:
-					cfg.Tabs = 6;					
-					FixTabMenu();
-                    return TRUE;
-				case ID_TAB8:
-					cfg.Tabs = 8;
-					FixTabMenu();
-                    return TRUE;
-				case ID_CALENDAR:
-					Calendar(wnd);
-					return TRUE;
-#ifdef INCLUDE_PICTUREBOX
-				case ID_BARCHART:
-					BarChart(wnd);
-					return TRUE;
-#endif
-                case ID_ABOUT:
-                    MessageBox(
-                         "About D-Flat and the MemoPad",
-                        "   ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿\n"
-                        "   ³    ÜÜÜ   ÜÜÜ     Ü    ³\n"
-                        "   ³    Û  Û  Û  Û    Û    ³\n"
-                        "   ³    Û  Û  Û  Û    Û    ³\n"
-                        "   ³    Û  Û  Û  Û Û  Û    ³\n"
-                        "   ³    ßßß   ßßß   ßß     ³\n"
-                        "   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ\n"
-                        "D-Flat implements the SAA/CUA\n"
-                        "interface in a public domain\n"
-                        "C language library originally\n"
-                        "published in Dr. Dobb's Journal\n"
-                        "    ------------------------ \n"
-                        "MemoPad is a multiple document\n"
-                        "editor that demonstrates D-Flat");
-                    return TRUE;
-                default:
-                    break;
-            }
-            break;
-        default:
-            break;
-    }
-    return DefaultWndProc(wnd, msg, p1, p2);
-}
+/* return MESSAGEBOX */
+DBOX c_MsgBox() {
+    return MsgBox;
+};
 
 /* Caller is reponsible for free buf
  * Keep this in c because casting to PARAM does not work. */
@@ -118,7 +36,7 @@ void SendTextMessage(WINDOW wnd, char *buf)
 }
 
 /* ---------- save a file to disk ------------ */
-static void SaveFile(WINDOW wnd, int Saveas)
+void SaveFile(WINDOW wnd, int Saveas)
 {
     FILE *fp;
     if (wnd->extension == NULL || Saveas)    {
@@ -145,7 +63,7 @@ static void SaveFile(WINDOW wnd, int Saveas)
     }
 }
 /* -------- delete a file ------------ */
-static void DeleteFile(WINDOW wnd)
+void DeleteFile(WINDOW wnd)
 {
     if (wnd->extension != NULL)    {
         if (strcmp(wnd->extension, Untitled))    {

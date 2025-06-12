@@ -74,8 +74,73 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                         return df.FALSE;
                     }
                 },
+                df.ID_SAVE => {
+                    df.SaveFile(df.inFocus, df.FALSE);
+                    return df.TRUE;
+                },
+                df.ID_SAVEAS => {
+                    df.SaveFile(df.inFocus, df.TRUE);
+                    return df.TRUE;
+                },
+                df.ID_DELETEFILE => {
+                    df.DeleteFile(df.inFocus);
+                    return df.TRUE;
+                },
+                df.ID_WRAP => {
+                    df.cfg.WordWrap = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
+                    return df.TRUE;
+                },
+                df.ID_INSERT => {
+                    df.cfg.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
+                    return df.TRUE;
+                },
+                df.ID_TAB2 => {
+                    df.cfg.Tabs = 2;
+                    df.FixTabMenu();
+                    return df.TRUE;
+                },
+                df.ID_TAB4 => {
+                    df.cfg.Tabs = 4;
+                    df.FixTabMenu();
+                    return df.TRUE;
+                },
+                df.ID_TAB6 => {
+                    df.cfg.Tabs = 6;
+                    df.FixTabMenu();
+                    return df.TRUE;
+                },
+                df.ID_TAB8 => {
+                    df.cfg.Tabs = 8;
+                    df.FixTabMenu();
+                    return df.TRUE;
+                },
+                df.ID_CALENDAR => {
+                    df.Calendar(wnd);
+                    return df.TRUE;
+                },
+                df.ID_BARCHART => {
+                    df.BarChart(wnd);
+                    return df.TRUE;
+                },
+                df.ID_EXIT => {
+                    if (mp.msgbox.YesNoBox("Exit Memopad?") == false)
+                        return df.FALSE;
+                },
+                df.ID_ABOUT => {
+                    const message =
+                        \\D-Flat implements the SAA/CUA
+                        \\interface in a public domain
+                        \\C language library originally
+                        \\published in Dr. Dobb's Journal
+                        \\------------------------
+                        \\MemoPad is a multiple document
+                        \\editor that demonstrates D-Flat
+                    ;
+                    _ = mp.msgbox.MessageBox("About D-Flat and the MemoPad", message);
+                    return df.TRUE;
+                },
                 else => {
-                    return df.MemoPadProc(wnd, msg, p1, p2);
+                    // return df.MemoPadProc(wnd, msg, p1, p2);
                 }
             }
         },

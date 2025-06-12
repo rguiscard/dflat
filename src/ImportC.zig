@@ -1,4 +1,5 @@
 pub const df = @cImport({
+    @cDefine("BUILD_FULL_DFLAT", {});
     @cInclude("dflat.h");
     @cInclude("memopad.zig.h");
 });
