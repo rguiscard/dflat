@@ -26,15 +26,6 @@ DBOX c_MsgBox() {
     return MsgBox;
 };
 
-/* Caller is reponsible for free buf
- * Keep this in c because casting to PARAM does not work. */
-void SendTextMessage(WINDOW wnd, char *buf)
-{
-    if (buf != NULL)	{
-        SendMessage(wnd, SETTEXT, (PARAM) buf, 0);
-    }
-}
-
 /* ---------- save a file to disk ------------ */
 void SaveFile(WINDOW wnd, int Saveas)
 {

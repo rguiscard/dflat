@@ -232,7 +232,7 @@ fn LoadFile(wnd: df.WINDOW, filename: []const u8) void {
     if (std.fs.cwd().readFileAlloc(allocator, filename, 1_048_576)) |content| {
         defer allocator.free(content);
         const buf:[*c]u8 = content.ptr;
-        df.SendTextMessage(wnd, buf);
+        _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(buf)), 0);
     } else |_| {
     }
 }
