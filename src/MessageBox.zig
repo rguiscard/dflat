@@ -59,6 +59,25 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
     return rtn;
 }
 
+pub fn MomentaryMessage(message: []const u8) df.WINDOW {
+    const m:[*c]u8 = @constCast(message.ptr);
+    const wnd = df.CreateWindow(
+                    df.TEXTBOX,
+                    null,
+                    -1,-1,df.MsgHeight(m)+2,df.MsgWidth(m)+2,
+                    df.NULL,null,null,
+                    df.HASBORDER | df.SHADOW | df.SAVESELF);
+    _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(m)), 0);
+    if (df.cfg.mono == 0) {
+        wnd.*.WindowColors[df.STD_COLOR][df.FG] = df.WHITE;
+        wnd.*.WindowColors[df.STD_COLOR][df.BG] = df.GREEN;
+        wnd.*.WindowColors[df.FRAME_COLOR][df.FG] = df.WHITE;
+        wnd.*.WindowColors[df.FRAME_COLOR][df.BG] = df.GREEN;
+    }
+    _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
+    return wnd;
+}
+
 fn YesNoBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch (message) {
         df.CREATE_WINDOW => {

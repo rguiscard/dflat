@@ -75,15 +75,15 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     }
                 },
                 df.ID_SAVE => {
-                    df.SaveFile(df.inFocus, df.FALSE);
+                    SaveFile(df.inFocus, df.FALSE);
                     return df.TRUE;
                 },
                 df.ID_SAVEAS => {
-                    df.SaveFile(df.inFocus, df.TRUE);
+                    SaveFile(df.inFocus, df.TRUE);
                     return df.TRUE;
                 },
                 df.ID_DELETEFILE => {
-                    df.DeleteFile(df.inFocus);
+                    DeleteFile(df.inFocus);
                     return df.TRUE;
                 },
                 df.ID_WRAP => {
@@ -234,6 +234,67 @@ fn LoadFile(wnd: df.WINDOW, filename: []const u8) void {
         const buf:[*c]u8 = content.ptr;
         _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(buf)), 0);
     } else |_| {
+    }
+}
+
+// ---------- save a file to disk ------------ 
+fn SaveFile(wnd: df.WINDOW, Saveas: c_int) void {
+    var fspec = [_:0]u8{ '*'};
+    var filename: [df.MAXPATH]u8 = undefined;
+    if ((wnd.*.extension == null) or (Saveas == 1)) {
+        if (df.SaveAsDialogBox(&fspec, null, &filename) == df.TRUE) {
+            if (wnd.*.extension != df.NULL) {
+                df.free(wnd.*.extension);
+            }
+            if (std.fs.cwd().realpathAlloc(allocator, ".")) |_| {
+                wnd.*.extension = df.DFmalloc(df.strlen(&filename)+1);
+                const ext:[*c]u8 = @ptrCast(wnd.*.extension);
+                _ = df.strcpy(ext, &filename);
+                df.AddTitle(wnd, df.NameComponent(&filename));
+                _ = df.SendMessage(wnd, df.BORDER, 0, 0);
+            } else |_| {
+            }
+        } else {
+            return;
+        }
+    }
+    if (wnd.*.extension != df.NULL) {
+        const message:[]const u8 = "Saving the file";
+        const mwnd = mp.msgbox.MomentaryMessage(message);
+
+        const extension:[*c]u8 = @ptrCast(wnd.*.extension);
+        const path:[:0]const u8 = std.mem.span(extension);
+        const text:[*c]u8 = @ptrCast(wnd.*.text);
+        const data:[:0]const u8 = std.mem.span(text);
+        if (std.fs.cwd().writeFile(.{.sub_path = path, .data = data})) {
+            wnd.*.TextChanged = df.FALSE;
+        } else |_| {
+        }
+
+        _ = df.SendMessage(mwnd, df.CLOSE_WINDOW, 0, 0);
+    }
+}
+
+// -------- delete a file ------------
+fn DeleteFile(wnd: df.WINDOW) void {
+    const extension:[*c]u8 = @ptrCast(wnd.*.extension);
+    if (extension != null)    {
+        const path:[:0]const u8 = std.mem.span(extension);
+        if (std.mem.eql(u8, path, sUntitled) == false) {
+            const fname:[*c]u8 = @ptrCast(df.NameComponent(extension));
+            if (fname != null) {
+                if (std.fmt.allocPrint(allocator, "Delete {s} ?", .{path})) |message| {
+                    defer allocator.free(message);
+                    if (mp.msgbox.YesNoBox(message) == true) {
+                        if (std.fs.cwd().deleteFileZ(path)) |_| {
+                        } else |_| {
+                        }
+                        _ = df.SendMessage(wnd, df.CLOSE_WINDOW, 0, 0);
+                    }
+                } else |_| {
+                }
+            }
+        }
     }
 }
 

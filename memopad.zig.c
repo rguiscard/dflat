@@ -13,7 +13,7 @@ void SendTextMessage(WINDOW, char *);
 void SaveFile(WINDOW, int);
 void DeleteFile(WINDOW);
 int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
-static char *NameComponent(char *);
+char *NameComponent(char *);
 void FixTabMenu(void);
 void Calendar(WINDOW);
 void BarChart(WINDOW);
@@ -26,50 +26,6 @@ DBOX c_MsgBox() {
     return MsgBox;
 };
 
-/* ---------- save a file to disk ------------ */
-void SaveFile(WINDOW wnd, int Saveas)
-{
-    FILE *fp;
-    if (wnd->extension == NULL || Saveas)    {
-        char FileName[MAXPATH];
-        if (SaveAsDialogBox("*", NULL, FileName))    {
-            if (wnd->extension != NULL)
-                free(wnd->extension);
-            wnd->extension = DFmalloc(strlen(FileName)+1);
-            strcpy(wnd->extension, FileName);
-            AddTitle(wnd, NameComponent(FileName));
-            SendMessage(wnd, BORDER, 0, 0);
-        }
-        else
-            return;
-    }
-    if (wnd->extension != NULL)    {
-        WINDOW mwnd = MomentaryMessage("Saving the file");
-        if ((fp = fopen(wnd->extension, "wt")) != NULL)    {
-            fwrite(GetText(wnd), strlen(GetText(wnd)), 1, fp);
-            fclose(fp);
-            wnd->TextChanged = FALSE;
-        }
-        SendMessage(mwnd, CLOSE_WINDOW, 0, 0);
-    }
-}
-/* -------- delete a file ------------ */
-void DeleteFile(WINDOW wnd)
-{
-    if (wnd->extension != NULL)    {
-        if (strcmp(wnd->extension, Untitled))    {
-            char *fn = NameComponent(wnd->extension);
-            if (fn != NULL)    {
-                char msg[30];
-                sprintf(msg, "Delete %s?", fn);
-                if (YesNoBox(msg))    {
-                    unlink(wnd->extension);
-                    SendMessage(wnd, CLOSE_WINDOW, 0, 0);
-                }
-            }
-        }
-    }
-}
 /* ------ display the row and column in the statusbar ------ */
 static void ShowPosition(WINDOW wnd)
 {
@@ -139,7 +95,7 @@ int OurEditorProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
     return DefaultWndProc(wnd, msg, p1, p2);
 }
 /* -- point to the name component of a file specification -- */
-static char *NameComponent(char *FileName)
+char *NameComponent(char *FileName)
 {
     char *Fname;
     if ((Fname = strrchr(FileName, '/')) == NULL)
