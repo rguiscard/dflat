@@ -10,8 +10,6 @@ static int wndpos;
 int MemoPadProc(WINDOW, MESSAGE, PARAM, PARAM);
 void OpenPadWindow(WINDOW, char *);
 void SendTextMessage(WINDOW, char *);
-void SaveFile(WINDOW, int);
-void DeleteFile(WINDOW);
 int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
 char *NameComponent(char *);
 void FixTabMenu(void);

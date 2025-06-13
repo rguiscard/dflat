@@ -17,7 +17,7 @@ pub fn main() !void {
     // if (!LoadConfig())
     //     cfg.ScreenLines = SCREENHEIGHT;
 
-    const wnd = df.CreateWindow(df.APPLICATION,
+    const wnd = df.CreateWindow(df.APPLICATION, // Win
                         "D-Flat MemoPad",
                         0, 0, -1, -1,
                         &df.MainMenu,
@@ -30,11 +30,11 @@ pub fn main() !void {
                         df.HASSTATUSBAR
                         );
 
-    const win = mp.Window.init(wnd);
+    var win = mp.Window.init(wnd, allocator);
 
     df.LoadHelpFile(&DFlatApplication);
 
-    _ = mp.msg.SendMessage(win, df.SETFOCUS, df.TRUE, 0);
+    _ = win.sendMessage(df.SETFOCUS, df.TRUE, 0);
 
     // while (argc > 1)    {
     //     OpenPadWindow(wnd, argv[1]);
@@ -51,6 +51,8 @@ pub fn main() !void {
 // ------- window processing module for the
 //                    memopad application window -----
 fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    const win:*mp.Window = @constCast(@fieldParentPtr("win", &wnd));
+
     switch(msg) {
         df.CREATE_WINDOW => {
             const rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
@@ -64,7 +66,7 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
         df.COMMAND => {
             switch(p1) {
                 df.ID_NEW => {
-                    NewFile(wnd);
+                    NewFile(win);
                     return df.TRUE;
                 },
                 df.ID_OPEN => {
@@ -152,8 +154,8 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
 }
 
 // --- The New command. Open an empty editor window ---
-fn NewFile(wnd: df.WINDOW) void {
-    OpenPadWindow(wnd, sUntitled);
+fn NewFile(win: *mp.Window) void {
+    OpenPadWindow(win.win, sUntitled);
 }
 
 // --- The Open... command. Select a file  ---
@@ -196,10 +198,12 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
     }
 
     const wwnd = df.WatchIcon();
+    var wwin = mp.Window.init(wwnd, allocator);
+
     wndpos += 2;
     if (wndpos == 20)
         wndpos = 2;
-    const wnd1 = df.CreateWindow(df.EDITBOX,
+    const wnd1 = df.CreateWindow(df.EDITBOX, // Win
                 fname.ptr,
                 (wndpos-1)*2, wndpos, 10, 40,
                 null, wnd, df.OurEditorProc,
@@ -214,25 +218,26 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
                 df.MULTILINE
     );
 
-    if (std.mem.eql(u8, fname, sUntitled) == false) {
-        wnd1.*.extension = df.DFmalloc(fname.len+1);
-        const ext:[*c]u8 = @ptrCast(wnd1.*.extension);
-        // wnd.extension is used to store filename.
-        // it is also be used to compared already opened files.
-        _ = df.strcpy(ext, fname.ptr);
+    var win1 = mp.Window.init(wnd1, allocator);
 
-        LoadFile(wnd1, fname);
+    if (std.mem.eql(u8, fname, sUntitled) == false) {
+        if (win1.setTitle(filename)) |_| {
+        } else |_| {
+        }
+
+        LoadFile(win1, fname);
     }
-    _ = df.SendMessage(wwnd, df.CLOSE_WINDOW, 0, 0);
-    _ = df.SendMessage(wnd1, df.SETFOCUS, df.TRUE, 0);
+
+    _ = wwin.sendMessage(df.CLOSE_WINDOW, 0, 0);
+    _ = win1.sendMessage(df.SETFOCUS, df.TRUE, 0);
 }
 
 // --- Load the notepad file into the editor text buffer ---
-fn LoadFile(wnd: df.WINDOW, filename: []const u8) void {
+fn LoadFile(win: mp.Window, filename: []const u8) void {
+    var w = win;
     if (std.fs.cwd().readFileAlloc(allocator, filename, 1_048_576)) |content| {
         defer allocator.free(content);
-        const buf:[*c]u8 = content.ptr;
-        _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(buf)), 0);
+        _ = w.sendTextMessage(df.SETTEXT, content, 0);
     } else |_| {
     }
 }
