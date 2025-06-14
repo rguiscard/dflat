@@ -17,6 +17,8 @@ void Calendar(WINDOW);
 void BarChart(WINDOW);
 
 extern DBOX MsgBox;
+extern DBOX FileOpen;
+extern DBOX SaveAs;
 int MessageBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 /* return MESSAGEBOX */
@@ -24,8 +26,16 @@ DBOX c_MsgBox() {
     return MsgBox;
 };
 
+DBOX c_FileOpen() {
+    return FileOpen;
+};
+
+DBOX c_SaveAs() {
+    return SaveAs;
+};
+
 /* ------ display the row and column in the statusbar ------ */
-static void ShowPosition(WINDOW wnd)
+void ShowPosition(WINDOW wnd)
 {
     char status[30];
     sprintf(status, "Line:%4d  Column: %2d",

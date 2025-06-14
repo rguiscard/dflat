@@ -77,11 +77,11 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     }
                 },
                 df.ID_SAVE => {
-                    SaveFile(df.inFocus, df.FALSE);
+                    SaveFile(df.inFocus, false);
                     return df.TRUE;
                 },
                 df.ID_SAVEAS => {
-                    SaveFile(df.inFocus, df.TRUE);
+                    SaveFile(df.inFocus, true);
                     return df.TRUE;
                 },
                 df.ID_DELETEFILE => {
@@ -160,10 +160,10 @@ fn NewFile(win: *mp.Window) void {
 
 // --- The Open... command. Select a file  ---
 fn SelectFile(wnd: df.WINDOW) !void {
-    var fspec = [_:0]u8{ '*'};
+    const fspec = "*";
     var filename: [df.MAXPATH]u8 = undefined;
 
-   if (df.OpenFileDialogBox(&fspec, &filename) > 0) {
+    if (mp.fileopen.OpenFileDialogBox(fspec, &filename)) {
         // --- see if the document is already in a window ---
         var wnd1:df.WINDOW = df.FirstWindow(wnd);
         while (wnd1 != null)    {
@@ -206,7 +206,7 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
     const wnd1 = df.CreateWindow(df.EDITBOX, // Win
                 fname.ptr,
                 (wndpos-1)*2, wndpos, 10, 40,
-                null, wnd, df.OurEditorProc,
+                null, wnd, OurEditorProc,
                 df.SHADOW     |
                 df.MINMAXBOX  |
                 df.CONTROLBOX |
@@ -243,11 +243,11 @@ fn LoadFile(win: mp.Window, filename: []const u8) void {
 }
 
 // ---------- save a file to disk ------------ 
-fn SaveFile(wnd: df.WINDOW, Saveas: c_int) void {
-    var fspec = [_:0]u8{ '*'};
+fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
+    const fspec = "*";
     var filename: [df.MAXPATH]u8 = undefined;
-    if ((wnd.*.extension == null) or (Saveas == 1)) {
-        if (df.SaveAsDialogBox(&fspec, null, &filename) == df.TRUE) {
+    if ((wnd.*.extension == null) or (Saveas == true)) {
+        if (mp.fileopen.SaveAsDialogBox(fspec, null, &filename)) {
             if (wnd.*.extension != df.NULL) {
                 df.free(wnd.*.extension);
             }
@@ -265,7 +265,7 @@ fn SaveFile(wnd: df.WINDOW, Saveas: c_int) void {
     }
     if (wnd.*.extension != df.NULL) {
         const message:[]const u8 = "Saving the file";
-        const mwnd = mp.msgbox.MomentaryMessage(message);
+        var mwin = mp.msgbox.MomentaryMessage(message, allocator);
 
         const extension:[*c]u8 = @ptrCast(wnd.*.extension);
         const path:[:0]const u8 = std.mem.span(extension);
@@ -276,7 +276,7 @@ fn SaveFile(wnd: df.WINDOW, Saveas: c_int) void {
         } else |_| {
         }
 
-        _ = df.SendMessage(mwnd, df.CLOSE_WINDOW, 0, 0);
+        _ = mwin.sendMessage(df.CLOSE_WINDOW, 0, 0);
     }
 }
 
@@ -302,6 +302,75 @@ fn DeleteFile(wnd: df.WINDOW) void {
         }
     }
 }
+
+// ----- window processing module for the editboxes -----
+fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    var rtn:c_int = 0;
+    const param:isize = @intCast(p1);
+    switch (msg) {
+        df.SETFOCUS => {
+            if (param > 0) {
+                wnd.*.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
+                wnd.*.WordWrapMode = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
+            }
+            rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
+            if (param == 0) {
+                _ = df.SendMessage(df.GetParent(wnd), df.ADDSTATUS, 0, 0);
+            } else {
+                df.ShowPosition(wnd);
+            }
+            return rtn;
+        },
+        df.KEYBOARD_CURSOR => {
+            rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
+            df.ShowPosition(wnd);
+            return rtn;
+        },
+        df.COMMAND => {
+            switch(param) {
+                df.ID_HELP => {
+                    const helpfile:[:0]const u8 = "MEMOPADDOC";
+                    _ = df.DisplayHelp(wnd, @constCast(helpfile.ptr));
+                    return df.TRUE;
+                },
+                df.ID_WRAP => {
+                    _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_WRAP, 0);
+                    wnd.*.WordWrapMode = df.cfg.WordWrap;
+                },
+                df.ID_INSERT => {
+                    _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_INSERT, 0);
+                    wnd.*.InsertMode = df.cfg.InsertMode;
+                    _ = df.SendMessage(null, df.SHOW_CURSOR, wnd.*.InsertMode, 0);
+                },
+                else => {
+                }
+            }
+        },
+        df.CLOSE_WINDOW => {
+            if (wnd.*.TextChanged > 0)    {
+                _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
+                const tl:[*c]u8 = @ptrCast(wnd.*.title);
+                const title:[:0]const u8 = std.mem.span(tl);
+                if (std.fmt.allocPrint(allocator, "{s}\nText changed. Save it ?", .{title})) |message| {
+                    defer allocator.free(message);
+                    if (mp.msgbox.YesNoBox(message) == true) {
+                        _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_SAVE, 0);
+                    }
+                } else |_| {
+                }
+            }
+            wndpos = 0;
+            if (wnd.*.extension != df.NULL)    {
+                df.free(wnd.*.extension);
+                wnd.*.extension = df.NULL;
+            }
+        },
+        else => {
+        }
+    }
+    return mp.DefaultWndProc(wnd, msg, p1, p2);
+}
+
 
 const std = @import("std");
 

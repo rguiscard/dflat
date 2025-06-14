@@ -1,6 +1,7 @@
 const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
+const Window = @import("Window.zig");
 
 pub fn MessageBox(title: []const u8, message: []const u8) bool {
     const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
@@ -59,7 +60,7 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
     return rtn;
 }
 
-pub fn MomentaryMessage(message: []const u8) df.WINDOW {
+pub fn MomentaryMessage(message: []const u8, allocator: std.mem.Allocator) Window {
     const m:[*c]u8 = @constCast(message.ptr);
     const wnd = df.CreateWindow(
                     df.TEXTBOX,
@@ -67,6 +68,7 @@ pub fn MomentaryMessage(message: []const u8) df.WINDOW {
                     -1,-1,df.MsgHeight(m)+2,df.MsgWidth(m)+2,
                     df.NULL,null,null,
                     df.HASBORDER | df.SHADOW | df.SAVESELF);
+    const win = Window.init(wnd, allocator);
     _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(m)), 0);
     if (df.cfg.mono == 0) {
         wnd.*.WindowColors[df.STD_COLOR][df.FG] = df.WHITE;
@@ -75,7 +77,7 @@ pub fn MomentaryMessage(message: []const u8) df.WINDOW {
         wnd.*.WindowColors[df.FRAME_COLOR][df.BG] = df.GREEN;
     }
     _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
-    return wnd;
+    return win;
 }
 
 fn YesNoBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {

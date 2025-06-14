@@ -9,6 +9,7 @@ pub const df = @import("ImportC.zig").df;
 pub const Window = @import("Window.zig");
 pub const msg = @import("Message.zig");
 pub const msgbox = @import("MessageBox.zig");
+pub const fileopen = @import("FileOpen.zig");
 
 pub fn BaseWndProc(klass: df.CLASS, wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) c_int {
     const base_class = df.classdefs[@intCast(klass)].base;

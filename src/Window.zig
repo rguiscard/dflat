@@ -16,7 +16,7 @@ pub fn init(wnd: df.WINDOW, allocator: std.mem.Allocator) TopLevelFields {
     };
 }
 
-// This set with win.title and wnd.title
+// This set with win.title and wnd.ext as filename
 pub fn setTitle(self: *TopLevelFields, filename: []const u8) !void {
     if (self.title != null) {
         self.allocator.free(filename);

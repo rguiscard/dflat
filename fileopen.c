@@ -2,8 +2,8 @@
 
 #include "dflat.h"
 
-static BOOL DlgFileOpen(char *, char *, char *, DBOX *);
-static int DlgFnOpen(WINDOW, MESSAGE, PARAM, PARAM);
+BOOL DlgFileOpen(char *, char *, char *, DBOX *);
+int DlgFnOpen(WINDOW, MESSAGE, PARAM, PARAM);
 static void InitDlgBox(WINDOW);
 static void StripPath(char *);
 static BOOL IncompleteFilename(char *);
@@ -32,7 +32,7 @@ BOOL SaveAsDialogBox(char *Fspec, char *Sspec, char *Fname)
 }
 
 /* --------- generic file open ---------- */
-static BOOL DlgFileOpen(char *Fspec, char *Sspec, char *Fname, DBOX *db)
+BOOL DlgFileOpen(char *Fspec, char *Sspec, char *Fname, DBOX *db)
 {
     BOOL rtn;
 
@@ -48,7 +48,7 @@ static BOOL DlgFileOpen(char *Fspec, char *Sspec, char *Fname, DBOX *db)
 /*
  *  Process dialog box messages
  */
-static int DlgFnOpen(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
+int DlgFnOpen(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 {
     switch (msg)    {
         case CREATE_WINDOW:    {
