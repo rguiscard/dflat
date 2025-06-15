@@ -1,5 +1,3 @@
-void OpenPadWindow(WINDOW wnd, char *FileName);
-int OurEditorProc(WINDOW, MESSAGE, PARAM, PARAM);
 void FixTabMenu(void);
 char *NameComponent(char *);
 void ShowPosition(WINDOW);
