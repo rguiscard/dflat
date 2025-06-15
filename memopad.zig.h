@@ -11,5 +11,6 @@ DBOX c_MsgBox();
 DBOX c_FileOpen();
 DBOX c_SaveAs();
 
-BOOL DlgFileOpen(char *, char *, char *, DBOX *);
-int DlgFnOpen(WINDOW, MESSAGE, PARAM, PARAM);
+BOOL BuildFileList(WINDOW, char *);
+void BuildDirectoryList(WINDOW);
+void BuildPathDisplay(WINDOW);

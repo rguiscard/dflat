@@ -160,13 +160,13 @@ fn NewFile(win: *mp.Window) void {
 
 // --- The Open... command. Select a file  ---
 fn SelectFile(wnd: df.WINDOW) !void {
-    const fspec = "*";
-    var filename: [df.MAXPATH]u8 = undefined;
+    const fspec:[:0]const u8 = "*";
+    var filename = std.mem.zeroes([1024]u8);
 
-    if (mp.fileopen.OpenFileDialogBox(fspec, &filename)) {
+    if (mp.fileopen.OpenFileDialogBox(allocator, fspec, &filename)) {
         // --- see if the document is already in a window ---
         var wnd1:df.WINDOW = df.FirstWindow(wnd);
-        while (wnd1 != null)    {
+        while (wnd1 != null) {
             if (wnd1.*.extension) |extension| {
                 const ext:[*c]const u8 = @ptrCast(extension);
                 if (df.strcasecmp(&filename, ext) == 0) {
@@ -179,8 +179,11 @@ fn SelectFile(wnd: df.WINDOW) !void {
         }
 
         var filename_it = std.mem.splitScalar(u8, &filename, 0);
-        const Fname = filename_it.first();
-        OpenPadWindow(wnd, Fname);
+        if (allocator.dupe(u8, filename_it.first())) |f| {
+            // should free
+            OpenPadWindow(wnd, f);
+        } else |_| {
+        }
     }
 }
 
@@ -244,14 +247,15 @@ fn LoadFile(win: mp.Window, filename: []const u8) void {
 
 // ---------- save a file to disk ------------ 
 fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
-    const fspec = "*";
+    const fspec:[:0]const u8 = "*";
     var filename: [df.MAXPATH]u8 = undefined;
     if ((wnd.*.extension == null) or (Saveas == true)) {
-        if (mp.fileopen.SaveAsDialogBox(fspec, null, &filename)) {
+        if (mp.fileopen.SaveAsDialogBox(allocator, fspec, null, &filename)) {
             if (wnd.*.extension != df.NULL) {
                 df.free(wnd.*.extension);
             }
             if (std.fs.cwd().realpathAlloc(allocator, ".")) |_| {
+                // should free
                 wnd.*.extension = df.DFmalloc(df.strlen(&filename)+1);
                 const ext:[*c]u8 = @ptrCast(wnd.*.extension);
                 _ = df.strcpy(ext, &filename);
@@ -270,7 +274,7 @@ fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
         const extension:[*c]u8 = @ptrCast(wnd.*.extension);
         const path:[:0]const u8 = std.mem.span(extension);
         const text:[*c]u8 = @ptrCast(wnd.*.text);
-        const data:[:0]const u8 = std.mem.span(text);
+        const data:[]const u8 = std.mem.span(text);
         if (std.fs.cwd().writeFile(.{.sub_path = path, .data = data})) {
             wnd.*.TextChanged = df.FALSE;
         } else |_| {
