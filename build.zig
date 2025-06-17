@@ -133,12 +133,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .link_libc = true,
     });
-//    memopad_mod.addCSourceFiles(.{ .files = &.{
-//            "memopad.zig.c",
-//            "menus.zig.c",
-//        },
-//        .flags = &flags,
-//    });
     memopad_mod.addIncludePath(b.path("."));
 
     // We will also create a module for our other entry point, 'main.zig'.
@@ -199,34 +193,36 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     // File selector
-//    const fs_mod = b.createModule(.{
-//        .root_source_file = b.path("src/file_selector.zig"),
-//        .target = target,
-//        .optimize = optimize,
-//    });
-//    fs_mod.addCSourceFiles(.{ .files = &.{
-//            "file-selector.zig.c",
-//        },
-//        .flags = &flags,
-//    });
-//
-//    const fs_exe = b.addExecutable(.{
-//        .name = "file-selector",
-//        .root_module = fs_mod,
-//    });
-//    fs_exe.addIncludePath(b.path("."));
-//    // instead of addImport, link to libdflat.a as an example
-//    fs_exe.linkLibrary(lib);
-//
-//    b.installArtifact(fs_exe);
-//
-//    const run_fs = b.addRunArtifact(fs_exe);
-//    run_fs.step.dependOn(b.getInstallStep());
-//    if (b.args) |args| {
-//        run_fs.addArgs(args);
-//    }
-//    const run_fs_step = b.step("file-select", "Run file selector");
-//    run_fs_step.dependOn(&run_fs.step);
+    const fs_mod = b.createModule(.{
+        .root_source_file = b.path("src/file_selector.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    fs_mod.addIncludePath(b.path("."));
+    fs_mod.addCSourceFiles(.{ .files = &.{
+            "file-selector.zig.c",
+        },
+        .flags = &flags,
+    });
+    fs_mod.addImport("dflat", lib_mod); // this import c as module
+    fs_mod.addImport("memopad", memopad_mod);
+
+    const fs_exe = b.addExecutable(.{
+        .name = "file-selector",
+        .root_module = fs_mod,
+    });
+    fs_exe.linkLibC();
+    fs_exe.addIncludePath(b.path("."));
+
+    b.installArtifact(fs_exe);
+
+    const run_fs = b.addRunArtifact(fs_exe);
+    run_fs.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_fs.addArgs(args);
+    }
+    const run_fs_step = b.step("file-select", "Run file selector");
+    run_fs_step.dependOn(&run_fs.step);
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.

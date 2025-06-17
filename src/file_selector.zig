@@ -3,12 +3,10 @@ const mp = @import("memopad");
 const df = mp.df;
 
 var filename: [1024]u8 = undefined;
-var dir: [1024]u8 = undefined;
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    const allocator = gpa.allocator();
-
     try run_dflat_app();
 
     // stdout is for the actual output of your application, for example if you
@@ -18,11 +16,8 @@ pub fn main() !void {
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
 
-    var dir_it = std.mem.splitScalar(u8, &dir, 0);
     var filename_it = std.mem.splitScalar(u8, &filename, 0);
-
-    const paths = [_][]const u8{ dir_it.first(), filename_it.first() };
-    const path = try std.fs.path.join(allocator, &paths);
+    const path = try std.fs.cwd().realpathAlloc(allocator, filename_it.first());
     try stdout.print("{s}\n", .{path});
     try bw.flush(); // Don't forget to flush!
 }
@@ -45,7 +40,7 @@ fn run_dflat_app() !void {
                         df.HASSTATUSBAR
                         );
     _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
-    try SelectFile(wnd);
+    SelectFile(wnd);
 
     while (df.dispatch_message() > 0) {
     }
@@ -53,11 +48,9 @@ fn run_dflat_app() !void {
     return;
 }
 
-fn SelectFile(wnd: df.WINDOW) !void {
-    var fspec = [_:0]u8{ '*'};
-
-    if (df.OpenFileDialogBox(&fspec, &filename) > 0)    {
-        _ = df.getcwd(&dir, 1024);
+fn SelectFile(wnd: df.WINDOW) void {
+    const fspec = "*";
+    if (mp.fileopen.OpenFileDialogBox(allocator, fspec, &filename)) {
         df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
     }
 }
@@ -67,7 +60,7 @@ fn FileSelectorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM)
         df.COMMAND => {
             switch (p1)    {
                 df.ID_OPEN => {
-                    df.SelectFile(wnd);
+                    _ = SelectFile(wnd);
                     return df.TRUE;
                 },
                 else => {

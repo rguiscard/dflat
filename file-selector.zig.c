@@ -31,36 +31,11 @@ ENDMENU
 
 char DFlatApplication[] = "MemoPad";
 
-void SelectFile(WINDOW);
-static char *NameComponent(char *);
+extern DBOX FileOpen;
 
-/* --- The Open... command. Select a file  --- */
-void SelectFile(WINDOW wnd)
-{
-    char FileName[MAXPATH];
-    if (OpenFileDialogBox("*", FileName))    {
-        /* --- see if the document is already in a window --- */
-        WINDOW wnd1 = FirstWindow(wnd);
-        while (wnd1 != NULL)    {
-            if (wnd1->extension && strcasecmp(FileName, wnd1->extension) == 0)    {
-                SendMessage(wnd1, SETFOCUS, TRUE, 0);
-                SendMessage(wnd1, RESTORE, 0, 0);
-                return;
-            }
-            wnd1 = NextWindow(wnd1);
-        }
-	PostMessage(wnd, CLOSE_WINDOW, 0, 0);
-    }
-}
-
-/* -- point to the name component of a file specification -- */
-static char *NameComponent(char *FileName)
-{
-    char *Fname;
-    if ((Fname = strrchr(FileName, '/')) == NULL)
-        Fname = FileName-1;
-    return Fname + 1;
-}
+DBOX c_FileOpen() {
+    return FileOpen;
+};
 
 void PrepFileMenu(void *w, struct Menu *mnu)
 {
