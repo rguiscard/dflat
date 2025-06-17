@@ -1,7 +1,6 @@
-const df = @cImport({
-    @cInclude("dflat.h");
-    @cInclude("file-selector.zig.h");
-});
+const std = @import("std");
+const mp = @import("memopad");
+const df = mp.df;
 
 var filename: [1024]u8 = undefined;
 var dir: [1024]u8 = undefined;
@@ -80,8 +79,3 @@ fn FileSelectorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM)
     }
     return df.ApplicationProc(wnd, msg, p1, p2);
 }
-
-const std = @import("std");
-
-/// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
-const df_lib = @import("dflat_lib");

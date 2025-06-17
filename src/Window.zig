@@ -1,5 +1,6 @@
 const std = @import("std");
 const df = @import("ImportC.zig").df;
+const message = @import("Message.zig").Message;
 
 win: df.WINDOW,
 title: ?[]const u8 = null,
@@ -30,14 +31,18 @@ pub fn setTitle(self: *TopLevelFields, filename: []const u8) !void {
     _ = df.strcpy(ext, filename.ptr);
 }
 
-pub fn sendMessage(self: *TopLevelFields, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) isize {
-    return df.SendMessage(self.win, message, p1, p2);
+pub fn sendMessage(self: *TopLevelFields, msg: message, p1: df.PARAM, p2: df.PARAM) isize {
+    const x = @intFromEnum(msg);
+    const m:df.MESSAGE = @intCast(x);
+    return df.SendMessage(self.win, m, p1, p2);
 }
 
-pub fn sendTextMessage(self: *TopLevelFields, message: df.MESSAGE, p1: []u8, p2: df.PARAM) isize {
+pub fn sendTextMessage(self: *TopLevelFields, msg: message, p1: []u8, p2: df.PARAM) isize {
     // message should only be df.SETTEXT ?
     const buf:[*c]u8 = p1.ptr;
-    return df.SendMessage(self.win, message, @intCast(@intFromPtr(buf)), p2);
+    const x = @intFromEnum(msg);
+    const m:df.MESSAGE = @intCast(x);
+    return df.SendMessage(self.win, m, @intCast(@intFromPtr(buf)), p2);
 }
 
 pub fn deinit(self: *TopLevelFields) void {

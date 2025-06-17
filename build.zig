@@ -67,7 +67,7 @@ pub fn build(b: *std.Build) void {
             "spinbutt.c",
             "combobox.c",
             "slidebox.c",
-            "fileopen.c",
+//            "fileopen.c",
             "direct.c",
             "pictbox.c",
             "calendar.c",
@@ -99,31 +99,31 @@ pub fn build(b: *std.Build) void {
     // Now, we will create a static library based on the module we created above.
     // This creates a `std.Build.Step.Compile`, which is the build step responsible
     // for actually invoking the compiler.
-    const lib = b.addLibrary(.{
-        .linkage = .static,
-        .name = "dflat",
-        .root_module = lib_mod,
-    });
-    lib.linkLibC();
-    lib.installHeader(b.path("dflat.h"), "dflat.h");
-    lib.installHeader(b.path("system.h"), "system.h");
-    lib.installHeader(b.path("dflatmsg.h"), "dflatmsg.h");
-    lib.installHeader(b.path("classes.h"), "classes.h");
-    lib.installHeader(b.path("config.h"), "config.h");
-    lib.installHeader(b.path("rect.h"), "rect.h");
-    lib.installHeader(b.path("keys.h"), "keys.h");
-    lib.installHeader(b.path("unikey.h"), "unikey.h");
-    lib.installHeader(b.path("commands.h"), "commands.h");
-    lib.installHeader(b.path("dialbox.h"), "dialbox.h");
-    lib.installHeader(b.path("helpbox.h"), "helpbox.h");
-    lib.installHeader(b.path("video.h"), "video.h");
-    lib.installHeader(b.path("classdef.h"), "classdef.h");
-    lib.installHeader(b.path("menu.h"), "menu.h");
+//    const lib = b.addLibrary(.{
+//        .linkage = .static,
+//        .name = "dflat",
+//        .root_module = lib_mod,
+//    });
+//    lib.linkLibC();
+//    lib.installHeader(b.path("dflat.h"), "dflat.h");
+//    lib.installHeader(b.path("system.h"), "system.h");
+//    lib.installHeader(b.path("dflatmsg.h"), "dflatmsg.h");
+//    lib.installHeader(b.path("classes.h"), "classes.h");
+//    lib.installHeader(b.path("config.h"), "config.h");
+//    lib.installHeader(b.path("rect.h"), "rect.h");
+//    lib.installHeader(b.path("keys.h"), "keys.h");
+//    lib.installHeader(b.path("unikey.h"), "unikey.h");
+//    lib.installHeader(b.path("commands.h"), "commands.h");
+//    lib.installHeader(b.path("dialbox.h"), "dialbox.h");
+//    lib.installHeader(b.path("helpbox.h"), "helpbox.h");
+//    lib.installHeader(b.path("video.h"), "video.h");
+//    lib.installHeader(b.path("classdef.h"), "classdef.h");
+//    lib.installHeader(b.path("menu.h"), "menu.h");
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
     // running `zig build`).
-    b.installArtifact(lib);
+//    b.installArtifact(lib);
 
     // memopad (exe) import lib_mod as module while file-selector links libdflat.a
 
@@ -133,12 +133,12 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .link_libc = true,
     });
-    memopad_mod.addCSourceFiles(.{ .files = &.{
-            "memopad.zig.c",
-            "menus.zig.c",
-        },
-        .flags = &flags,
-    });
+//    memopad_mod.addCSourceFiles(.{ .files = &.{
+//            "memopad.zig.c",
+//            "menus.zig.c",
+//        },
+//        .flags = &flags,
+//    });
     memopad_mod.addIncludePath(b.path("."));
 
     // We will also create a module for our other entry point, 'main.zig'.
@@ -147,6 +147,13 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    exe_mod.addCSourceFiles(.{ .files = &.{
+            "memopad.zig.c",
+            "menus.zig.c",
+        },
+        .flags = &flags,
+    });
+    exe_mod.addIncludePath(b.path("."));
 
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
     // This is what allows Zig source code to use `@import("foo")` where 'foo' is not a
@@ -192,39 +199,34 @@ pub fn build(b: *std.Build) void {
     run_step.dependOn(&run_cmd.step);
 
     // File selector
-    const fs_mod = b.createModule(.{
-        .root_source_file = b.path("src/file_selector.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-    fs_mod.addCSourceFiles(.{ .files = &.{
-            "file-selector.zig.c",
-        },
-        .flags = &[_][]const u8{"-DMACOS=1",
-                                "-DBUILD_FULL_DFLAT",
-                                "-g",
-                                "-Wno-pointer-sign",
-                                "-Wno-compare-distinct-pointer-types",
-                                "-Wno-invalid-source-encoding"},
-    });
-
-    const fs_exe = b.addExecutable(.{
-        .name = "file-selector",
-        .root_module = fs_mod,
-    });
-    fs_exe.addIncludePath(b.path("."));
-    // instead of addImport, link to libdflat.a as an example
-    fs_exe.linkLibrary(lib);
-
-    b.installArtifact(fs_exe);
-
-    const run_fs = b.addRunArtifact(fs_exe);
-    run_fs.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_fs.addArgs(args);
-    }
-    const run_fs_step = b.step("file-select", "Run file selector");
-    run_fs_step.dependOn(&run_fs.step);
+//    const fs_mod = b.createModule(.{
+//        .root_source_file = b.path("src/file_selector.zig"),
+//        .target = target,
+//        .optimize = optimize,
+//    });
+//    fs_mod.addCSourceFiles(.{ .files = &.{
+//            "file-selector.zig.c",
+//        },
+//        .flags = &flags,
+//    });
+//
+//    const fs_exe = b.addExecutable(.{
+//        .name = "file-selector",
+//        .root_module = fs_mod,
+//    });
+//    fs_exe.addIncludePath(b.path("."));
+//    // instead of addImport, link to libdflat.a as an example
+//    fs_exe.linkLibrary(lib);
+//
+//    b.installArtifact(fs_exe);
+//
+//    const run_fs = b.addRunArtifact(fs_exe);
+//    run_fs.step.dependOn(b.getInstallStep());
+//    if (b.args) |args| {
+//        run_fs.addArgs(args);
+//    }
+//    const run_fs_step = b.step("file-select", "Run file selector");
+//    run_fs_step.dependOn(&run_fs.step);
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.

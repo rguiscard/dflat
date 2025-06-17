@@ -1,7 +1,8 @@
 const df = mp.df;
+const command = mp.command;
+const message = mp.msg.Message;
 
 var DFlatApplication = [_:0]u8{'m', 'e', 'm', 'o', 'p', 'a', 'd'};
-var untitled = [_:0]u8{'U', 'n', 't', 'i', 't', 'l', 'e', 'd'};
 const sUntitled = "Untitled";
 var wndpos: c_int = 0;
 
@@ -34,7 +35,7 @@ pub fn main() !void {
 
     df.LoadHelpFile(&DFlatApplication);
 
-    _ = win.sendMessage(df.SETFOCUS, df.TRUE, 0);
+    _ = win.sendMessage(message.SETFOCUS, df.TRUE, 0);
 
     // while (argc > 1)    {
     //     OpenPadWindow(wnd, argv[1]);
@@ -53,8 +54,9 @@ pub fn main() !void {
 fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     const win:*mp.Window = @constCast(@fieldParentPtr("win", &wnd));
 
-    switch(msg) {
-        df.CREATE_WINDOW => {
+    const mssg:message = @enumFromInt(msg);
+    switch(mssg) {
+        message.CREATE_WINDOW => {
             const rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
             if (df.cfg.InsertMode == df.TRUE)
                 df.SetCommandToggle(&df.MainMenu, df.ID_INSERT);
@@ -63,73 +65,74 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
             df.FixTabMenu();
             return rtn;
         },
-        df.COMMAND => {
-            switch(p1) {
-                df.ID_NEW => {
+        message.COMMAND => {
+            const cmnd:command = @enumFromInt(p1);
+            switch(cmnd) {
+                command.ID_NEW => {
                     NewFile(win);
                     return df.TRUE;
                 },
-                df.ID_OPEN => {
+                command.ID_OPEN => {
                     if (SelectFile(wnd)) {
                         return df.TRUE;
                     } else |_| {
                         return df.FALSE;
                     }
                 },
-                df.ID_SAVE => {
+                command.ID_SAVE => {
                     SaveFile(df.inFocus, false);
                     return df.TRUE;
                 },
-                df.ID_SAVEAS => {
+                command.ID_SAVEAS => {
                     SaveFile(df.inFocus, true);
                     return df.TRUE;
                 },
-                df.ID_DELETEFILE => {
+                command.ID_DELETEFILE => {
                     DeleteFile(df.inFocus);
                     return df.TRUE;
                 },
-                df.ID_WRAP => {
+                command.ID_WRAP => {
                     df.cfg.WordWrap = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
                     return df.TRUE;
                 },
-                df.ID_INSERT => {
+                command.ID_INSERT => {
                     df.cfg.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
                     return df.TRUE;
                 },
-                df.ID_TAB2 => {
+                command.ID_TAB2 => {
                     df.cfg.Tabs = 2;
                     df.FixTabMenu();
                     return df.TRUE;
                 },
-                df.ID_TAB4 => {
+                command.ID_TAB4 => {
                     df.cfg.Tabs = 4;
                     df.FixTabMenu();
                     return df.TRUE;
                 },
-                df.ID_TAB6 => {
+                command.ID_TAB6 => {
                     df.cfg.Tabs = 6;
                     df.FixTabMenu();
                     return df.TRUE;
                 },
-                df.ID_TAB8 => {
+                command.ID_TAB8 => {
                     df.cfg.Tabs = 8;
                     df.FixTabMenu();
                     return df.TRUE;
                 },
-                df.ID_CALENDAR => {
+                command.ID_CALENDAR => {
                     df.Calendar(wnd);
                     return df.TRUE;
                 },
-                df.ID_BARCHART => {
+                command.ID_BARCHART => {
                     df.BarChart(wnd);
                     return df.TRUE;
                 },
-                df.ID_EXIT => {
+                command.ID_EXIT => {
                     if (mp.msgbox.YesNoBox("Exit Memopad?") == false)
                         return df.FALSE;
                 },
-                df.ID_ABOUT => {
-                    const message =
+                command.ID_ABOUT => {
+                    const m =
                         \\D-Flat implements the SAA/CUA
                         \\interface in a public domain
                         \\C language library originally
@@ -138,7 +141,7 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                         \\MemoPad is a multiple document
                         \\editor that demonstrates D-Flat
                     ;
-                    _ = mp.msgbox.MessageBox("About D-Flat and the MemoPad", message);
+                    _ = mp.msgbox.MessageBox("About D-Flat and the MemoPad", m);
                     return df.TRUE;
                 },
                 else => {
@@ -231,8 +234,8 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
         LoadFile(win1, fname);
     }
 
-    _ = wwin.sendMessage(df.CLOSE_WINDOW, 0, 0);
-    _ = win1.sendMessage(df.SETFOCUS, df.TRUE, 0);
+    _ = wwin.sendMessage(message.CLOSE_WINDOW, 0, 0);
+    _ = win1.sendMessage(message.SETFOCUS, df.TRUE, 0);
 }
 
 // --- Load the notepad file into the editor text buffer ---
@@ -240,7 +243,7 @@ fn LoadFile(win: mp.Window, filename: []const u8) void {
     var w = win;
     if (std.fs.cwd().readFileAlloc(allocator, filename, 1_048_576)) |content| {
         defer allocator.free(content);
-        _ = w.sendTextMessage(df.SETTEXT, content, 0);
+        _ = w.sendTextMessage(message.SETTEXT, content, 0);
     } else |_| {
     }
 }
@@ -268,8 +271,8 @@ fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
         }
     }
     if (wnd.*.extension != df.NULL) {
-        const message:[]const u8 = "Saving the file";
-        var mwin = mp.msgbox.MomentaryMessage(message, allocator);
+        const m:[]const u8 = "Saving the file";
+        var mwin = mp.msgbox.MomentaryMessage(m, allocator);
 
         const extension:[*c]u8 = @ptrCast(wnd.*.extension);
         const path:[:0]const u8 = std.mem.span(extension);
@@ -280,7 +283,7 @@ fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
         } else |_| {
         }
 
-        _ = mwin.sendMessage(df.CLOSE_WINDOW, 0, 0);
+        _ = mwin.sendMessage(message.CLOSE_WINDOW, 0, 0);
     }
 }
 
@@ -292,9 +295,9 @@ fn DeleteFile(wnd: df.WINDOW) void {
         if (std.mem.eql(u8, path, sUntitled) == false) {
             const fname:[*c]u8 = @ptrCast(df.NameComponent(extension));
             if (fname != null) {
-                if (std.fmt.allocPrint(allocator, "Delete {s} ?", .{path})) |message| {
-                    defer allocator.free(message);
-                    if (mp.msgbox.YesNoBox(message) == true) {
+                if (std.fmt.allocPrint(allocator, "Delete {s} ?", .{path})) |m| {
+                    defer allocator.free(m);
+                    if (mp.msgbox.YesNoBox(m) == true) {
                         if (std.fs.cwd().deleteFileZ(path)) |_| {
                         } else |_| {
                         }
@@ -310,9 +313,10 @@ fn DeleteFile(wnd: df.WINDOW) void {
 // ----- window processing module for the editboxes -----
 fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     var rtn:c_int = 0;
-    const param:isize = @intCast(p1);
-    switch (msg) {
-        df.SETFOCUS => {
+    const mssg:message = @enumFromInt(msg);
+    switch (mssg) {
+        message.SETFOCUS => {
+            const param:isize = @intCast(p1);
             if (param > 0) {
                 wnd.*.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
                 wnd.*.WordWrapMode = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
@@ -325,23 +329,24 @@ fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) ca
             }
             return rtn;
         },
-        df.KEYBOARD_CURSOR => {
+        message.KEYBOARD_CURSOR => {
             rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
             df.ShowPosition(wnd);
             return rtn;
         },
-        df.COMMAND => {
-            switch(param) {
-                df.ID_HELP => {
+        message.COMMAND => {
+            const cmnd:command = @enumFromInt(p1);
+            switch(cmnd) {
+                command.ID_HELP => {
                     const helpfile:[:0]const u8 = "MEMOPADDOC";
                     _ = df.DisplayHelp(wnd, @constCast(helpfile.ptr));
                     return df.TRUE;
                 },
-                df.ID_WRAP => {
+                command.ID_WRAP => {
                     _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_WRAP, 0);
                     wnd.*.WordWrapMode = df.cfg.WordWrap;
                 },
-                df.ID_INSERT => {
+                command.ID_INSERT => {
                     _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_INSERT, 0);
                     wnd.*.InsertMode = df.cfg.InsertMode;
                     _ = df.SendMessage(null, df.SHOW_CURSOR, wnd.*.InsertMode, 0);
@@ -350,14 +355,14 @@ fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) ca
                 }
             }
         },
-        df.CLOSE_WINDOW => {
+        message.CLOSE_WINDOW => {
             if (wnd.*.TextChanged > 0)    {
                 _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
                 const tl:[*c]u8 = @ptrCast(wnd.*.title);
                 const title:[:0]const u8 = std.mem.span(tl);
-                if (std.fmt.allocPrint(allocator, "{s}\nText changed. Save it ?", .{title})) |message| {
-                    defer allocator.free(message);
-                    if (mp.msgbox.YesNoBox(message) == true) {
+                if (std.fmt.allocPrint(allocator, "{s}\nText changed. Save it ?", .{title})) |m| {
+                    defer allocator.free(m);
+                    if (mp.msgbox.YesNoBox(m) == true) {
                         _ = df.SendMessage(df.GetParent(wnd), df.COMMAND, df.ID_SAVE, 0);
                     }
                 } else |_| {

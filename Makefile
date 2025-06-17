@@ -6,9 +6,9 @@ SMALL=
 FULL=y
 
 ifeq ($(SMALL),y)
-PRGS = smallpad
+PRGS =
 else
-PRGS = memopad huffc fixhelp memopad.hlp
+PRGS = huffc fixhelp memopad.hlp
 endif
 
 CC = zig cc
