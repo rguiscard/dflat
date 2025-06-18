@@ -27,22 +27,3 @@ DEFMENU(SystemMenu)
         SELECTION("~Close",    ID_SYSCLOSE,    CTRL_F4,   0 )
     ENDPOPDOWN
 ENDMENU
-/* --------------- file-selector.c ----------- */
-
-char DFlatApplication[] = "MemoPad";
-
-extern DBOX FileOpen;
-
-DBOX c_FileOpen() {
-    return FileOpen;
-};
-
-void PrepFileMenu(void *w, struct Menu *mnu)
-{
-	/* do nothing for now */
-	WINDOW wnd = w;
-	if (wnd != NULL && GetClass(wnd) == EDITBOX) {
-		if (isMultiLine(wnd))	{
-		}
-	}
-}

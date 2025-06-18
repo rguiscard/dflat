@@ -8,7 +8,13 @@ void BarChart(WINDOW);
 DBOX c_MsgBox();
 DBOX c_FileOpen();
 DBOX c_SaveAs();
+DBOX c_SearchTextDB();
+DBOX c_ReplaceTextDB();
 
 BOOL BuildFileList(WINDOW, char *);
 void BuildDirectoryList(WINDOW);
 void BuildPathDisplay(WINDOW);
+
+void _SearchText(WINDOW);
+void _SearchNext(WINDOW);
+void _ReplaceText(WINDOW);

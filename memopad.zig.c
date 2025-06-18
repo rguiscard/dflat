@@ -10,7 +10,8 @@ void FixTabMenu(void);
 extern DBOX MsgBox;
 extern DBOX FileOpen;
 extern DBOX SaveAs;
-//int MessageBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+extern DBOX SearchTextDB;
+extern DBOX ReplaceTextDB;
 
 /* return MESSAGEBOX */
 DBOX c_MsgBox() {
@@ -23,6 +24,14 @@ DBOX c_FileOpen() {
 
 DBOX c_SaveAs() {
     return SaveAs;
+};
+
+DBOX c_SearchTextDB() {
+    return SearchTextDB;
+};
+
+DBOX c_ReplaceTextDB() {
+    return ReplaceTextDB;
 };
 
 /* ------ display the row and column in the statusbar ------ */

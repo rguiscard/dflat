@@ -72,7 +72,7 @@ pub fn build(b: *std.Build) void {
             "pictbox.c",
             "calendar.c",
             "barchart.c",
-            "search.c",
+//            "search.c",
             "clipbord.c",
             "helpbox.c",
             "decomp.c",
@@ -133,6 +133,11 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .link_libc = true,
     });
+    memopad_mod.addCSourceFiles(.{ .files = &.{
+            "memopad.zig.c",
+        },
+        .flags = &flags,
+    });
     memopad_mod.addIncludePath(b.path("."));
 
     // We will also create a module for our other entry point, 'main.zig'.
@@ -142,7 +147,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     exe_mod.addCSourceFiles(.{ .files = &.{
-            "memopad.zig.c",
             "menus.zig.c",
         },
         .flags = &flags,
@@ -194,13 +198,13 @@ pub fn build(b: *std.Build) void {
 
     // File selector
     const fs_mod = b.createModule(.{
-        .root_source_file = b.path("src/file_selector.zig"),
+        .root_source_file = b.path("examples/file_selector.zig"),
         .target = target,
         .optimize = optimize,
     });
     fs_mod.addIncludePath(b.path("."));
     fs_mod.addCSourceFiles(.{ .files = &.{
-            "file-selector.zig.c",
+            "examples/file-selector.zig.c",
         },
         .flags = &flags,
     });
@@ -214,7 +218,7 @@ pub fn build(b: *std.Build) void {
     fs_exe.linkLibC();
     fs_exe.addIncludePath(b.path("."));
 
-    b.installArtifact(fs_exe);
+//    b.installArtifact(fs_exe);
 
     const run_fs = b.addRunArtifact(fs_exe);
     run_fs.step.dependOn(b.getInstallStep());
@@ -223,6 +227,38 @@ pub fn build(b: *std.Build) void {
     }
     const run_fs_step = b.step("file-select", "Run file selector");
     run_fs_step.dependOn(&run_fs.step);
+
+    // Demo to test various components
+    const demo_mod = b.createModule(.{
+        .root_source_file = b.path("examples/demo.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    demo_mod.addIncludePath(b.path("."));
+    demo_mod.addCSourceFiles(.{ .files = &.{
+            "examples/demo.zig.c",
+        },
+        .flags = &flags,
+    });
+    demo_mod.addImport("dflat", lib_mod); // this import c as module
+    demo_mod.addImport("memopad", memopad_mod);
+
+    const demo = b.addExecutable(.{
+        .name = "demo",
+        .root_module = demo_mod,
+    });
+    demo.linkLibC();
+    demo.addIncludePath(b.path("."));
+
+//    b.installArtifact(demo);
+
+    const run_demo = b.addRunArtifact(demo);
+    run_demo.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_demo.addArgs(args);
+    }
+    const run_demo_step = b.step("demo", "Run demo");
+    run_demo_step.dependOn(&run_demo.step);
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.

@@ -24,6 +24,10 @@ static BOOL TextMarking;
 static int ButtonX, ButtonY;
 static int PrevY = -1;
 
+extern void SearchText(WINDOW);
+extern void ReplaceText(WINDOW);
+extern void SearchNext(WINDOW);
+
 /* ----------- CREATE_WINDOW Message ---------- */
 static int CreateWindowMsg(WINDOW wnd)
 {
