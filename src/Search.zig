@@ -1,7 +1,10 @@
 const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
+const msg = @import("Message.zig").Message;
 const msgbox = @import("MessageBox.zig");
+const command = @import("Commands.zig").Command;
+const Window = @import("Window.zig");
 
 var CheckCase = true;
 var Replacing = false;
@@ -63,23 +66,30 @@ fn BlkBegColFromLine(wnd: df.WINDOW, cp:[*c]u8) c_int {
 
 // ------- search for the occurrance of a string ------- 
 fn SearchTextBox(wnd:df.WINDOW, incr:bool) void {
+    // Confirm window type
+    if (wnd.*.Class != df.EDITBOX) {
+        _ = msgbox.ErrorMessage("Window is not a EDITBOX");
+        return;
+    }
+
+    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
 //    char *s1 = NULL, *s2, *cp1;
     var cp1:[*c]u8 = null;
-    const cp = df.GetEditBoxText(search_box, df.ID_SEARCHFOR);
+    const cp = df.GetEditBoxText(search_box, @intFromEnum(command.ID_SEARCHFOR));
     var FoundOne = false;
     var rpl = true;
     while ((rpl == true) and (cp != null) and (df.strlen(cp) > 0)) {
         if (Replacing) {
-            rpl = (df.CheckBoxSetting(search_box, df.ID_REPLACEALL) > 0);
+            rpl = (df.CheckBoxSetting(search_box, @intFromEnum(command.ID_REPLACEALL)) > 0);
         } else {
             rpl = false;
         }
-        if (root.TextBlockMarked(wnd)) {
-            root.ClearTextBlock(wnd);
-            _ = df.SendMessage(wnd, df.PAINT, 0, 0);
+        if (win.TextBlockMarked()) {
+            win.ClearTextBlock();
+            _ = win.sendMessage(msg.PAINT, 0, 0);
         }
 
-        cp1 = root.CurrChar(wnd);
+        cp1 = win.CurrChar();
         if (incr) {
             cp1 = cp1 + lastsize; // start past the last hit
         }
@@ -117,16 +127,16 @@ fn SearchTextBox(wnd:df.WINDOW, incr:bool) void {
             lastsize = df.strlen(cp);
 
             // align the window scroll to matching text
-            if (root.WndCol(wnd) > (root.ClientWidth(wnd)-1)) {
+            if (win.WndCol() > (win.ClientWidth()-1)) {
                 wnd.*.wleft = wnd.*.CurrCol;
             }
-            if (wnd.*.WndRow > (root.ClientHeight(wnd)-1)) {
+            if (wnd.*.WndRow > (win.ClientHeight()-1)) {
                 wnd.*.wtop = wnd.*.CurrLine;
                 wnd.*.WndRow = 0;
             }
 
-            _ = df.SendMessage(wnd, df.PAINT, 0, 0);
-            _ = df.SendMessage(wnd, df.KEYBOARD_CURSOR, root.WndCol(wnd), wnd.*.WndRow);
+            _ = win.sendMessage(msg.PAINT, 0, 0);
+            _ = win.sendMessage(msg.KEYBOARD_CURSOR, win.WndCol(), wnd.*.WndRow);
 
 //            if (Replacing)    {
 //                if (rpl || YesNoBox("Replace the text?"))  {
@@ -138,8 +148,8 @@ fn SearchTextBox(wnd:df.WINDOW, incr:bool) void {
 //                        continue;
 //                        }
 //                }
-//                ClearTextBlock(wnd);
-//                SendMessage(wnd, PAINT, 0, 0);
+//                win.ClearTextBlock();
+//                _ = win.sendMessage(msg.PAINT, 0, 0);
 //            }
             return;
         }
@@ -158,10 +168,10 @@ pub fn ReplaceText(wnd:df.WINDOW) void {
     var box = df.c_ReplaceTextDB();
     search_box = &box;
     if (CheckCase) {
-        df.SetCheckBox(&box, df.ID_MATCHCASE);
+        df.SetCheckBox(&box, @intFromEnum(command.ID_MATCHCASE));
     }
     if (df.DialogBox(null, &box, df.TRUE, null) > 0) {
-        CheckCase = (df.CheckBoxSetting(&box, df.ID_MATCHCASE) > 0);
+        CheckCase = (df.CheckBoxSetting(&box, @intFromEnum(command.ID_MATCHCASE)) > 0);
         SearchTextBox(wnd, false);
     }
 }
@@ -173,10 +183,10 @@ pub fn SearchText(wnd:df.WINDOW) void {
     var box = df.c_SearchTextDB();
     search_box = &box;
     if (CheckCase) {
-        df.SetCheckBox(&box, df.ID_MATCHCASE);
+        df.SetCheckBox(&box, @intFromEnum(command.ID_MATCHCASE));
     }
     if (df.DialogBox(null, &box, df.TRUE, null) > 0) {
-        CheckCase = (df.CheckBoxSetting(&box, df.ID_MATCHCASE) > 0);
+        CheckCase = (df.CheckBoxSetting(&box, @intFromEnum(command.ID_MATCHCASE)) > 0);
         SearchTextBox(wnd, false);
     }
 }

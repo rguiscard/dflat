@@ -17,6 +17,57 @@ pub fn init(wnd: df.WINDOW, allocator: std.mem.Allocator) TopLevelFields {
     };
 }
 
+// ------- window methods -----------
+pub fn BorderAdj(self: *TopLevelFields) isize {
+    var border:isize = 0;
+    if (df.TestAttribute(self.win, df.HASBORDER) > 0) {
+        border = 1;
+    }
+    return border;
+}
+
+pub fn BottomBorderAdj(self: *TopLevelFields) isize {
+    var border = BorderAdj(self);
+    if (df.TestAttribute(self.win, df.HASSTATUSBAR) > 0) {
+        border = 1;
+    }
+    return border;
+}
+
+pub fn TopBorderAdj(self: *TopLevelFields) isize {
+    var border:isize = 0;
+    if ((df.TestAttribute(self.win, df.HASTITLEBAR) > 0) and (df.TestAttribute(self.win, df.HASMENUBAR) > 0)) {
+        border = 2;
+    } else {
+        if (df.TestAttribute(self.win, df.HASTITLEBAR | df.HASMENUBAR | df.HASBORDER) > 0) {
+            border = 1;
+        }
+    }
+    return border;
+}
+
+pub fn ClientWidth(self: *TopLevelFields) isize {
+    return (df.WindowWidth(self.win)-BorderAdj(self)*2);
+}
+
+pub fn ClientHeight(self: *TopLevelFields) isize {
+    return (df.WindowHeight(self.win)-TopBorderAdj(self)-BottomBorderAdj(self));
+}
+
+// ------------- edit box prototypes -----------
+pub fn CurrChar(self: *TopLevelFields) [*c]u8 {
+    const w = self.win;
+    const sel:usize = @intCast(w.*.CurrLine);
+    const curr_col:usize = @intCast(w.*.CurrCol);
+    return df.TextLine(w, sel)+curr_col;
+}
+
+pub fn WndCol(self: *TopLevelFields) isize {
+    return self.win.*.CurrCol - self.win.*.wleft;
+}
+
+// --------- Accessories --------
+
 // This set with win.title and wnd.ext as filename
 pub fn setTitle(self: *TopLevelFields, filename: []const u8) !void {
     if (self.title != null) {
@@ -30,6 +81,22 @@ pub fn setTitle(self: *TopLevelFields, filename: []const u8) !void {
     // it is also be used to compared already opened files.
     _ = df.strcpy(ext, filename.ptr);
 }
+
+// -------- text box prototypes ----------
+pub fn TextBlockMarked(self: *TopLevelFields) bool {
+    const w = self.win;
+    return (w.*.BlkBegLine > 0) or (w.*.BlkEndLine > 0) or (w.*.BlkBegCol > 0) or (w.*.BlkEndCol > 0);
+}
+
+pub fn ClearTextBlock(self: *TopLevelFields) void {
+    const w = self.win;
+    w.*.BlkBegLine = 0;
+    w.*.BlkEndLine = 0;
+    w.*.BlkBegCol = 0;
+    w.*.BlkEndCol = 0;
+}
+
+// --------- message prototypes -----------
 
 pub fn sendMessage(self: *TopLevelFields, msg: message, p1: df.PARAM, p2: df.PARAM) isize {
     const x = @intFromEnum(msg);

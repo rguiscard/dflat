@@ -3,6 +3,11 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
 
+pub fn ErrorMessage(message: []const u8) bool {
+    const result = GenericMessage(null, "Error", message, 1, ErrorBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
+    return (result == 1);
+}
+
 pub fn MessageBox(title: []const u8, message: []const u8) bool {
     const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
     return (result == 1);
@@ -116,4 +121,20 @@ fn MessageBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARA
         }
     }
     return root.BaseWndProc(df.MESSAGEBOX, wnd, message, p1, p2);
+}
+
+fn ErrorBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    switch (message)    {
+        df.CREATE_WINDOW => {
+            wnd.*.Class = df.ERRORBOX;
+            df.InitWindowColors(wnd);
+        },
+        df.KEYBOARD => {
+//            if (p1 == '\r' || p1 == ESC)
+//                ReturnValue = (int)p1;
+        },
+        else => {
+        }
+    }
+    return root.BaseWndProc(df.ERRORBOX, wnd, message, p1, p2);
 }
