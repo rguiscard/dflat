@@ -7,6 +7,7 @@ const testing = std.testing;
 // This make dflat public to all zig codes
 pub const df = @import("ImportC.zig").df;
 pub const Window = @import("Window.zig");
+pub const DBox = @import("DialogBox.zig");
 pub const msg = @import("Message.zig");
 pub const msgbox = @import("MessageBox.zig");
 pub const fileopen = @import("FileOpen.zig");

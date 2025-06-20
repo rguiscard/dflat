@@ -8,6 +8,7 @@ pub fn ErrorMessage(message: []const u8) bool {
     return (result == 1);
 }
 
+// FIXME: potential double free error
 pub fn MessageBox(title: []const u8, message: []const u8) bool {
     const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
     return (result == 1);

@@ -3,13 +3,14 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const msg = @import("Message.zig").Message;
 const msgbox = @import("MessageBox.zig");
-const command = @import("Commands.zig").Command;
+const cmd = @import("Commands.zig").Command;
 const Window = @import("Window.zig");
+const DialogBox = @import("DialogBox.zig");
 
 var CheckCase = true;
 var Replacing = false;
 var lastsize:usize = 0;
-var search_box:*df.DBOX = undefined; // keep a copy of box so that values will not disappear for unknown reason
+var dbox:DialogBox = undefined;
 
 // - case-insensitive, white-space-normalized char compare -
 fn SearchCmp(a:u8, b:u8) bool {
@@ -75,12 +76,12 @@ fn SearchTextBox(wnd:df.WINDOW, incr:bool) void {
     const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
 //    char *s1 = NULL, *s2, *cp1;
     var cp1:[*c]u8 = null;
-    const cp = df.GetEditBoxText(search_box, @intFromEnum(command.ID_SEARCHFOR));
+    const cp = dbox.getEditBoxText(cmd.ID_SEARCHFOR);
     var FoundOne = false;
     var rpl = true;
     while ((rpl == true) and (cp != null) and (df.strlen(cp) > 0)) {
         if (Replacing) {
-            rpl = (df.CheckBoxSetting(search_box, @intFromEnum(command.ID_REPLACEALL)) > 0);
+            rpl = (dbox.checkBoxSetting(cmd.ID_REPLACEALL));
         } else {
             rpl = false;
         }
@@ -166,12 +167,12 @@ pub fn ReplaceText(wnd:df.WINDOW) void {
     Replacing = true;
     lastsize = 0;
     var box = df.c_ReplaceTextDB();
-    search_box = &box;
+    dbox = DialogBox.init(&box);
     if (CheckCase) {
-        df.SetCheckBox(&box, @intFromEnum(command.ID_MATCHCASE));
+        dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (df.DialogBox(null, &box, df.TRUE, null) > 0) {
-        CheckCase = (df.CheckBoxSetting(&box, @intFromEnum(command.ID_MATCHCASE)) > 0);
+    if (df.DialogBox(null, dbox.box, df.TRUE, null) > 0) {
+        CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }
 }
@@ -181,12 +182,12 @@ pub fn SearchText(wnd:df.WINDOW) void {
     Replacing = false;
     lastsize = 0;
     var box = df.c_SearchTextDB();
-    search_box = &box;
+    dbox = DialogBox.init(&box);
     if (CheckCase) {
-        df.SetCheckBox(&box, @intFromEnum(command.ID_MATCHCASE));
+        dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (df.DialogBox(null, &box, df.TRUE, null) > 0) {
-        CheckCase = (df.CheckBoxSetting(&box, @intFromEnum(command.ID_MATCHCASE)) > 0);
+    if (df.DialogBox(null, dbox.box, df.TRUE, null) > 0) {
+        CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }
 }
