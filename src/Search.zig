@@ -6,6 +6,7 @@ const msgbox = @import("MessageBox.zig");
 const cmd = @import("Commands.zig").Command;
 const Window = @import("Window.zig");
 const DBox = @import("DBox.zig");
+const DialogBox = @import("DialogBox.zig");
 
 var CheckCase = true;
 var Replacing = false;
@@ -171,7 +172,7 @@ pub fn ReplaceText(wnd:df.WINDOW) void {
     if (CheckCase) {
         dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (df.DialogBox(null, dbox.box, df.TRUE, null) > 0) {
+    if (DialogBox.DialogBox(null, dbox.box, true, null)) {
         CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }
@@ -186,7 +187,7 @@ pub fn SearchText(wnd:df.WINDOW) void {
     if (CheckCase) {
         dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (df.DialogBox(null, dbox.box, df.TRUE, null) > 0) {
+    if (DialogBox.DialogBox(null, dbox.box, true, null)) {
         CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }

@@ -14,7 +14,3 @@ DBOX c_ReplaceTextDB();
 BOOL BuildFileList(WINDOW, char *);
 void BuildDirectoryList(WINDOW);
 void BuildPathDisplay(WINDOW);
-
-void _SearchText(WINDOW);
-void _SearchNext(WINDOW);
-void _ReplaceText(WINDOW);

@@ -2,26 +2,27 @@ const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
+const DialogBox = @import("DialogBox.zig");
 
 pub fn ErrorMessage(message: []const u8) bool {
-    const result = GenericMessage(null, "Error", message, 1, ErrorBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
-    return (result == 1);
+    const result = GenericMessage(null, "Error", message, 1, ErrorBoxProc, "   Ok   ", null, df.ID_OK, 0, true);
+    return result;
 }
 
 // FIXME: potential double free error
 pub fn MessageBox(title: []const u8, message: []const u8) bool {
-    const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, df.TRUE);
-    return (result == 1);
+    const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, true);
+    return result;
 }
 
 pub fn YesNoBox(message: []const u8) bool {
-    const result = GenericMessage(null, "Confirm", message, 2, YesNoBoxProc, "   Yes  ", "   No   ", df.ID_OK, df.ID_CANCEL, df.TRUE);
-    return (result == 1);
+    const result = GenericMessage(null, "Confirm", message, 2, YesNoBoxProc, "   Yes  ", "   No   ", df.ID_OK, df.ID_CANCEL, true);
+    return result;
 }
 
 fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, buttonct: c_int,
                   wndproc: *const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
-                  button1: ?[]const u8, button2: ?[]const u8, c1: c_int, c2: c_int, isModal: c_int) c_uint {
+                  button1: ?[]const u8, button2: ?[]const u8, c1: c_int, c2: c_int, isModal: bool) bool {
     var mBox = df.c_MsgBox();
     var ttl:[*c]u8 = null;
     const msg:[*c]u8 = @constCast(message.ptr);
@@ -61,7 +62,8 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
     mBox.ctl[2].command = c2;
     mBox.ctl[1].isetting = df.ON;
     mBox.ctl[2].isetting = df.ON;
-    const rtn = df.DialogBox(wnd, &mBox, @intCast(isModal), wndproc);
+    const rtn = DialogBox.DialogBox(wnd, &mBox, isModal, wndproc);
+
     mBox.ctl[2].Class = 0;
     return rtn;
 }
