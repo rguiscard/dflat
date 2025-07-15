@@ -13,10 +13,13 @@ pub const msgbox = @import("MessageBox.zig");
 pub const fileopen = @import("FileOpen.zig");
 pub const command = @import("Commands.zig").Command;
 pub const search = @import("Search.zig");
+pub const Classes = @import("Classes.zig");
+pub const app = @import("Application.zig");
 
 pub fn BaseWndProc(klass: df.CLASS, wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) c_int {
-    const base_class = df.classdefs[@intCast(klass)].base;
-    if (df.classdefs[@intCast(base_class)].wndproc) |proc| {
+    const base_class = Classes.classdefs[@intCast(klass)][0]; // base
+    const index:c_int = @intFromEnum(base_class);
+    if (Classes.classdefs[@intCast(index)][1]) |proc| { // wndproc
         return proc(wnd, mesg, p1, p2);
     }
 
@@ -24,10 +27,11 @@ pub fn BaseWndProc(klass: df.CLASS, wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PAR
 }
 
 pub fn DefaultWndProc(wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) c_int {
-    if (df.classdefs[@intCast(wnd.*.Class)].wndproc) |proc| {
+    const klass = wnd.*.Class;
+    if (Classes.classdefs[@intCast(klass)][1]) |proc| { // wndproc
         return proc(wnd, mesg, p1, p2);
     }
-    return BaseWndProc(wnd.*.Class, wnd, mesg, p1, p2);
+    return BaseWndProc(klass, wnd, mesg, p1, p2);
 }
 
 // Export search.c function to c (used by editbox.c)

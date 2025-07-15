@@ -18,6 +18,21 @@ pub fn init(wnd: df.WINDOW, allocator: std.mem.Allocator) TopLevelFields {
 }
 
 // ------- window methods -----------
+pub fn WindowHeight(self: *TopLevelFields) isize {
+    const wnd = self.win;
+    return wnd.*.ht;
+}
+
+pub fn SetWindowHeight(self: *TopLevelFields, height: isize) void {
+    const wnd = self.win;
+    wnd.*.ht = @intCast(height);
+}
+
+pub fn WindowWidth(self: *TopLevelFields) isize {
+    const wnd = self.win;
+    return wnd.*.wd;
+}
+
 pub fn BorderAdj(self: *TopLevelFields) isize {
     var border:isize = 0;
     if (df.TestAttribute(self.win, df.HASBORDER) > 0) {
@@ -47,11 +62,65 @@ pub fn TopBorderAdj(self: *TopLevelFields) isize {
 }
 
 pub fn ClientWidth(self: *TopLevelFields) isize {
-    return (df.WindowWidth(self.win)-BorderAdj(self)*2);
+    return (self.WindowWidth()-BorderAdj(self)*2);
 }
 
 pub fn ClientHeight(self: *TopLevelFields) isize {
-    return (df.WindowHeight(self.win)-TopBorderAdj(self)-BottomBorderAdj(self));
+    return (self.WindowHeight()-TopBorderAdj(self)-BottomBorderAdj(self));
+}
+
+pub fn WindowRect(self: *TopLevelFields) df.RECT {
+    const wnd = self.win;
+    return wnd.*.rc;
+}
+
+pub fn GetTop(self: *TopLevelFields) isize {
+    const rect = self.WindowRect();
+    return rect.tp;
+}
+
+pub fn GetBottom(self: *TopLevelFields) isize {
+    const rect = self.WindowRect();
+    return rect.bt;
+}
+
+pub fn SetBottom(self: *TopLevelFields, bottom: isize) void {
+    self.win.*.rc.bt = @intCast(bottom);
+}
+
+pub fn GetLeft(self: *TopLevelFields) isize {
+    const rect = self.WindowRect();
+    return rect.lf;
+}
+
+pub fn GetRight(self: *TopLevelFields) isize {
+    const rect = self.WindowRect();
+    return rect.rt;
+}
+
+pub fn getParent(self: *TopLevelFields) df.WINDOW {
+    const wnd = self.win;
+    return wnd.*.parent;
+}
+
+pub fn firstWindow(self: *TopLevelFields) df.WINDOW {
+    const wnd = self.win;
+    return wnd.*.firstchild;
+}
+
+pub fn lastWindow(self: *TopLevelFields) df.WINDOW {
+    const wnd = self.win;
+    return wnd.*.lastchild;
+}
+
+pub fn nextWindow(self: *TopLevelFields) df.WINDOW {
+    const wnd = self.win;
+    return wnd.*.nextsibling;
+}
+
+pub fn prevWindow(self: *TopLevelFields) df.WINDOW {
+    const wnd = self.win;
+    return wnd.*.prevsibling;
 }
 
 // ------------- edit box prototypes -----------

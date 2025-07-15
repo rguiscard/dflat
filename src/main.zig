@@ -73,7 +73,7 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     return df.TRUE;
                 },
                 command.ID_OPEN => {
-                    if (SelectFile(wnd)) {
+                    if (SelectFile(win)) {
                         return df.TRUE;
                     } else |_| {
                         return df.FALSE;
@@ -162,19 +162,21 @@ fn NewFile(win: *mp.Window) void {
 }
 
 // --- The Open... command. Select a file  ---
-fn SelectFile(wnd: df.WINDOW) !void {
+fn SelectFile(win: *mp.Window) !void {
+    const wnd = win.win;
     const fspec:[:0]const u8 = "*";
     var filename = std.mem.zeroes([1024]u8);
 
     if (mp.fileopen.OpenFileDialogBox(allocator, fspec, &filename)) {
         // --- see if the document is already in a window ---
-        var wnd1:df.WINDOW = df.FirstWindow(wnd);
+        var wnd1:df.WINDOW = win.firstWindow();
         while (wnd1 != null) {
+            const win1:*mp.Window = @constCast(@fieldParentPtr("win", &wnd1));
             if (wnd1.*.extension) |extension| {
                 const ext:[*c]const u8 = @ptrCast(extension);
                 if (df.strcasecmp(&filename, ext) == 0) {
-                    _ = df.SendMessage(wnd1, df.SETFOCUS, df.TRUE, 0);
-                    _ = df.SendMessage(wnd1, df.RESTORE, 0, 0);
+                    _ = win1.sendMessage(mp.msg.Message.SETFOCUS, df.TRUE, 0);
+                    _ = win1.sendMessage(mp.msg.Message.RESTORE, 0, 0);
                     return;
                 }
             }
@@ -223,7 +225,6 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
                 df.SIZEABLE   |
                 df.MULTILINE
     );
-
     var win1 = mp.Window.init(wnd1, allocator);
 
     if (std.mem.eql(u8, fname, sUntitled) == false) {

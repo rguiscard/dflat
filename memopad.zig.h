@@ -14,3 +14,5 @@ DBOX c_ReplaceTextDB();
 BOOL BuildFileList(WINDOW, char *);
 void BuildDirectoryList(WINDOW);
 void BuildPathDisplay(WINDOW);
+
+extern DBOX Display;

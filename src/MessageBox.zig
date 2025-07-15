@@ -3,6 +3,7 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
 const DialogBox = @import("DialogBox.zig");
+const msg = @import("Message.zig").Message;
 
 pub fn ErrorMessage(message: []const u8) bool {
     const result = GenericMessage(null, "Error", message, 1, ErrorBoxProc, "   Ok   ", null, df.ID_OK, 0, true);
@@ -25,7 +26,7 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
                   button1: ?[]const u8, button2: ?[]const u8, c1: c_int, c2: c_int, isModal: bool) bool {
     var mBox = df.c_MsgBox();
     var ttl:[*c]u8 = null;
-    const msg:[*c]u8 = @constCast(message.ptr);
+    const m:[*c]u8 = @constCast(message.ptr);
     var ttl_w:c_int = 0;
     if (title) |t| {
       ttl = @constCast(t.ptr);
@@ -41,8 +42,8 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
     }
 
     mBox.dwnd.title = ttl;
-    mBox.ctl[0].dwnd.h = df.MsgHeight(msg);
-    mBox.ctl[0].dwnd.w = @max(@max(df.MsgWidth(msg), buttonct*8+buttonct+2),ttl_w);
+    mBox.ctl[0].dwnd.h = df.MsgHeight(m);
+    mBox.ctl[0].dwnd.w = @max(@max(df.MsgWidth(m), buttonct*8+buttonct+2),ttl_w);
     mBox.dwnd.h = mBox.ctl[0].dwnd.h+6;
     mBox.dwnd.w = mBox.ctl[0].dwnd.w+4;
     if (buttonct == 1) {
@@ -55,7 +56,7 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
 
     mBox.ctl[1].dwnd.y = mBox.dwnd.h - 4;
     mBox.ctl[2].dwnd.y = mBox.dwnd.h - 4;
-    mBox.ctl[0].itext = msg;
+    mBox.ctl[0].itext = m;
     mBox.ctl[1].itext = b1;
     mBox.ctl[2].itext = b2;
     mBox.ctl[1].command = c1;
@@ -76,15 +77,15 @@ pub fn MomentaryMessage(message: []const u8, allocator: std.mem.Allocator) Windo
                     -1,-1,df.MsgHeight(m)+2,df.MsgWidth(m)+2,
                     df.NULL,null,null,
                     df.HASBORDER | df.SHADOW | df.SAVESELF);
-    const win = Window.init(wnd, allocator);
-    _ = df.SendMessage(wnd, df.SETTEXT, @intCast(@intFromPtr(m)), 0);
+    var win = Window.init(wnd, allocator);
+    _ = win.sendTextMessage(msg.SETTEXT, @constCast(message), 0);
     if (df.cfg.mono == 0) {
         wnd.*.WindowColors[df.STD_COLOR][df.FG] = df.WHITE;
         wnd.*.WindowColors[df.STD_COLOR][df.BG] = df.GREEN;
         wnd.*.WindowColors[df.FRAME_COLOR][df.FG] = df.WHITE;
         wnd.*.WindowColors[df.FRAME_COLOR][df.BG] = df.GREEN;
     }
-    _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
+    _ = win.sendMessage(msg.SHOW_WINDOW, 0, 0);
     return win;
 }
 
