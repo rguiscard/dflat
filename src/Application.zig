@@ -153,7 +153,7 @@ fn CreateMenu(win: *Window) void {
     if (wnd.*.MenuBarWnd != null) {
         _ = df.SendMessage(wnd.*.MenuBarWnd, df.CLOSE_WINDOW, 0, 0);
     }
-    win.win.*.MenuBarWnd = df.CreateWindow(df.MENUBAR,
+    var mwnd = Window.create(df.MENUBAR,
                         null,
                         @intCast(win.GetClientLeft()),
                         @intCast(win.GetClientTop()-1),
@@ -162,11 +162,14 @@ fn CreateMenu(win: *Window) void {
                         null,
                         wnd,
                         null,
-                        0);
+                        0,
+                        root.global_allocator);
+
+    win.win.*.MenuBarWnd = mwnd.win;
+
     const ext:isize = @intCast(@intFromPtr(wnd.*.extension));
     _ = df.SendMessage(wnd.*.MenuBarWnd, df.BUILDMENU, ext,0);
-    const mbWnd = win.win.*.MenuBarWnd;
-    mbWnd.*.attrib = mbWnd.*.attrib | df.VISIBLE; // should use win.AddAttribute()
+    mwnd.AddAttribute(df.VISIBLE);
 }
 
 // ----------- Create the status bar -------------
@@ -177,7 +180,7 @@ fn CreateStatusBar(win: *Window) void {
         win.win.*.StatusBar = null;
     }
     if (win.TestAttribute(df.HASSTATUSBAR)) {
-        const sbar = df.CreateWindow(df.STATUSBAR,
+        var sbar = Window.create(df.STATUSBAR,
                             null,
                             @intCast(win.GetClientLeft()),
                             @intCast(win.GetBottom()),
@@ -186,8 +189,9 @@ fn CreateStatusBar(win: *Window) void {
                             null,
                             wnd,
                             null,
-                            0);
-        win.win.*.StatusBar = sbar;
-        sbar.*.attrib = sbar.*.attrib | df.VISIBLE; // should use win.AddAttribute()
+                            0,
+                            root.global_allocator);
+        win.win.*.StatusBar = sbar.win;
+        sbar.AddAttribute(df.VISIBLE);
     }
 }

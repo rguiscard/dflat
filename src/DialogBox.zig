@@ -1,4 +1,5 @@
 const std = @import("std");
+const root = @import("root.zig");
 const df = @import("ImportC.zig").df;
 const command = @import("Commands.zig").Command;
 const msg = @import("Message.zig");
@@ -19,16 +20,19 @@ pub fn DialogBox(wnd: df.WINDOW, db:*df.DBOX, Modal: bool,
         save = df.SAVESELF;
     }
 
-    const DialogWnd = df.CreateWindow(df.DIALOG,
-                        db.*.dwnd.title,
+    const ttl:[]const u8 =  std.mem.span(db.*.dwnd.title);
+    var win = Window.create(df.DIALOG,
+                        ttl,
                         x, y,
                         db.*.dwnd.h,
                         db.*.dwnd.w,
                         db,
                         wnd,
                         wndproc,
-                        save);
-    var win = Window.init(DialogWnd, allocator);
+                        save,
+                        root.global_allocator);
+    const DialogWnd = win.win;
+
     _ = win.sendMessage(msg.Message.SETFOCUS, df.TRUE, 0);
     DialogWnd.*.Modal = if (Modal) 1 else 0;
     FirstFocus(db);

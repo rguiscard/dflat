@@ -16,6 +16,12 @@ pub const search = @import("Search.zig");
 pub const Classes = @import("Classes.zig");
 pub const app = @import("Application.zig");
 
+pub var global_allocator:std.mem.Allocator = undefined;
+
+pub fn setGlobalAllocator(allocator: std.mem.Allocator) void {
+    global_allocator = allocator;
+}
+
 pub fn BaseWndProc(klass: df.CLASS, wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) c_int {
     const base_class = Classes.classdefs[@intCast(klass)][0]; // base
     const index:c_int = @intFromEnum(base_class);

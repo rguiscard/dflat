@@ -71,13 +71,16 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
 
 pub fn MomentaryMessage(message: []const u8, allocator: std.mem.Allocator) Window {
     const m:[*c]u8 = @constCast(message.ptr);
-    const wnd = df.CreateWindow(
+
+    var win = Window.create(
                     df.TEXTBOX,
                     null,
                     -1,-1,df.MsgHeight(m)+2,df.MsgWidth(m)+2,
                     df.NULL,null,null,
-                    df.HASBORDER | df.SHADOW | df.SAVESELF);
-    var win = Window.init(wnd, allocator);
+                    df.HASBORDER | df.SHADOW | df.SAVESELF,
+                    allocator);
+    const wnd = win.win;
+
     _ = win.sendTextMessage(msg.SETTEXT, @constCast(message), 0);
     if (df.cfg.mono == 0) {
         wnd.*.WindowColors[df.STD_COLOR][df.FG] = df.WHITE;

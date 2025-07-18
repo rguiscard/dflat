@@ -2,6 +2,7 @@
 
 const df = @import("ImportC.zig").df;
 const app = @import("Application.zig");
+const sbar = @import("StatusBar.zig");
 
 // ----------- classes.h ------------
 //
@@ -83,7 +84,8 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.HASBORDER  |
                                                     df.NOCLIP     |
                                                     df.CONTROLBOX },
-    .{WindowClass.TEXTBOX,      df.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
+//    .{WindowClass.TEXTBOX,      StatusBarProc,   df.NOCLIP     },  // STATUSBAR
+    .{WindowClass.TEXTBOX,      sbar.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
     .{WindowClass.EDITBOX,      df.EditorProc,      0             },  // EDITOR
 
     // ========> Add new classes here <========

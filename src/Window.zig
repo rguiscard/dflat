@@ -19,16 +19,16 @@ pub fn init(wnd: df.WINDOW, allocator: std.mem.Allocator) TopLevelFields {
 
 pub fn create(
     klass: df.CLASS,            // class of this window
-    ttl: []const u8,            // title or NULL
+    ttl: ?[]const u8,            // title or NULL
     left:c_int, top:c_int,      // upper left coordinates
     height:c_int, width:c_int,  // dimensions
-    extension:*anyopaque,       // pointer to additional data
+    extension:?*anyopaque,       // pointer to additional data
     parent: df.WINDOW,          // parent of this window
-    wndproc: *const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
+    wndproc: ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
     attrib: c_int,
     allocator: std.mem.Allocator) TopLevelFields {
 
-    const title = ttl.ptr;
+    const title = if (ttl) |t| t.ptr else null;
     const wnd = df.CreateWindow(klass, title, left, top, height, width, extension, parent, wndproc, attrib);
     return init(wnd, allocator);
 }

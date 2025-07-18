@@ -13,6 +13,9 @@ pub fn main() !void {
     if (mp.msg.init_messages() == false)
         return;
 
+    // set global allocator for all callback in dflat.zig
+    mp.setGlobalAllocator(allocator);
+
     // Argv = argv;
     df.Argv = null;
     // if (!LoadConfig())
@@ -209,8 +212,9 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
     wndpos += 2;
     if (wndpos == 20)
         wndpos = 2;
-    const wnd1 = df.CreateWindow(df.EDITBOX, // Win
-                fname.ptr,
+
+    var win1 = mp.Window.create(df.EDITBOX, // Win
+                fname,
                 (wndpos-1)*2, wndpos, 10, 40,
                 null, wnd, OurEditorProc,
                 df.SHADOW     |
@@ -221,9 +225,9 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
                 df.MOVEABLE   |
                 df.HASBORDER  |
                 df.SIZEABLE   |
-                df.MULTILINE
+                df.MULTILINE,
+                allocator
     );
-    var win1 = mp.Window.init(wnd1, allocator);
 
     if (std.mem.eql(u8, fname, sUntitled) == false) {
         if (win1.setTitle(filename)) |_| {
