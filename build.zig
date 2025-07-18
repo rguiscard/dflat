@@ -55,7 +55,6 @@ pub fn build(b: *std.Build) void {
             "editbox.c",
             "editor.c",
             "sysmenu.c",
-            "statbar.c",
 
             "dialbox.c",
             "msgbox.c",

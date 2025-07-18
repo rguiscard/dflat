@@ -17,6 +17,22 @@ pub fn init(wnd: df.WINDOW, allocator: std.mem.Allocator) TopLevelFields {
     };
 }
 
+pub fn create(
+    klass: df.CLASS,            // class of this window
+    ttl: []const u8,            // title or NULL
+    left:c_int, top:c_int,      // upper left coordinates
+    height:c_int, width:c_int,  // dimensions
+    extension:*anyopaque,       // pointer to additional data
+    parent: df.WINDOW,          // parent of this window
+    wndproc: *const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
+    attrib: c_int,
+    allocator: std.mem.Allocator) TopLevelFields {
+
+    const title = ttl.ptr;
+    const wnd = df.CreateWindow(klass, title, left, top, height, width, extension, parent, wndproc, attrib);
+    return init(wnd, allocator);
+}
+
 // ------- window methods -----------
 pub fn WindowHeight(self: *TopLevelFields) isize {
     const wnd = self.win;
@@ -98,6 +114,22 @@ pub fn GetRight(self: *TopLevelFields) isize {
     return rect.rt;
 }
 
+pub fn GetClientTop(self: *TopLevelFields) isize {
+    return self.GetTop() + self.TopBorderAdj();
+}
+
+pub fn GetClientBottom(self: *TopLevelFields) isize {
+    return self.GetBottom() - self.BottomBorderAdj();
+}
+
+pub fn GetClientLeft(self: *TopLevelFields) isize {
+    return self.GetLeft() + self.BorderAdj();
+}
+
+pub fn GetClientRight(self: *TopLevelFields) isize {
+    return self.GetRight() - self.TopBorderAdj();
+}
+
 pub fn getParent(self: *TopLevelFields) df.WINDOW {
     const wnd = self.win;
     return wnd.*.parent;
@@ -121,6 +153,26 @@ pub fn nextWindow(self: *TopLevelFields) df.WINDOW {
 pub fn prevWindow(self: *TopLevelFields) df.WINDOW {
     const wnd = self.win;
     return wnd.*.prevsibling;
+}
+
+pub fn GetAttribute(self: *TopLevelFields) c_int {
+    const wnd = self.win;
+    return wnd.*.attrib;
+}
+
+pub fn AddAttribute(self: *TopLevelFields, attr: c_int) void {
+    const wnd = self.win;
+    wnd.*.attrib = wnd.*.attrib | attr;
+}
+
+pub fn ClearAttribute(self: *TopLevelFields, attr: c_int) void {
+    const wnd = self.win;
+    wnd.*.attrib = wnd.*.attrib & (~attr);
+}
+
+pub fn TestAttribute(self: *TopLevelFields, attr: c_int) bool {
+    const wnd = self.win;
+    return (wnd.*.attrib & attr) > 0;
 }
 
 // ------------- edit box prototypes -----------

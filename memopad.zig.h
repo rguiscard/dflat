@@ -16,3 +16,7 @@ void BuildDirectoryList(WINDOW);
 void BuildPathDisplay(WINDOW);
 
 extern DBOX Display;
+
+extern WINDOW inFocus;
+
+extern int foreground, background;

@@ -18,7 +18,7 @@ pub fn main() !void {
     // if (!LoadConfig())
     //     cfg.ScreenLines = SCREENHEIGHT;
 
-    const wnd = df.CreateWindow(df.APPLICATION, // Win
+    var win = mp.Window.create(df.APPLICATION, // Win
                         "D-Flat MemoPad",
                         0, 0, -1, -1,
                         &df.MainMenu,
@@ -28,10 +28,8 @@ pub fn main() !void {
                         df.SIZEABLE  |
                         df.HASBORDER |
                         df.MINMAXBOX |
-                        df.HASSTATUSBAR
-                        );
-
-    var win = mp.Window.init(wnd, allocator);
+                        df.HASSTATUSBAR,
+                        allocator);
 
     df.LoadHelpFile(&DFlatApplication);
 

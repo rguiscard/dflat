@@ -59,14 +59,22 @@ fn CreateWindowMsg(win: *Window) c_int {
     }
     SelectColors(win);
     // INCLUDE_WINDOWOPTIONS
-//    df.SelectBorder(wnd);
-//    df.SelectTitle(wnd);
-//    df.SelectStatusBar(wnd);
+    SelectBorder(win);
+    SelectTitle(win);
+    SelectStatusBar(win);
 
     const rtn = root.BaseWndProc(df.APPLICATION, wnd, df.CREATE_WINDOW, 0, 0);
-//    if (wnd->extension != NULL)
-//        CreateMenu(wnd);
-//    CreateStatusBar(wnd);
+    if (wnd.*.extension != null) {
+        CreateMenu(win);
+    }
+
+    // FIXME: call this method result memory leak if:
+    // 1. open a document
+    // 2. exit the application
+    // It will not happen for exiting after new document or no document
+    // It will not happen for c version (calling df.ApplicationProc in src/Classes.zig).
+    CreateStatusBar(win);
+
     _ = df.SendMessage(null, df.SHOW_MOUSE, 0, 0);
     return rtn;
 }
@@ -100,5 +108,86 @@ fn DoWindowColors(wnd: df.WINDOW) void {
             _ = df.SendMessage(cwnd, df.CLEARTEXT, 0, 0);
         }
         cwnd = df.NextWindow(cwnd);
+    }
+}
+
+// ----- select the screen texture -----
+fn SelectTexture() void {
+    df.cfg.Texture = df.CheckBoxSetting(&df.Display, df.ID_TEXTURE);
+}
+
+// -- select whether the application screen has a border --
+fn SelectBorder(win: *Window) void {
+    df.cfg.Border = df.CheckBoxSetting(&df.Display, df.ID_BORDER);
+    if (df.cfg.Border > 0) {
+        win.AddAttribute(df.HASBORDER);
+    } else {
+        win.ClearAttribute(df.HASBORDER);
+    }
+}
+
+// select whether the application screen has a status bar
+fn SelectStatusBar(win: *Window) void {
+    df.cfg.StatusBar = df.CheckBoxSetting(&df.Display, df.ID_STATUSBAR);
+    if (df.cfg.StatusBar > 0) {
+        win.AddAttribute(df.HASSTATUSBAR);
+    } else {
+        win.ClearAttribute(df.HASSTATUSBAR);
+    }
+}
+
+// select whether the application screen has a title bar
+fn SelectTitle(win: *Window) void {
+    df.cfg.Title = df.CheckBoxSetting(&df.Display, df.ID_TITLE);
+    if (df.cfg.Title > 0) {
+        win.AddAttribute(df.HASTITLEBAR);
+    } else {
+        win.ClearAttribute(df.HASTITLEBAR);
+    }
+}
+
+// -------- Create the menu bar --------
+fn CreateMenu(win: *Window) void {
+    const wnd = win.win;
+    win.AddAttribute(df.HASMENUBAR);
+    if (wnd.*.MenuBarWnd != null) {
+        _ = df.SendMessage(wnd.*.MenuBarWnd, df.CLOSE_WINDOW, 0, 0);
+    }
+    win.win.*.MenuBarWnd = df.CreateWindow(df.MENUBAR,
+                        null,
+                        @intCast(win.GetClientLeft()),
+                        @intCast(win.GetClientTop()-1),
+                        1,
+                        @intCast(win.ClientWidth()),
+                        null,
+                        wnd,
+                        null,
+                        0);
+    const ext:isize = @intCast(@intFromPtr(wnd.*.extension));
+    _ = df.SendMessage(wnd.*.MenuBarWnd, df.BUILDMENU, ext,0);
+    const mbWnd = win.win.*.MenuBarWnd;
+    mbWnd.*.attrib = mbWnd.*.attrib | df.VISIBLE; // should use win.AddAttribute()
+}
+
+// ----------- Create the status bar -------------
+fn CreateStatusBar(win: *Window) void {
+    const wnd = win.win;
+    if (wnd.*.StatusBar != null)    {
+        _ = df.SendMessage(wnd.*.StatusBar, df.CLOSE_WINDOW, 0, 0);
+        win.win.*.StatusBar = null;
+    }
+    if (win.TestAttribute(df.HASSTATUSBAR)) {
+        const sbar = df.CreateWindow(df.STATUSBAR,
+                            null,
+                            @intCast(win.GetClientLeft()),
+                            @intCast(win.GetBottom()),
+                            1,
+                            @intCast(win.ClientWidth()),
+                            null,
+                            wnd,
+                            null,
+                            0);
+        win.win.*.StatusBar = sbar;
+        sbar.*.attrib = sbar.*.attrib | df.VISIBLE; // should use win.AddAttribute()
     }
 }

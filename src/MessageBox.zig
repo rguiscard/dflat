@@ -94,7 +94,7 @@ fn YesNoBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM)
         df.CREATE_WINDOW => {
             wnd.*.Class = df.MESSAGEBOX;
             df.InitWindowColors(wnd);
-            wnd.*.attrib = wnd.*.attrib & (~df.CONTROLBOX);
+            wnd.*.attrib = wnd.*.attrib & (~df.CONTROLBOX); // should use win.AddAttribute()
         },
         df.KEYBOARD => {
 //            int c = tolower((int)p1);
@@ -115,7 +115,7 @@ fn MessageBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARA
         df.CREATE_WINDOW => {
             wnd.*.Class = df.MESSAGEBOX;
             df.InitWindowColors(wnd);
-            wnd.*.attrib = wnd.*.attrib & (~df.CONTROLBOX);
+            wnd.*.attrib = wnd.*.attrib & (~df.CONTROLBOX); // should use win.AddAttribute()
         },
         df.KEYBOARD => {
 //            if (p1 == '\r' || p1 == ESC)
