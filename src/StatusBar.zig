@@ -1,8 +1,10 @@
 const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
+const Window = @import("Window.zig");
 
 pub export fn StatusBarProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
     switch (message) {
         df.CREATE_WINDOW => {
             _ = df.SendMessage(wnd, df.CAPTURE_CLOCK, 0, 0);
@@ -13,9 +15,22 @@ pub export fn StatusBarProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p
 //                        break;
         },
         df.PAINT => {
-//                        if (!isVisible(wnd))
-//                                break;
-//                        statusbar = DFcalloc(1, WindowWidth(wnd)+1);
+            if (df.isVisible(wnd) > 0) {
+                const statusbar = root.global_allocator.alloc(u8, @intCast(win.WindowWidth()+1));
+                if (statusbar) |sb| {
+                    @memset(sb, ' ');
+                    sb[sb.len-1] = '0';
+                    const sub = "F1=Help";
+                    @memcpy(sb[0..7], sub);
+
+                    df.SetStandardColor(wnd);
+                    df.PutWindowLine(wnd, @constCast(@ptrCast(sb)), 0, 0);
+                    defer root.global_allocator.free(sb);
+                    return df.TRUE;
+                } else |_| {
+                    // error
+                }
+//            statusbar = DFcalloc(1, WindowWidth(wnd)+1);
 //                        memset(statusbar, ' ', WindowWidth(wnd));
 //                        *(statusbar+WindowWidth(wnd)) = '\0';
 //                        strncpy(statusbar+1, "F1=Help", 7);
@@ -30,17 +45,17 @@ pub export fn StatusBarProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p
 //                                *(statusbar+WindowWidth(wnd)-8) = '\0';
 //                        else
 //                                strncpy(statusbar+WindowWidth(wnd)-8, time_string, 9);
-//                        SetStandardColor(wnd);
+//            SetStandardColor(wnd);
 //            PutWindowLine(wnd, statusbar, 0, 0);
 //                        free(statusbar);
 //                        return TRUE;
-//            return df.StatusBarProc(wnd, message, p1, p2);
+            }
         },
         df.BORDER => {
             return df.TRUE;
         },
         df.CLOCKTICK => {
-//            return df.StatusBarProc(wnd, message, p1, p2);
+            return df.StatusBarProc(wnd, message, p1, p2);
 //                        SetStandardColor(wnd);
 //                        PutWindowLine(wnd, (char *)p1, WindowWidth(wnd)-8, 0);
 //                        wnd->TimePosted = TRUE;

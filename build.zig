@@ -69,7 +69,6 @@ pub fn build(b: *std.Build) void {
             "direct.c",
             "pictbox.c",
             "calendar.c",
-            "barchart.c",
             "clipbord.c",
             "helpbox.c",
             "decomp.c",

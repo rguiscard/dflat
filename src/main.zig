@@ -125,7 +125,7 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     return df.TRUE;
                 },
                 command.ID_BARCHART => {
-                    df.BarChart(wnd);
+                    mp.barchart.BarChart(wnd);
                     return df.TRUE;
                 },
                 command.ID_EXIT => {

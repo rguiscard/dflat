@@ -14,11 +14,75 @@ pub fn ApplicationProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df
         df.CREATE_WINDOW => {
             return CreateWindowMsg(win);
         },
+        df.HIDE_WINDOW => {
+            if (wnd == df.inFocus)
+                df.inFocus = null;
+        },
+        df.ADDSTATUS => {
+            AddStatusMsg(win, p1);
+            return df.TRUE;
+        },
+        df.SETFOCUS => {
+//            if ((int)p1 == (inFocus != wnd))    {
+//                SetFocusMsg(wnd, (BOOL) p1);
+//                return TRUE;
+//            }
+        },
+        df.SIZE => {
+//            SizeMsg(wnd, p1, p2);
+//            return df.TRUE;
+        },
+        df.MINIMIZE => {
+            return df.TRUE;
+        },
+        df.KEYBOARD => {
+//            return df.KeyboardMsg(wnd, p1, p2);
+        },
+        df.SHIFT_CHANGED => {
+//            ShiftChangedMsg(wnd, p1);
+//            return df.TRUE;
+        },
+        df.PAINT => {
+//            if (isVisible(wnd))    {
+//                int cl = cfg.Texture ? APPLCHAR : ' ';
+//                ClearWindow(wnd, (RECT *)p1, cl);
+//            }
+//            return df.TRUE;
+        },
+        df.COMMAND => {
+//            CommandMsg(wnd, p1, p2);
+//            return df.TRUE;
+        },
+        df.CLOSE_WINDOW => {
+//            return CloseWindowMsg(wnd);
+        },
         else => {
         }
     }
 //    return root.BaseWndProc(df.APPLICATION, wnd, message, p1, p2);
     return df.ApplicationProc(wnd, message, p1, p2);
+}
+
+// --------- ADDSTATUS Message ----------
+fn AddStatusMsg(win: *Window, p1: df.PARAM) void {
+    const wnd = win.win;
+    if (wnd.*.StatusBar != null) {
+        var text:?[]const u8 = null;
+        if (p1 > 0) {
+            const p:usize = @intCast(p1);
+            const t:[*c]u8 = @ptrFromInt(p);
+            text = std.mem.span(t);
+            if (text.?.len == 0) {
+                text = null;
+            }
+        }
+        if (text) |_| {
+            _ = df.SendMessage(wnd.*.StatusBar, df.SETTEXT, p1, 0);
+        } else {
+            _ = df.SendMessage(wnd.*.StatusBar, df.CLEARTEXT, 0, 0);
+        }
+        _ = df.SendMessage(wnd.*.StatusBar, df.PAINT, 0, 0);
+    }
 }
 
 // --------------- CREATE_WINDOW Message --------------
