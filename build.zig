@@ -60,7 +60,6 @@ pub fn build(b: *std.Build) void {
             "msgbox.c",
             "box.c",
             "text.c",
-            "button.c",
             "radio.c",
             "checkbox.c",
             "spinbutt.c",

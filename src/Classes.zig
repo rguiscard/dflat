@@ -2,7 +2,8 @@
 
 const df = @import("ImportC.zig").df;
 const app = @import("Application.zig");
-const sbar = @import("StatusBar.zig");
+const sb = @import("StatusBar.zig");
+const bt = @import("Button.zig");
 
 // ----------- classes.h ------------
 //
@@ -69,7 +70,7 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.HASBORDER  |
                                                     df.NOCLIP     },
     .{WindowClass.NORMAL,       df.BoxProc,         df.HASBORDER  },  // BOX
-    .{WindowClass.TEXTBOX,      df.ButtonProc,      df.SHADOW     },  // BUTTON
+    .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
     .{WindowClass.EDITBOX,      df.ComboProc,       0             },  // COMBOBOX
     .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT
     .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
@@ -84,8 +85,7 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.HASBORDER  |
                                                     df.NOCLIP     |
                                                     df.CONTROLBOX },
-//    .{WindowClass.TEXTBOX,      StatusBarProc,   df.NOCLIP     },  // STATUSBAR
-    .{WindowClass.TEXTBOX,      sbar.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
+    .{WindowClass.TEXTBOX,      sb.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
     .{WindowClass.EDITBOX,      df.EditorProc,      0             },  // EDITOR
 
     // ========> Add new classes here <========

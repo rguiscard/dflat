@@ -8,6 +8,37 @@ const Window = @import("Window.zig");
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
 
+const MAXCONTROLS = 30;
+
+pub const DLBox = struct {
+    HelpName: []const u8,
+    dwnd: df.DIALOGWINDOW,
+    ctl: [MAXCONTROLS+1]?df.CTLWINDOW = .{null} ** (MAXCONTROLS+1),
+
+    pub fn addControl(self: DLBox, ty: df.CLASS, tx:?[]const u8, x: c_int, y: c_int, w: c_int, h: c_int, c: c_int) void {
+        var box = self;
+
+        for(self.ctl, 0..) |ctl, i| {
+            if (ctl == null) {
+                const txt = if ((ty == df.EDITBOX) or (ty == df.COMBOBOX)) null else if (tx) |t| t.ptr else null;
+                const ctl_wnd:df.CTLWINDOW = .{
+                    .dwnd = .{.title = null, .x = x, .y = y, .h = h, .w = w},
+                    .Class = ty,
+                    .itext = @constCast(txt),
+                    .command = c,
+                    .help = null, // should be #c, c in text
+                    .isetting = if (ty == df.BUTTON) df.ON else df.OFF,
+                    .setting = df.OFF,
+                    .wnd = null,
+                };
+
+                box.ctl[i] = ctl_wnd;
+                break;
+            }
+        }
+    }
+};
+
 // ------- create and execute a dialog box ----------
 pub fn DialogBox(wnd: df.WINDOW, db:*df.DBOX, Modal: bool,
                  wndproc: ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int) bool {

@@ -16,6 +16,8 @@ pub const search = @import("Search.zig");
 pub const Classes = @import("Classes.zig");
 pub const app = @import("Application.zig");
 pub const barchart = @import("BarChart.zig");
+pub const button = @import("Button.zig");
+pub const Dialogs = @import("Dialogs.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 
