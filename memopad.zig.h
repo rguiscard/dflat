@@ -20,3 +20,6 @@ extern DBOX Display;
 extern WINDOW inFocus;
 
 extern int foreground, background;
+
+int ControlProc(WINDOW, MESSAGE, PARAM, PARAM);
+int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2);

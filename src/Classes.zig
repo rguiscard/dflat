@@ -4,6 +4,7 @@ const df = @import("ImportC.zig").df;
 const app = @import("Application.zig");
 const sb = @import("StatusBar.zig");
 const bt = @import("Button.zig");
+const box = @import("Box.zig");
 
 // ----------- classes.h ------------
 //
@@ -69,7 +70,7 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.CONTROLBOX |
                                                     df.HASBORDER  |
                                                     df.NOCLIP     },
-    .{WindowClass.NORMAL,       df.BoxProc,         df.HASBORDER  },  // BOX
+    .{WindowClass.NORMAL,       box.BoxProc,        df.HASBORDER  },  // BOX
     .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
     .{WindowClass.EDITBOX,      df.ComboProc,       0             },  // COMBOBOX
     .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT

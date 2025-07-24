@@ -4,7 +4,7 @@
 
 static int inFocusCommand(DBOX *);
 static BOOL dbShortcutKeys(DBOX *, int);
-static int ControlProc(WINDOW, MESSAGE, PARAM, PARAM);
+int ControlProc(WINDOW, MESSAGE, PARAM, PARAM);
 static void FirstFocus(DBOX *db);
 static void NextFocus(DBOX *db);
 static void PrevFocus(DBOX *db);
@@ -201,6 +201,7 @@ static BOOL CommandMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* ----- window-processing module, DIALOG window class ----- */
+/*
 int DialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
 	int rtn;
@@ -258,6 +259,7 @@ int DialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
     }
     return BaseWndProc(DIALOG, wnd, msg, p1, p2);
 }
+*/
 
 /* ------- create and execute a dialog box ---------- */
 BOOL DialogBox(WINDOW wnd, DBOX *db, BOOL Modal,
@@ -680,7 +682,7 @@ static void FixColors(WINDOW wnd)
 }
 
 /* -- generic window processor used by dialog box controls -- */
-static int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
+int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 {
     DBOX *db;
 

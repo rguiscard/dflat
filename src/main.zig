@@ -206,8 +206,7 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
         } else |_| { return; }
     }
 
-    const wwnd = df.WatchIcon();
-    var wwin = mp.Window.init(wwnd, allocator);
+    var wwin = mp.watch.WatchIcon();
 
     wndpos += 2;
     if (wndpos == 20)

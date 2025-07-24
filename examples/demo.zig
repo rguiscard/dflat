@@ -1,6 +1,7 @@
 const std = @import("std");
 const mp = @import("memopad");
 const df = mp.df;
+const message = mp.msg.Message;
 
 var filename: [1024]u8 = undefined;
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -14,54 +15,64 @@ pub fn main() !void {
     // stdout, not any debugging messages.
     const stdout_file = std.io.getStdErr().writer();
     var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+//    const stdout = bw.writer();
 
-    var filename_it = std.mem.splitScalar(u8, &filename, 0);
-    const path = try std.fs.cwd().realpathAlloc(allocator, filename_it.first());
-    try stdout.print("{s}\n", .{path});
+//    var filename_it = std.mem.splitScalar(u8, &filename, 0);
+//    const path = try std.fs.cwd().realpathAlloc(allocator, filename_it.first());
+//    try stdout.print("{s}\n", .{path});
     try bw.flush(); // Don't forget to flush!
 }
 
 fn run_dflat_app() !void {
-    const init_value = df.init_messages();
-    if (init_value == 0)
+    if (mp.msg.init_messages() == false)
         return;
 
-    const wnd = df.CreateWindow(df.APPLICATION,
-                        "File Selector",
+    // set global allocator for all callback in dflat.zig
+    mp.setGlobalAllocator(allocator);
+
+    var win = mp.Window.create(df.APPLICATION, // Win
+                        "D-Flat MemoPad",
                         0, 0, -1, -1,
                         &df.MainMenu,
                         null,
-                        FileSelectorProc,
+                        MainProc,
                         df.MOVEABLE  |
                         df.SIZEABLE  |
                         df.HASBORDER |
                         df.MINMAXBOX |
-                        df.HASSTATUSBAR
-                        );
-    _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
-    SelectFile(wnd);
+                        df.HASSTATUSBAR,
+                        allocator);
 
-    while (df.dispatch_message() > 0) {
+    _ = win.sendMessage(message.SETFOCUS, df.TRUE, 0);
+
+    _ = mp.watch.WatchIcon();
+
+    const bwnd = mp.Window.create(
+                    df.BOX,
+                    "Box",
+                    4, 5, 10, 15,
+                    null, null,
+                    BoxProc,
+                    df.VISIBLE | df.HASBORDER | df.SHADOW | df.SAVESELF,
+                    allocator);
+    _ = bwnd;
+
+
+    while (mp.msg.dispatch_message()) {
     }
 
     return;
 }
 
-fn SelectFile(wnd: df.WINDOW) void {
-    const fspec = "*";
-    if (mp.fileopen.OpenFileDialogBox(allocator, fspec, &filename)) {
-        df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
-    }
+fn BoxProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    return mp.DefaultWndProc(wnd, msg, p1, p2);
 }
 
-fn FileSelectorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+fn MainProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch (msg)    {
         df.COMMAND => {
             switch (p1)    {
                 df.ID_OPEN => {
-                    _ = SelectFile(wnd);
-                    return df.TRUE;
                 },
                 else => {
                 }
@@ -72,3 +83,4 @@ fn FileSelectorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM)
     }
     return df.ApplicationProc(wnd, msg, p1, p2);
 }
+

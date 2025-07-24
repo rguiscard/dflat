@@ -7,6 +7,7 @@ const testing = std.testing;
 // This make dflat public to all zig codes
 pub const df = @import("ImportC.zig").df;
 pub const Window = @import("Window.zig");
+pub const Dialogs = @import("Dialogs.zig");
 pub const DBox = @import("DBox.zig");
 pub const msg = @import("Message.zig");
 pub const msgbox = @import("MessageBox.zig");
@@ -17,7 +18,8 @@ pub const Classes = @import("Classes.zig");
 pub const app = @import("Application.zig");
 pub const barchart = @import("BarChart.zig");
 pub const button = @import("Button.zig");
-pub const Dialogs = @import("Dialogs.zig");
+pub const box = @import("Box.zig");
+pub const watch = @import("Watch.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 

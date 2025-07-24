@@ -58,7 +58,6 @@ pub fn build(b: *std.Build) void {
 
             "dialbox.c",
             "msgbox.c",
-            "box.c",
             "text.c",
             "radio.c",
             "checkbox.c",
@@ -72,7 +71,6 @@ pub fn build(b: *std.Build) void {
             "helpbox.c",
             "decomp.c",
             "log.c",
-            "watch.c",
 
             "video.c",
             "events-unix.c",
