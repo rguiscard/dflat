@@ -2,15 +2,6 @@ void FixTabMenu(void);
 char *NameComponent(char *);
 void ShowPosition(WINDOW);
 
-void Calendar(WINDOW);
-void BarChart(WINDOW);
-
-DBOX c_MsgBox();
-DBOX c_FileOpen();
-DBOX c_SaveAs();
-DBOX c_SearchTextDB();
-DBOX c_ReplaceTextDB();
-
 BOOL BuildFileList(WINDOW, char *);
 void BuildDirectoryList(WINDOW);
 void BuildPathDisplay(WINDOW);
@@ -21,5 +12,5 @@ extern WINDOW inFocus;
 
 extern int foreground, background;
 
-int ControlProc(WINDOW, MESSAGE, PARAM, PARAM);
+int cDialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2);

@@ -2,6 +2,7 @@ const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
+const Dialogs = @import("Dialogs.zig");
 
 var _allocator: std.mem.Allocator = undefined;
 var _fileSpec:?[]const u8 = null;
@@ -40,13 +41,13 @@ fn set_fileName(text: []const u8) void {
 
 // Dialog Box to select a file to open
 pub fn OpenFileDialogBox(allocator: std.mem.Allocator, Fspec:[]const u8, Fname:[*c]u8) bool {
-    var fBox = df.c_FileOpen();
+    var fBox = Dialogs.FileOpen;
     return DlgFileOpen(allocator, Fspec, Fspec, Fname, &fBox);
 }
 
 // Dialog Box to select a file to save as
 pub fn SaveAsDialogBox(allocator: std.mem.Allocator, Fspec:[]const u8, Sspec:?[]const u8, Fname:[*c]u8) bool {
-    var sBox = df.c_SaveAs();
+    var sBox = Dialogs.SaveAs;
     return DlgFileOpen(allocator, Fspec, Sspec orelse Fspec, Fname, &sBox);
 }
 

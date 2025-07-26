@@ -13,7 +13,6 @@ pub fn ErrorMessage(message: []const u8) bool {
 
 // FIXME: potential double free error
 pub fn MessageBox(title: []const u8, message: []const u8) bool {
-    _ = Dialogs.GetMsgBox();
     const result = GenericMessage(null, title, message, 1, MessageBoxProc, "   Ok   ", null, df.ID_OK, 0, true);
     return result;
 }
@@ -26,7 +25,8 @@ pub fn YesNoBox(message: []const u8) bool {
 fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, buttonct: c_int,
                   wndproc: *const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
                   button1: ?[]const u8, button2: ?[]const u8, c1: c_int, c2: c_int, isModal: bool) bool {
-    var mBox = df.c_MsgBox();
+    var mBox = Dialogs.MsgBox;
+//    var mBox = df.c_MsgBox();
     const m:[*c]u8 = @constCast(message.ptr);
     var ttl_w:c_int = 0;
     if (title) |t| {
@@ -55,7 +55,10 @@ fn GenericMessage(wnd: df.WINDOW, title: ?[]const u8, message:[]const u8, button
     mBox.ctl[2].command = c2;
     mBox.ctl[1].isetting = df.ON;
     mBox.ctl[2].isetting = df.ON;
-    const rtn = DialogBox.DialogBox(wnd, &mBox, isModal, wndproc);
+
+    var box = DialogBox.init(&mBox);
+    const rtn = box.create(wnd, isModal, wndproc);
+//    const rtn = DialogBox.DialogBox(wnd, &mBox, isModal, wndproc);
 
     mBox.ctl[2].Class = 0;
     return rtn;

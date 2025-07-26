@@ -5,13 +5,13 @@ const msg = @import("Message.zig").Message;
 const msgbox = @import("MessageBox.zig");
 const cmd = @import("Commands.zig").Command;
 const Window = @import("Window.zig");
-const DBox = @import("DBox.zig");
 const DialogBox = @import("DialogBox.zig");
+const Dialogs = @import("Dialogs.zig");
 
 var CheckCase = true;
 var Replacing = false;
 var lastsize:usize = 0;
-var dbox:DBox = undefined;
+var dbox:DialogBox = undefined;
 
 // - case-insensitive, white-space-normalized char compare -
 fn SearchCmp(a:u8, b:u8) bool {
@@ -167,12 +167,12 @@ fn SearchTextBox(wnd:df.WINDOW, incr:bool) void {
 pub fn ReplaceText(wnd:df.WINDOW) void {
     Replacing = true;
     lastsize = 0;
-    var box = df.c_ReplaceTextDB();
-    dbox = DBox.init(&box);
+    var box = Dialogs.ReplaceTextDB;
+    dbox = DialogBox.init(&box);
     if (CheckCase) {
         dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (DialogBox.DialogBox(null, dbox.box, true, null)) {
+    if (dbox.create(null, true, null)) {
         CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }
@@ -182,12 +182,12 @@ pub fn ReplaceText(wnd:df.WINDOW) void {
 pub fn SearchText(wnd:df.WINDOW) void {
     Replacing = false;
     lastsize = 0;
-    var box = df.c_SearchTextDB();
-    dbox = DBox.init(&box);
+    var box = Dialogs.SearchTextDB;
+    dbox = DialogBox.init(&box);
     if (CheckCase) {
         dbox.setCheckBox(cmd.ID_MATCHCASE);
     }
-    if (DialogBox.DialogBox(null, dbox.box, true, null)) {
+    if (dbox.create(null, true, null)) {
         CheckCase = dbox.checkBoxSetting(cmd.ID_MATCHCASE);
         SearchTextBox(wnd, false);
     }

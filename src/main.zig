@@ -121,7 +121,7 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     return df.TRUE;
                 },
                 command.ID_CALENDAR => {
-                    df.Calendar(wnd);
+                    mp.calendar.Calendar(wnd);
                     return df.TRUE;
                 },
                 command.ID_BARCHART => {

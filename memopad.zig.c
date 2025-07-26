@@ -7,33 +7,6 @@ char DFlatApplication[] = "MemoPad";
 char *NameComponent(char *);
 void FixTabMenu(void);
 
-extern DBOX MsgBox;
-extern DBOX FileOpen;
-extern DBOX SaveAs;
-extern DBOX SearchTextDB;
-extern DBOX ReplaceTextDB;
-
-/* return MESSAGEBOX */
-DBOX c_MsgBox() {
-    return MsgBox;
-};
-
-DBOX c_FileOpen() {
-    return FileOpen;
-};
-
-DBOX c_SaveAs() {
-    return SaveAs;
-};
-
-DBOX c_SearchTextDB() {
-    return SearchTextDB;
-};
-
-DBOX c_ReplaceTextDB() {
-    return ReplaceTextDB;
-};
-
 /* ------ display the row and column in the statusbar ------ */
 void ShowPosition(WINDOW wnd)
 {

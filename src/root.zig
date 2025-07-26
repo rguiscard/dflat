@@ -8,7 +8,6 @@ const testing = std.testing;
 pub const df = @import("ImportC.zig").df;
 pub const Window = @import("Window.zig");
 pub const Dialogs = @import("Dialogs.zig");
-pub const DBox = @import("DBox.zig");
 pub const msg = @import("Message.zig");
 pub const msgbox = @import("MessageBox.zig");
 pub const fileopen = @import("FileOpen.zig");
@@ -20,6 +19,7 @@ pub const barchart = @import("BarChart.zig");
 pub const button = @import("Button.zig");
 pub const box = @import("Box.zig");
 pub const watch = @import("Watch.zig");
+pub const calendar = @import("Calendar.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 

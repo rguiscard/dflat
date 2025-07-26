@@ -4,6 +4,7 @@ const df = @import("ImportC.zig").df;
 const command = @import("Commands.zig").Command;
 const msg = @import("Message.zig");
 const Window = @import("Window.zig");
+const Dialogs = @import("Dialogs.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
@@ -12,34 +13,39 @@ var SysMenuOpen = false;
 const MAXCONTROLS = 30;
 var dbs = std.ArrayList(*df.DBOX).init(allocator);
 
-pub const DLBox = struct {
-    HelpName: []const u8,
-    dwnd: df.DIALOGWINDOW,
-    ctl: [MAXCONTROLS+1]?df.CTLWINDOW = .{null} ** (MAXCONTROLS+1),
+// Handle DBOX from dflat
+box: *df.DBOX,
 
-    pub fn addControl(self: DLBox, ty: df.CLASS, tx:?[]const u8, x: c_int, y: c_int, w: c_int, h: c_int, c: c_int) void {
-        var box = self;
+/// `@This()` can be used to refer to this struct type. In files with fields, it is quite common to
+/// name the type here, so it can be easily referenced by other declarations in this file.
+const TopLevelFields = @This();
 
-        for(self.ctl, 0..) |ctl, i| {
-            if (ctl == null) {
-                const txt = if ((ty == df.EDITBOX) or (ty == df.COMBOBOX)) null else if (tx) |t| @constCast(t.ptr) else null;
-                const ctl_wnd:df.CTLWINDOW = .{
-                    .dwnd = .{.title = null, .x = x, .y = y, .h = h, .w = w},
-                    .Class = ty,
-                    .itext = txt,
-                    .command = c,
-                    .help = null, // should be #c, c in text
-                    .isetting = if (ty == df.BUTTON) df.ON else df.OFF,
-                    .setting = df.OFF,
-                    .wnd = null,
-                };
+// use create() after this one to create associate windows
+pub fn init(box: *df.DBOX) TopLevelFields {
+    return .{
+        .box = box,
+    };
+}
 
-                box.ctl[i] = ctl_wnd;
-                break;
-            }
-        }
-    }
-};
+pub fn setCheckBox(self: *TopLevelFields, cmd: command) void {
+    const c:c_uint = @intCast(@intFromEnum(cmd));
+    df.SetCheckBox(self.box,  c);
+}
+
+pub fn checkBoxSetting(self: *TopLevelFields, cmd: command) bool {
+    const c:c_uint = @intCast(@intFromEnum(cmd));
+    return (df.CheckBoxSetting(self.box,  c) > 0);
+}
+
+
+pub fn getEditBoxText(self: *TopLevelFields, cmd: command) [*c]u8 {
+    const c:c_uint = @intCast(@intFromEnum(cmd));
+    return df.GetEditBoxText(self.box,  c);
+}
+
+pub fn deinit(self: *TopLevelFields) void {
+    _ = self;
+}
 
 // -------- CREATE_WINDOW Message ---------
 fn CreateWindowMsg(wnd: df.WINDOW, p1: df.PARAM, p2: df.PARAM) c_int {
@@ -143,10 +149,12 @@ pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
         df.LEFT_BUTTON => {
 //            if (LeftButtonMsg(wnd, p1, p2))
 //                return TRUE;
+            return df.cDialogProc(wnd, message, p1, p2);
         },
         df.KEYBOARD => {
 //            if (KeyboardMsg(wnd, p1, p2))
 //                return TRUE;
+            return df.cDialogProc(wnd, message, p1, p2);
         },
         df.CLOSE_POPDOWN => {
             SysMenuOpen = false;
@@ -160,9 +168,9 @@ pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
             }
         },
         df.SETFOCUS => {
-//                        if ((int)p1 && wnd->dfocus != NULL && isVisible(wnd))
-//                                return SendMessage(wnd->dfocus, SETFOCUS, TRUE, 0);
-//            return df.cDialogProc(wnd, message, p1, p2_new);
+            if ((p1 != 0) and (wnd.*.dfocus != null) and (df.isVisible(wnd) > 0)) {
+                return df.SendMessage(wnd.*.dfocus, df.SETFOCUS, df.TRUE, 0);
+            }
         },
         df.COMMAND => {
             if (CommandMsg(wnd, p1, p2) > 0)
@@ -190,24 +198,25 @@ pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
 }
 
 // ------- create and execute a dialog box ----------
-pub fn DialogBox(wnd: df.WINDOW, db:*df.DBOX, Modal: bool,
+// Use this one after init()
+pub fn create(self: *TopLevelFields, wnd: df.WINDOW, Modal: bool,
                  wndproc: ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int) bool {
     var rtn = false;
-    const x = db.*.dwnd.x;
-    const y = db.*.dwnd.y;
+    const x = self.box.*.dwnd.x;
+    const y = self.box.*.dwnd.y;
 
     var save:c_int = 0;
     if (Modal) {
         save = df.SAVESELF;
     }
 
-    const ttl:[]const u8 =  std.mem.span(db.*.dwnd.title);
+    const ttl:[]const u8 =  std.mem.span(self.box.*.dwnd.title);
     var win = Window.create(df.DIALOG,
                         ttl,
                         x, y,
-                        db.*.dwnd.h,
-                        db.*.dwnd.w,
-                        db,
+                        self.box.*.dwnd.h,
+                        self.box.*.dwnd.w,
+                        self.box,
                         wnd,
                         wndproc,
                         save,
@@ -216,7 +225,7 @@ pub fn DialogBox(wnd: df.WINDOW, db:*df.DBOX, Modal: bool,
 
     _ = win.sendMessage(msg.Message.SETFOCUS, df.TRUE, 0);
     DialogWnd.*.Modal = if (Modal) 1 else 0;
-    FirstFocus(db);
+    self.FirstFocus();
     df.PostMessage(DialogWnd, df.INITIATE_DIALOG, 0, 0);
     if (Modal) {
         _ = win.sendMessage(msg.Message.CAPTURE_MOUSE, 0, 0);
@@ -265,6 +274,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
         df.KEYBOARD => {
 //            if (CtlKeyboardMsg(wnd, p1, p2))
 //                return TRUE;
+            return df.ControlProc(wnd, message, p1, p2);
         },
         df.PAINT => {
 //            FixColors(wnd);
@@ -272,6 +282,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
 //                    GetClass(wnd) == LISTBOX ||
 //                        GetClass(wnd) == TEXTBOX)
 //                SetScrollBars(wnd);
+            return df.ControlProc(wnd, message, p1, p2);
         },
         df.BORDER => {
 //                        FixColors(wnd);
@@ -282,6 +293,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
 //                inFocus = oldFocus;
 //                return TRUE;
 //            }
+            return df.ControlProc(wnd, message, p1, p2);
         },
         df.SETFOCUS => {
             const db:?*df.DBOX = if (df.GetParent(wnd) != null) @alignCast(@ptrCast(df.GetParent(wnd).*.extension)) else null;
@@ -315,6 +327,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
         },
         df.CLOSE_WINDOW => {
 //            CtlCloseWindowMsg(wnd);
+            return df.ControlProc(wnd, message, p1, p2);
         },
         else => {
         }
@@ -336,7 +349,8 @@ fn CtlCreateWindowMsg(wnd: df.WINDOW) void {
 }
 
 // ---- change the focus to the first control ---
-fn FirstFocus(db:*df.DBOX) void {
+fn FirstFocus(self: *TopLevelFields) void {
+    const db = self.box;
     var ct:[*c]df.CTLWINDOW = &db.*.ctl;
     if (ct != null) {
         while ((ct.*.Class == df.TEXT) or (ct.*.Class == df.BOX)) {

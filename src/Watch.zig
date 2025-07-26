@@ -2,20 +2,23 @@ const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
+const msg = @import("Message.zig").Message;
 
 var tick:usize = 0;
 const hands = [_][]const u8{" À ", " Ú ", " ¿ ", " Ù "};
 const bo = "Í";
 
 pub export fn WatchIconProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
+
     switch (message) {
         df.CREATE_WINDOW => {
             tick = 0;
             const rtn = root.DefaultWndProc(wnd, message, p1, p2);
-            _ = df.SendMessage(wnd, df.CAPTURE_MOUSE, 0, 0);
-            _ = df.SendMessage(wnd, df.HIDE_MOUSE, 0, 0);
-            _ = df.SendMessage(wnd, df.CAPTURE_KEYBOARD, 0, 0);
-            _ = df.SendMessage(wnd, df.CAPTURE_CLOCK, 0, 0);
+            _ = win.sendMessage(msg.CAPTURE_MOUSE, 0, 0);
+            _ = win.sendMessage(msg.HIDE_MOUSE, 0, 0);
+            _ = win.sendMessage(msg.CAPTURE_KEYBOARD, 0, 0);
+            _ = win.sendMessage(msg.CAPTURE_CLOCK, 0, 0);
             return rtn;
         },
         df.CLOCKTICK => {
@@ -38,16 +41,16 @@ pub export fn WatchIconProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p
             return rtn;
         },
         df.MOUSE_MOVED => {
-            _ = df.SendMessage(wnd, df.HIDE_WINDOW, 0, 0);
-            _ = df.SendMessage(wnd, df.MOVE, p1, p2);
-            _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
+            _ = win.sendMessage(msg.HIDE_WINDOW, 0, 0);
+            _ = win.sendMessage(msg.MOVE, p1, p2);
+            _ = win.sendMessage(msg.SHOW_WINDOW, 0, 0);
             return df.TRUE;
         },
         df.CLOSE_WINDOW => {
-            _ = df.SendMessage(wnd, df.RELEASE_CLOCK, 0, 0);
-            _ = df.SendMessage(wnd, df.RELEASE_MOUSE, 0, 0);
-            _ = df.SendMessage(wnd, df.RELEASE_KEYBOARD, 0, 0);
-            _ = df.SendMessage(wnd, df.SHOW_MOUSE, 0, 0);
+            _ = win.sendMessage(msg.RELEASE_CLOCK, 0, 0);
+            _ = win.sendMessage(msg.RELEASE_MOUSE, 0, 0);
+            _ = win.sendMessage(msg.RELEASE_KEYBOARD, 0, 0);
+            _ = win.sendMessage(msg.SHOW_MOUSE, 0, 0);
         },
         else => {
         }

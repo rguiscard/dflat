@@ -45,8 +45,22 @@ fn run_dflat_app() !void {
 
     _ = win.sendMessage(message.SETFOCUS, df.TRUE, 0);
 
-    _ = mp.watch.WatchIcon();
+//    _ = mp.watch.WatchIcon();
 
+//    Box();
+    Calendar(win);
+
+    while (mp.msg.dispatch_message()) {
+    }
+
+    return;
+}
+
+fn Calendar(win:mp.Window) void {
+    _ = mp.calendar.Calendar(win.win);
+}
+
+fn Box() void {
     const bwnd = mp.Window.create(
                     df.BOX,
                     "Box",
@@ -56,12 +70,6 @@ fn run_dflat_app() !void {
                     df.VISIBLE | df.HASBORDER | df.SHADOW | df.SAVESELF,
                     allocator);
     _ = bwnd;
-
-
-    while (mp.msg.dispatch_message()) {
-    }
-
-    return;
 }
 
 fn BoxProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
