@@ -5,6 +5,7 @@ const app = @import("Application.zig");
 const sb = @import("StatusBar.zig");
 const bt = @import("Button.zig");
 const box = @import("Box.zig");
+const cb = @import("CheckBox.zig");
 
 // ----------- classes.h ------------
 //
@@ -75,7 +76,7 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.EDITBOX,      df.ComboProc,       0             },  // COMBOBOX
     .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT
     .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
-    .{WindowClass.TEXTBOX,      df.CheckBoxProc,    0             },  // CHECKBOX
+    .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX
     .{WindowClass.LISTBOX,      df.SpinButtonProc,  0             },  // SPINBUTTON
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // ERRORBOX
                                                     df.HASBORDER  },

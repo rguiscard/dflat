@@ -6,6 +6,9 @@ const Dialogs = @import("Dialogs.zig");
 const DialogBox = @import("DialogBox.zig");
 const msg = @import("Message.zig").Message;
 
+
+// InputBox and CancelBox were not used. Port them later.
+
 pub fn ErrorMessage(message: []const u8) bool {
     const result = GenericMessage(null, "Error", message, 1, ErrorBoxProc, "   Ok   ", null, df.ID_OK, 0, true);
     return result;

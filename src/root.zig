@@ -20,6 +20,8 @@ pub const button = @import("Button.zig");
 pub const box = @import("Box.zig");
 pub const watch = @import("Watch.zig");
 pub const calendar = @import("Calendar.zig");
+pub const log = @import("Log.zig");
+pub const checkbox = @import("CheckBox.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 

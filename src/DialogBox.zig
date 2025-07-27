@@ -5,6 +5,7 @@ const command = @import("Commands.zig").Command;
 const msg = @import("Message.zig");
 const Window = @import("Window.zig");
 const Dialogs = @import("Dialogs.zig");
+const checkbox = @import("CheckBox.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
@@ -34,7 +35,8 @@ pub fn setCheckBox(self: *TopLevelFields, cmd: command) void {
 
 pub fn checkBoxSetting(self: *TopLevelFields, cmd: command) bool {
     const c:c_uint = @intCast(@intFromEnum(cmd));
-    return (df.CheckBoxSetting(self.box,  c) > 0);
+    return (checkbox.CheckBoxSetting(self.box,  c) > 0);
+//    return (df.CheckBoxSetting(self.box,  c) > 0);
 }
 
 

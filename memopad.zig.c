@@ -3,6 +3,21 @@
 #include "dflat.h"
 
 char DFlatApplication[] = "MemoPad";
+char **Argv;
+WINDOW ApplicationWindow;
+
+static WINDOW oldFocus;
+static char *Menus[9] = {
+    "~1.                      ",
+    "~2.                      ",
+    "~3.                      ",
+    "~4.                      ",
+    "~5.                      ",
+    "~6.                      ",
+    "~7.                      ",
+    "~8.                      ",
+    "~9.                      "
+};
 
 char *NameComponent(char *);
 void FixTabMenu(void);
@@ -96,4 +111,77 @@ void PrepEditMenu(void *w, struct Menu *mnu)
 				ActivateCommand(&MainMenu, ID_UNDO);
 		}
 	}
+}
+
+/* ----------- Prepare the Window menu ------------ */
+void PrepWindowMenu(void *w, struct Menu *mnu)
+{
+    WINDOW wnd = w;
+    struct PopDown *p0 = mnu->Selections;
+    struct PopDown *pd = mnu->Selections + 2;
+    struct PopDown *ca = mnu->Selections + 13;
+    int MenuNo = 0;
+    WINDOW cwnd;
+    mnu->Selection = 0;
+    oldFocus = NULL;
+    if (GetClass(wnd) != APPLICATION)    {
+        oldFocus = wnd;
+        /* ----- point to the APPLICATION window ----- */
+                if (ApplicationWindow == NULL)
+                        return;
+                cwnd = FirstWindow(ApplicationWindow);
+        /* ----- get the first 9 document windows ----- */
+        while (cwnd != NULL && MenuNo < 9)    {
+            if (isVisible(cwnd) && GetClass(cwnd) != MENUBAR &&
+                    GetClass(cwnd) != STATUSBAR) {
+                /* --- add the document window to the menu --- */
+#if MSDOS | ELKS
+                strncpy(Menus[MenuNo]+4, WindowName(cwnd), 20);
+#endif
+                pd->SelectionTitle = Menus[MenuNo];
+                if (cwnd == oldFocus)    {
+                    /* -- mark the current document -- */
+                    pd->Attrib |= CHECKED;
+                    mnu->Selection = MenuNo+2;
+                }
+                else
+                    pd->Attrib &= ~CHECKED;
+                pd++;
+                MenuNo++;
+            }
+                        cwnd = NextWindow(cwnd);
+        }
+    }
+
+    if (MenuNo)
+        p0->SelectionTitle = "~Close all";
+    else
+        p0->SelectionTitle = NULL;
+    if (MenuNo >= 9)    {
+        *pd++ = *ca;
+        if (mnu->Selection == 0)
+            mnu->Selection = 11;
+    }
+    pd->SelectionTitle = NULL;
+}
+
+int MsgHeight(char *msg)
+{
+    int h = 1;
+    while ((msg = strchr(msg, '\n')) != NULL)    {
+        h++;
+        msg++;
+    }
+    return min(h, SCREENHEIGHT-10);
+}
+
+int MsgWidth(char *msg)
+{
+    int w = 0;
+    char *cp = msg;
+    while ((cp = strchr(msg, '\n')) != NULL)    {
+        w = max(w, (int) (cp-msg));
+        msg = cp+1;
+    }
+    return min(max(strlen(msg),w), SCREENWIDTH-10);
 }

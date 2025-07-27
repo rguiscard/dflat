@@ -40,19 +40,6 @@ pub const SaveAs:df.DBOX = buildDialog(
         .{df.BUTTON,   "  ~Help  ",    46,13, 1, 8, df.ID_HELP,      "ID_HELP"     },
     },
 );
-//DIALOGBOX( SaveAs )
-//    DB_TITLE(        "Save As",    -1,-1,19,57)
-//    CONTROL(TEXT,    "~Filename:",    3, 1, 1, 9, ID_FILENAME)
-//    CONTROL(EDITBOX, NULL,           13, 1, 1,40, ID_FILENAME)
-//    CONTROL(TEXT,    NULL,            3, 3, 1,50, ID_PATH )
-//    CONTROL(TEXT,    "~Directories:", 3, 5, 1,12, ID_DIRECTORY )
-//    CONTROL(LISTBOX, NULL,            3, 6,10,14, ID_DIRECTORY )
-//    CONTROL(TEXT,    "F~iles:",      19, 5, 1, 6, ID_FILES )
-//    CONTROL(LISTBOX, NULL,           19, 6,10,24, ID_FILES )
-//    CONTROL(BUTTON,  "   ~OK   ",    46, 7, 1, 8, ID_OK)
-//    CONTROL(BUTTON,  " ~Cancel ",    46,10, 1, 8, ID_CANCEL)
-//    CONTROL(BUTTON,  "  ~Help  ",    46,13, 1, 8, ID_HELP)
-//ENDDB
 
 // -------------- the Search Text dialog box ---------------
 pub const SearchTextDB:df.DBOX = buildDialog(
@@ -96,6 +83,21 @@ pub const MsgBox:df.DBOX = buildDialog(
         .{df.TEXT,   null, 1, 1, 0, 0, 0,            null       },
         .{df.BUTTON, null, 0, 0, 1, 8, df.ID_OK,     "ID_OK"    },
         .{0,         null, 0, 0, 1, 8, df.ID_CANCEL, "ID_CANCEL"},
+    },
+);
+
+// ------------ Message Log dialog box --------------
+pub const Log:df.DBOX = buildDialog(
+    "Log",
+    .{"D-Flat Message Log", -1, -1,18,41},
+    .{
+        .{df.TEXT,    "~Messages",10, 1, 1, 8, df.ID_LOGLIST, "ID_LOGLIST"},
+        .{df.LISTBOX, null,        1, 2,14,26, df.ID_LOGLIST, "ID_LOGLIST"},
+        .{df.TEXT,    "~Logging:",29, 4, 1,10, df.ID_LOGGING, "ID_LOGGING"},
+        .{df.CHECKBOX,null,       31, 5, 1, 3, df.ID_LOGGING, "ID_LOGGING"},
+        .{df.BUTTON,  "   ~OK   ",29, 7, 1, 8, df.ID_OK,      "ID_OK"     },
+        .{df.BUTTON,  " ~Cancel ",29,10, 1, 8, df.ID_CANCEL,  "ID_CANCEL" },
+        .{df.BUTTON,  "  ~Help  ",29,13, 1, 8, df.ID_HELP,    "ID_HELP"   },
     },
 );
 
@@ -157,33 +159,4 @@ fn buildControls(comptime controls:anytype) [df.MAXCONTROLS+1]df.CTLWINDOW {
 
     return result;
 }
-
-//#define CONTROL(ty,tx,x,y,h,w,c)                                                \
-//                                {{NULL,x,y,h,w},ty,                                             \
-//                                (ty==EDITBOX||ty==COMBOBOX?NULL:tx),    \
-//                                c,#c,(ty==BUTTON?ON:OFF),OFF,NULL},
-//
-//DIALOGBOX( MsgBox )
-//    DB_TITLE(       NULL,  -1,-1, 0, 0)
-//    CONTROL(TEXT,   NULL,   1, 1, 0, 0, 0)
-//    CONTROL(BUTTON, NULL,   0, 0, 1, 8, ID_OK)
-//    CONTROL(0,      NULL,   0, 0, 1, 8, ID_CANCEL)
-//ENDDB
-
-//const msgHelpName = "MsgBox";
-//const MsgBox: df.DBOX = .{
-//    .HelpName = @constCast(msgHelpName.ptr),
-//    .dwnd = .{
-//        .title = null,
-//        .x = -1,
-//        .y = -1,
-//        .h = 0,
-//        .w = 0,
-//    },
-//    .ctl = buildControls(.{
-//        .{df.TEXT,   null, 1, 1, 0, 0, 0,            null       },
-//        .{df.BUTTON, null, 0, 0, 1, 8, df.ID_OK,     "ID_OK"    },
-//        .{0,         null, 0, 0, 1, 8, df.ID_CANCEL, "ID_CANCEL"},
-//    }),
-//};
 
