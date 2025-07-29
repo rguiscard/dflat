@@ -2,7 +2,6 @@
 
 #include "dflat.h"
 
-/*
 int CheckBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     int rtn;
@@ -38,7 +37,6 @@ int CheckBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
     }
     return BaseWndProc(CHECKBOX, wnd, msg, p1, p2);
 }
-*/
 
 BOOL CheckBoxSetting(DBOX *db, enum commands cmd)
 {

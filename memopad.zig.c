@@ -185,3 +185,26 @@ int MsgWidth(char *msg)
     }
     return min(max(strlen(msg),w), SCREENWIDTH-10);
 }
+
+#ifdef INCLUDE_LOGGING
+
+static char *message[] = {
+    #undef DFlatMsg
+    #define DFlatMsg(m) " " #m,
+    #include "dflatmsg.h"
+    NULL
+};
+
+static FILE *log = NULL;
+extern DBOX Log;
+
+void LogMessages (WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
+{
+    if (log != NULL && message[msg][0] != ' ')
+        fprintf(log,
+            "%-20.20s %-12.12s %-20.20s, %5.5ld, %5.5ld\n",
+            wnd ? (GetTitle(wnd) ? GetTitle(wnd) : "") : "",
+            wnd ? ClassNames[GetClass(wnd)] : "",
+            message[msg]+1, p1, p2);
+}
+#endif
