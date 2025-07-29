@@ -408,7 +408,7 @@ fn CreateMenu(win: *Window) void {
 
     win.win.*.MenuBarWnd = mwnd.win;
 
-    const ext:isize = @intCast(@intFromPtr(wnd.*.extension));
+    const ext:df.PARAM = @intCast(@intFromPtr(wnd.*.extension));
     _ = df.SendMessage(wnd.*.MenuBarWnd, df.BUILDMENU, ext,0);
     mwnd.AddAttribute(df.VISIBLE);
 }

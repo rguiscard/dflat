@@ -24,7 +24,7 @@ pub fn main() !void {
     var win = mp.Window.create(df.APPLICATION, // Win
                         "D-Flat MemoPad",
                         0, 0, -1, -1,
-                        &df.MainMenu,
+                        @constCast(@ptrCast(&mp.Menus.MainMenu)),
                         null,
                         MemoPadProc,
                         df.MOVEABLE  |
@@ -60,9 +60,9 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
         message.CREATE_WINDOW => {
             const rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
             if (df.cfg.InsertMode == df.TRUE)
-                df.SetCommandToggle(&df.MainMenu, df.ID_INSERT);
+                df.SetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_INSERT);
             if (df.cfg.WordWrap == df.TRUE)
-                df.SetCommandToggle(&df.MainMenu, df.ID_WRAP);
+                df.SetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_WRAP);
             df.FixTabMenu();
             return rtn;
         },
@@ -93,11 +93,11 @@ fn MemoPadProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) call
                     return df.TRUE;
                 },
                 command.ID_WRAP => {
-                    df.cfg.WordWrap = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
+                    df.cfg.WordWrap = df.GetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_WRAP);
                     return df.TRUE;
                 },
                 command.ID_INSERT => {
-                    df.cfg.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
+                    df.cfg.InsertMode = df.GetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_INSERT);
                     return df.TRUE;
                 },
                 command.ID_TAB2 => {
@@ -320,8 +320,8 @@ fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) ca
         message.SETFOCUS => {
             const param:isize = @intCast(p1);
             if (param > 0) {
-                wnd.*.InsertMode = df.GetCommandToggle(&df.MainMenu, df.ID_INSERT);
-                wnd.*.WordWrapMode = df.GetCommandToggle(&df.MainMenu, df.ID_WRAP);
+                wnd.*.InsertMode = df.GetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_INSERT);
+                wnd.*.WordWrapMode = df.GetCommandToggle(@constCast(@ptrCast(&mp.Menus.MainMenu)), df.ID_WRAP);
             }
             rtn = mp.DefaultWndProc(wnd, msg, p1, p2);
             if (param == 0) {

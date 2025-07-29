@@ -135,11 +135,6 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    exe_mod.addCSourceFiles(.{ .files = &.{
-            "menus.zig.c",
-        },
-        .flags = &flags,
-    });
     exe_mod.addIncludePath(b.path("."));
 
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
