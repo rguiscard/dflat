@@ -57,7 +57,6 @@ pub fn build(b: *std.Build) void {
 
             "dialbox.c",
             "text.c",
-            "checkbox.c",
             "radio.c",
             "spinbutt.c",
             "combobox.c",
@@ -77,8 +76,6 @@ pub fn build(b: *std.Build) void {
             "tty.c",
             "tty-cp437.c",
             "runshell.c",
-
-            "dialogs.c", // this should belong to library
         },
         .flags = &flags,
     });

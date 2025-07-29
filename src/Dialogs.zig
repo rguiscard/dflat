@@ -86,6 +86,35 @@ pub const MsgBox:df.DBOX = buildDialog(
     },
 );
 
+// ------------ Display dialog box --------------
+// This needs to be var instead of const because unlike other dialogs,
+// values of checkbox and radio will change
+pub export var Display:df.DBOX = buildDialog(
+    "Display",
+    .{"Display", -1, -1, 19, 35},
+    .{
+        .{df.BOX,      "Window",  7, 1, 6,20, 0,            null          },
+        .{df.CHECKBOX, null,      9, 2, 1, 3, df.ID_TITLE,  "ID_TITLE"    },
+        .{df.TEXT,     "~Title", 15, 2, 1, 5, df.ID_TITLE,  "ID_TITLE"    },
+        .{df.CHECKBOX, null,      9, 3, 1, 3, df.ID_BORDER, "ID_BORDER"   },
+        .{df.TEXT,     "~Border",15, 3, 1, 6, df.ID_BORDER, "ID_BORDER"   },
+        .{df.CHECKBOX, null,      9, 4, 1, 3, df.ID_STATUSBAR, "ID_STATUSBAR"   },
+        .{df.TEXT,     "Status bar",15, 4, 1,10, df.ID_STATUSBAR, "ID_STATUSBAR"   },
+        .{df.CHECKBOX, null,       9, 5, 1, 3, df.ID_TEXTURE, "ID_TEXTURE"   },
+        .{df.TEXT,     "Te~xture",15, 5, 1, 7, df.ID_TEXTURE, "ID_TEXTURE"   },
+        .{df.BOX,         "Colors",   7, 8, 5,20, 0,            null          },
+        .{df.RADIOBUTTON, null,       9, 9, 1, 3, df.ID_COLOR, "ID_COLOR"   },
+        .{df.TEXT,        "Co~lor",  13, 9, 1, 5, df.ID_COLOR, "ID_COLOR"   },
+        .{df.RADIOBUTTON, null,       9,10, 1, 3, df.ID_MONO,  "ID_MONO"   },
+        .{df.TEXT ,       "~Mono",   13,10, 1, 4, df.ID_MONO,  "ID_MONO"   },
+        .{df.RADIOBUTTON, null,       9,11, 1, 3, df.ID_REVERSE,  "ID_REVERSE"   },
+        .{df.TEXT,        "~Reverse",13,11, 1, 7, df.ID_REVERSE,  "ID_REVERSE"   },
+        .{df.BUTTON,   "   ~OK   ",   2,15, 1,  8, df.ID_OK,          "ID_OK"         },
+        .{df.BUTTON,   " ~Cancel ",  12,15, 1,  8, df.ID_CANCEL,      "ID_CANCEL"     },
+        .{df.BUTTON,   "  ~Help  ",  22,15, 1,  8, df.ID_HELP,        "ID_HELP"       },
+    },
+);
+
 // ------------ Message Log dialog box --------------
 pub const Log:df.DBOX = buildDialog(
     "Log",
@@ -98,6 +127,19 @@ pub const Log:df.DBOX = buildDialog(
         .{df.BUTTON,  "   ~OK   ",29, 7, 1, 8, df.ID_OK,      "ID_OK"     },
         .{df.BUTTON,  " ~Cancel ",29,10, 1, 8, df.ID_CANCEL,  "ID_CANCEL" },
         .{df.BUTTON,  "  ~Help  ",29,13, 1, 8, df.ID_HELP,    "ID_HELP"   },
+    },
+);
+
+// ------------ the Help window dialog box --------------
+pub export const HelpBox:df.DBOX = buildDialog( // remove export after porting other c code
+    "HelpBox",
+    .{null, -1, -1,0,45},
+    .{
+        .{df.TEXTBOX, null,        1, 1, 0,40, df.ID_HELPTEXT, "ID_HELPTEXT"},
+        .{df.BUTTON,  "  ~Close ", 0, 0, 1, 8, df.ID_CANCEL,   "ID_CANCEL"  },
+        .{df.BUTTON,  "  ~Back  ",10, 0, 1, 8, df.ID_BACK,     "ID_BACK"    },
+        .{df.BUTTON,  "<< ~Prev ",20, 0, 1, 8, df.ID_PREV,     "ID_PREV"    },
+        .{df.BUTTON,  " ~Next >>",30, 0, 1, 8, df.ID_NEXT,     "ID_NEXT"    },
     },
 );
 
