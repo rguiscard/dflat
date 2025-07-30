@@ -6,6 +6,8 @@ const sb = @import("StatusBar.zig");
 const bt = @import("Button.zig");
 const box = @import("Box.zig");
 const cb = @import("CheckBox.zig");
+const combo = @import("ComboBox.zig");
+const pict = @import("PictBox.zig");
 
 // ----------- classes.h ------------
 //
@@ -65,7 +67,7 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.LISTBOX,      df.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
                                                     df.NOCLIP     |
                                                     df.HASBORDER  },
-    .{WindowClass.TEXTBOX,      df.PictureProc,     0             },  // PICTUREBOX
+    .{WindowClass.TEXTBOX,      pict.PictureProc,   0             },  // PICTUREBOX
     .{WindowClass.NORMAL,       df.DialogProc,      df.SHADOW     |   // DIALOG
                                                     df.MOVEABLE   |
                                                     df.CONTROLBOX |
@@ -73,7 +75,7 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.NOCLIP     },
     .{WindowClass.NORMAL,       box.BoxProc,        df.HASBORDER  },  // BOX
     .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
-    .{WindowClass.EDITBOX,      df.ComboProc,       0             },  // COMBOBOX
+    .{WindowClass.EDITBOX,      combo.ComboProc,    0             },  // COMBOBOX
     .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT
     .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
     .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX

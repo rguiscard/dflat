@@ -22,7 +22,9 @@ pub const watch = @import("Watch.zig");
 pub const calendar = @import("Calendar.zig");
 pub const log = @import("Log.zig");
 pub const checkbox = @import("CheckBox.zig");
+pub const combobox = @import("ComboBox.zig");
 pub const Menus = @import("Menus.zig");
+pub const pictbox = @import("PictBox.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 

@@ -3,6 +3,7 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
 const msg = @import("Message.zig").Message;
+const pict = @import("PictBox.zig");
 
 const ctime = @cImport({
     @cInclude("time.h");
@@ -46,12 +47,12 @@ fn BuildDateArray() void {
 fn CreateWindowMsg(wnd: df.WINDOW) void {
     var x:isize = 5;
     var y:isize = 4;
-    df.DrawBox(wnd, 1, 2, CALHEIGHT-4, CALWIDTH-4);
+    pict.DrawBox(wnd, 1, 2, CALHEIGHT-4, CALWIDTH-4);
     while(x < CALWIDTH-4) : (x += 4) {
-        df.DrawVector(wnd, @intCast(x), 2, CALHEIGHT-4, df.FALSE);
+        pict.DrawVector(wnd, @intCast(x), 2, CALHEIGHT-4, df.FALSE);
     }
     while(y < CALHEIGHT-3) : (y += 2) {
-        df.DrawVector(wnd, 1, @intCast(y), CALWIDTH-4, df.TRUE);
+        pict.DrawVector(wnd, 1, @intCast(y), CALWIDTH-4, df.TRUE);
     }
 }
 

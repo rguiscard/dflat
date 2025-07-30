@@ -14,3 +14,9 @@ extern int foreground, background;
 
 int cDialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2);
+
+/* used in pictbox */
+typedef struct    {
+    enum VectTypes vt;
+    RECT rc;
+} VECT;
