@@ -57,7 +57,7 @@ pub fn build(b: *std.Build) void {
             "dialbox.c",
             "text.c",
             "radio.c",
-            "spinbutt.c",
+//            "spinbutt.c",
             "direct.c",
             "clipbord.c",
             "helpbox.c",

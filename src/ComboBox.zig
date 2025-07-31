@@ -6,9 +6,5 @@ const Window = @import("Window.zig");
 // ComboBox is not used in memopad. Port it later
 
 pub export fn ComboProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
-    _ = wnd;
-    _ = message;
-    _ = p1;
-    _ = p2;
-    return df.TRUE;
+    return root.BaseWndProc(df.COMBOBOX, wnd, message, p1, p2);
 }

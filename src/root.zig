@@ -23,6 +23,7 @@ pub const calendar = @import("Calendar.zig");
 pub const log = @import("Log.zig");
 pub const checkbox = @import("CheckBox.zig");
 pub const combobox = @import("ComboBox.zig");
+pub const spinbutton = @import("SpinButton.zig");
 pub const Menus = @import("Menus.zig");
 pub const pictbox = @import("PictBox.zig");
 pub const listbox = @import("ListBox.zig");

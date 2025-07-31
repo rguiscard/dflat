@@ -9,6 +9,7 @@ const cb = @import("CheckBox.zig");
 const combo = @import("ComboBox.zig");
 const pict = @import("PictBox.zig");
 const lb = @import("ListBox.zig");
+const spin = @import("SpinButton.zig");
 
 // ----------- classes.h ------------
 //
@@ -80,7 +81,7 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT
     .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
     .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX
-    .{WindowClass.LISTBOX,      df.SpinButtonProc,  0             },  // SPINBUTTON
+    .{WindowClass.LISTBOX,      spin.SpinButtonProc,  0             },  // SPINBUTTON
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // ERRORBOX
                                                     df.HASBORDER  },
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // MESSAGEBOX
