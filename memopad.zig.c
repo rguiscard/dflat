@@ -208,3 +208,18 @@ void LogMessages (WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
             message[msg]+1, p1, p2);
 }
 #endif
+
+/*
+#define within(p,v1,v2)   ((p)>=(v1)&&(p)<=(v2))
+#define RectTop(r)        (r.tp)
+#define RectBottom(r)     (r.bt)
+#define RectLeft(r)       (r.lf)
+#define RectRight(r)      (r.rt)
+#define InsideRect(x,y,r) (within((x),RectLeft(r),RectRight(r))\
+                               &&                              \
+                          within((y),RectTop(r),RectBottom(r)))
+*/
+int cInsideRect(int x, int y, RECT r) {
+    return within((x), RectLeft(r), RectRight(r)) &&
+    within((y), RectTop(r), RectBottom(r));
+}

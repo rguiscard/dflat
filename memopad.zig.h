@@ -20,3 +20,5 @@ typedef struct    {
     enum VectTypes vt;
     RECT rc;
 } VECT;
+
+int cInsideRect(int x, int y, RECT r);

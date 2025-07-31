@@ -50,7 +50,6 @@ pub fn build(b: *std.Build) void {
             "menubar.c",
             "menu.c",
             "popdown.c",
-            "listbox.c",
             "editbox.c",
             "editor.c",
             "sysmenu.c",

@@ -8,6 +8,7 @@ const box = @import("Box.zig");
 const cb = @import("CheckBox.zig");
 const combo = @import("ComboBox.zig");
 const pict = @import("PictBox.zig");
+const lb = @import("ListBox.zig");
 
 // ----------- classes.h ------------
 //
@@ -61,7 +62,7 @@ pub const classdefs = [_]struct{WindowClass,
                                                      df.SAVESELF  |
                                                      df.CONTROLBOX},
     .{WindowClass.NORMAL,       df.TextBoxProc,     0             },  // TEXTBOX
-    .{WindowClass.TEXTBOX,      df.ListBoxProc,     0             },  // LISTBOX
+    .{WindowClass.TEXTBOX,      lb.ListBoxProc,     0             },  // LISTBOX
     .{WindowClass.TEXTBOX,      df.EditBoxProc,     0             },  // EDITBOX
     .{WindowClass.NORMAL,       df.MenuBarProc,     df.NOCLIP     },  // MENUBAR
     .{WindowClass.LISTBOX,      df.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
