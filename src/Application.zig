@@ -176,28 +176,32 @@ fn CommandMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) void {
         df.ID_EXIT, df.ID_SYSCLOSE => {
             df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
         },
-//        df.ID_HELP => {
-//            df.DisplayHelp(wnd, DFlatApplication);
-//        },
-//        df.ID_HELPHELP => {
-//            df.DisplayHelp(wnd, "HelpHelp");
-//        },
-//        df.ID_EXTHELP => {
-//            df.DisplayHelp(wnd, "ExtHelp");
-//        },
-//        df.ID_KEYSHELP => {
-//            df.DisplayHelp(wnd, "KeysHelp");
-//        }
-//        df.ID_HELPINDEX => {
-//            df.DisplayHelp(wnd, "HelpIndex");
-//        }
-          df.ID_LOG => {
-              log.MessageLog(wnd);
-          },
-          df.ID_DOS => {
-//              df.ShellDOS(wnd);
-          },
-          df.ID_DISPLAY => {
+        df.ID_HELP => {
+            _ = df.DisplayHelp(wnd, df.DFlatApplication);
+        },
+        df.ID_HELPHELP => {
+            const helpName = "HelpHelp";
+            _ = df.DisplayHelp(wnd, @constCast(helpName.ptr));
+        },
+        df.ID_EXTHELP => {
+            const helpName = "ExtHelp";
+            _ = df.DisplayHelp(wnd, @constCast(helpName.ptr));
+        },
+        df.ID_KEYSHELP => {
+            const helpName = "KeysHelp";
+            _ = df.DisplayHelp(wnd, @constCast(helpName.ptr));
+        },
+        df.ID_HELPINDEX => {
+            const helpName = "HelpIndex";
+            _ = df.DisplayHelp(wnd, @constCast(helpName.ptr));
+        },
+        df.ID_LOG => {
+            log.MessageLog(wnd);
+        },
+        df.ID_DOS => {
+//            df.ShellDOS(wnd);
+        },
+        df.ID_DISPLAY => {
 //            if (DialogBox(wnd, &Display, TRUE, NULL))    {
 //                                if (inFocus == wnd->MenuBarWnd || inFocus == wnd->StatusBar)
 //                                        oldFocus = ApplicationWindow;

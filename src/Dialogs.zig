@@ -131,7 +131,8 @@ pub const Log:df.DBOX = buildDialog(
 );
 
 // ------------ the Help window dialog box --------------
-pub export const HelpBox:df.DBOX = buildDialog( // remove export after porting other c code
+// This need to be mutable because it will be modified at runtime.
+pub export var HelpBox:df.DBOX = buildDialog( // remove export after porting other c code
     "HelpBox",
     .{null, -1, -1,0,45},
     .{
