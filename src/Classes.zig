@@ -11,6 +11,7 @@ const pict = @import("PictBox.zig");
 const lb = @import("ListBox.zig");
 const spin = @import("SpinButton.zig");
 const hb = @import("HelpBox.zig");
+const editor = @import("Editor.zig");
 
 // ----------- classes.h ------------
 //
@@ -94,7 +95,8 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.NOCLIP     |
                                                     df.CONTROLBOX },
     .{WindowClass.TEXTBOX,      sb.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
-    .{WindowClass.EDITBOX,      df.EditorProc,      0             },  // EDITOR
+//    .{WindowClass.EDITBOX,      df.EditorProc,      0             },  // EDITOR
+    .{WindowClass.EDITBOX,      editor.EditorProc,      0             },  // EDITOR
 
     // ========> Add new classes here <========
 

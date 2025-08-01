@@ -37,3 +37,5 @@ extern BOOL Helping;
 FILE *OpenHelpFile(const char *fn, const char *md);
 int cHelpBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void ReadHelp(WINDOW);
+
+int cEditorProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
