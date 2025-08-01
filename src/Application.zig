@@ -598,20 +598,18 @@ fn SetScreenHeight(height: c_int) void {
 // ----- Close all document windows -----
 fn CloseAll(win:*Window, closing:bool) void {
     const wnd = win.win;
-    _ = wnd;
-//    WINDOW wnd1, wnd2;
-//    SendMessage(wnd, SETFOCUS, TRUE, 0);
-//        wnd1 = LastWindow(wnd);
-//        while (wnd1 != NULL)    {
-//                wnd2 = PrevWindow(wnd1);
-//        if (isVisible(wnd1) &&
-//                                GetClass(wnd1) != MENUBAR &&
-//                                        GetClass(wnd1) != STATUSBAR)    {
-//                ClearVisible(wnd1);
-//            SendMessage(wnd1, CLOSE_WINDOW, 0, 0);
-//                }
-//                wnd1 = wnd2;
-//    }
+    _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
+    var wnd1:df.WINDOW = df.LastWindow(wnd);
+    var wnd2:df.WINDOW = undefined;
+    while (wnd1 != null) {
+        wnd2 = df.PrevWindow(wnd1);
+        if ((df.isVisible(wnd1) > 0) and df.GetClass(wnd1) != df.MENUBAR and
+                                        df.GetClass(wnd1) != df.STATUSBAR) {
+              wnd.*.attrib = wnd.*.attrib & ~df.VISIBLE; // FIXME, should use ClearVisible() macro
+              _ = df.SendMessage(wnd1, df.CLOSE_WINDOW, 0, 0);
+        }
+        wnd1 = wnd2;
+    }
     if (closing == false)
         _ = win.sendMessage(msg.PAINT, 0, 0);
 }
