@@ -22,3 +22,18 @@ typedef struct    {
 } VECT;
 
 int cInsideRect(int x, int y, RECT r);
+
+struct helps *FindHelp(char *Help);
+void BuildHelpBox(WINDOW wnd);
+extern struct helps *FirstHelp;
+extern struct helps *ThisHelp;
+extern int HelpCount;
+extern char HelpFileName[9];
+
+extern FILE *helpfp;
+extern char hline [160];
+extern BOOL Helping;
+
+FILE *OpenHelpFile(const char *fn, const char *md);
+int cHelpBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+void ReadHelp(WINDOW);

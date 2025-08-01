@@ -10,6 +10,7 @@ const combo = @import("ComboBox.zig");
 const pict = @import("PictBox.zig");
 const lb = @import("ListBox.zig");
 const spin = @import("SpinButton.zig");
+const hb = @import("HelpBox.zig");
 
 // ----------- classes.h ------------
 //
@@ -86,7 +87,8 @@ pub const classdefs = [_]struct{WindowClass,
                                                     df.HASBORDER  },
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // MESSAGEBOX
                                                     df.HASBORDER  },
-    .{WindowClass.DIALOG,       df.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
+//    .{WindowClass.DIALOG,       df.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
+    .{WindowClass.DIALOG,       hb.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
                                                     df.SAVESELF   |
                                                     df.HASBORDER  |
                                                     df.NOCLIP     |
