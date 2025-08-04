@@ -39,3 +39,7 @@ int cHelpBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void ReadHelp(WINDOW);
 
 int cEditorProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+
+// text.c
+void drawText(WINDOW wnd);

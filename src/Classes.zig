@@ -12,6 +12,8 @@ const lb = @import("ListBox.zig");
 const spin = @import("SpinButton.zig");
 const hb = @import("HelpBox.zig");
 const editor = @import("Editor.zig");
+const editbox = @import("EditBox.zig");
+const text = @import("Text.zig");
 
 // ----------- classes.h ------------
 //
@@ -66,7 +68,8 @@ pub const classdefs = [_]struct{WindowClass,
                                                      df.CONTROLBOX},
     .{WindowClass.NORMAL,       df.TextBoxProc,     0             },  // TEXTBOX
     .{WindowClass.TEXTBOX,      lb.ListBoxProc,     0             },  // LISTBOX
-    .{WindowClass.TEXTBOX,      df.EditBoxProc,     0             },  // EDITBOX
+//    .{WindowClass.TEXTBOX,      df.EditBoxProc,     0             },  // EDITBOX
+    .{WindowClass.TEXTBOX,      editbox.EditBoxProc,     0             },  // EDITBOX
     .{WindowClass.NORMAL,       df.MenuBarProc,     df.NOCLIP     },  // MENUBAR
     .{WindowClass.LISTBOX,      df.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
                                                     df.NOCLIP     |
@@ -80,7 +83,7 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.NORMAL,       box.BoxProc,        df.HASBORDER  },  // BOX
     .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
     .{WindowClass.EDITBOX,      combo.ComboProc,    0             },  // COMBOBOX
-    .{WindowClass.TEXTBOX,      df.TextProc,        0             },  // TEXT
+    .{WindowClass.TEXTBOX,      text.TextProc,        0             },  // TEXT
     .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
     .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX
     .{WindowClass.LISTBOX,      spin.SpinButtonProc,  0             },  // SPINBUTTON

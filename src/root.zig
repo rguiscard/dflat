@@ -28,6 +28,7 @@ pub const Menus = @import("Menus.zig");
 pub const pictbox = @import("PictBox.zig");
 pub const listbox = @import("ListBox.zig");
 pub const helpbox = @import("HelpBox.zig");
+pub const text = @import("Text.zig");
 
 pub var global_allocator:std.mem.Allocator = undefined;
 
