@@ -43,3 +43,14 @@ int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 // text.c
 void drawText(WINDOW wnd);
+
+// editor.c
+int EditorKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+int EditorSetTextMsg(WINDOW wnd, char *Buf);
+
+// helpbox.c
+BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1);
+BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
+
+// memnubar.c
+int cMenuBarProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);

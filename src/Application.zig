@@ -127,12 +127,9 @@ fn SizeMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) void {
 // ----------- KEYBOARD Message ------------
 fn KeyboardMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) c_int {
     const wnd = win.win;
-    _ = wnd;
-    _ = p1;
-    _ = p2;
-//    if (WindowMoving || WindowSizing || (int) p1 == F1)
-//        return BaseWndProc(APPLICATION, wnd, KEYBOARD, p1, p2);
-//    switch ((int) p1)    {
+    if ((df.WindowMoving > 0) or (df.WindowSizing>0) or (p1 == df.F1))
+        return root.BaseWndProc(df.APPLICATION, wnd, df.KEYBOARD, p1, p2);
+    switch (p1)  {
 //        case ALT_F4:
 //                        if (TestAttribute(wnd, CONTROLBOX))
 //                    PostMessage(wnd, CLOSE_WINDOW, 0, 0);
@@ -146,10 +143,10 @@ fn KeyboardMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) c_int {
 //                        if (TestAttribute(wnd, CONTROLBOX))
 //                    BuildSystemMenu(wnd);
 //            return TRUE;
-//        default:
-//            break;
-//    }
-//    PostMessage(wnd->MenuBarWnd, KEYBOARD, p1, p2);
+        else => {
+        }
+    }
+    df.PostMessage(wnd.*.MenuBarWnd, df.KEYBOARD, p1, p2);
     return df.TRUE;
 }
 

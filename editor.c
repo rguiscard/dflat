@@ -4,8 +4,11 @@
 #define pTab ('\t' + 0x80)
 #define sTab ('\f' + 0x80)
 
+int EditorSetTextMsg(WINDOW wnd, char *Buf);
+int EditorKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+
 /* ---------- SETTEXT Message ------------ */
-static int SetTextMsg(WINDOW wnd, char *Buf)
+int EditorSetTextMsg(WINDOW wnd, char *Buf)
 {
    	unsigned char *tp, *ep, *ttp;
    	int x = 0;
@@ -129,7 +132,7 @@ static void RepaintLine(WINDOW wnd)
 }
 
 /* --------- KEYBOARD Message ---------- */
-static int KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
+int EditorKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     int c = (int) p1;
 	BOOL delnl;
@@ -186,20 +189,4 @@ static int KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 			break;
 	}
     return FALSE;
-}
-
-/* ------- Window processing module for EDITBOX class ------ */
-int cEditorProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
-{
-    switch (msg)    {
-		case KEYBOARD:
-            if (KeyboardMsg(wnd, p1, p2))
-                return TRUE;
-            break;
-		case SETTEXT:
-			return SetTextMsg(wnd, (char *) p1);
-        default:
-            break;
-    }
-    return BaseWndProc(EDITOR, wnd, msg, p1, p2);
 }

@@ -46,18 +46,11 @@ struct helps *FindHelp(char *);
 static void DisplayDefinition(WINDOW, char *);
 static void BestFit(WINDOW, DIALOGWINDOW *);
 
-/* ------------- CREATE_WINDOW message ------------ */
-static void CreateWindowMsg(WINDOW wnd)
-{
-    Helping = TRUE;
-    GetClass(wnd) = HELPBOX;
-    InitWindowColors(wnd);
-    if (ThisHelp != NULL)
-        ThisHelp->hwnd = wnd;
-}
+BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1);
+BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
 
 /* ------------- COMMAND message ------------ */
-static BOOL CommandMsg(WINDOW wnd, PARAM p1)
+BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1)
 {
     switch ((int)p1)    {
         case ID_PREV:
@@ -79,7 +72,7 @@ static BOOL CommandMsg(WINDOW wnd, PARAM p1)
 }
 
 /* ------------- KEYBOARD message ------------ */
-static BOOL KeyboardMsg(WINDOW wnd, PARAM p1)
+BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1)
 {
     WINDOW cwnd;
 
@@ -126,39 +119,6 @@ static BOOL KeyboardMsg(WINDOW wnd, PARAM p1)
     }
     SendMessage(cwnd, PAINT, 0, 0);
     return TRUE;
-}
-
-/* ---- window processing module for the HELPBOX ------- */
-int cHelpBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
-{
-    switch (msg)    {
-        case CREATE_WINDOW:
-            CreateWindowMsg(wnd);
-            break;
-        case INITIATE_DIALOG:
-            ReadHelp(wnd);
-            break;
-        case COMMAND:
-            if (p2 != 0)
-                break;
-            if (CommandMsg(wnd, p1))
-                return TRUE;
-            break;
-        case KEYBOARD:
-            if (WindowMoving)
-                break;
-            if (KeyboardMsg(wnd, p1))
-                return TRUE;
-            break;
-        case CLOSE_WINDOW:
-            if (ThisHelp != NULL)
-                ThisHelp->hwnd = NULL;
-            Helping = FALSE;
-            break;
-        default:
-            break;
-    }
-    return BaseWndProc(HELPBOX, wnd, msg, p1, p2);
 }
 
 /* ---- PAINT message for the helpbox text editbox ---- */
@@ -492,7 +452,7 @@ BOOL DisplayHelp(WINDOW wnd, char *Help)
         if ((helpfp = OpenHelpFile(HelpFileName, "rb")) != NULL)    {
 			BuildHelpBox(wnd);
 		    DisableButton(&HelpBox, ID_BACK);
-            /* ------- display the help window ----- */
+            // ------- display the help window -----
             DialogBox(NULL, &HelpBox, TRUE, HelpBoxProc);
             free(HelpBox.dwnd.title);
 			HelpBox.dwnd.title = NULL;

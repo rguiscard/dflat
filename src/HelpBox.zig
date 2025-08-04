@@ -12,54 +12,39 @@ const DialogBox = @import("DialogBox.zig");
 //var Helping:bool = false;
 //var stacked:isize = 0;
 
+// ------------- CREATE_WINDOW message ------------
+fn CreateWindowMsg(wnd:df.WINDOW) void {
+    df.Helping = df.TRUE;
+    wnd.*.Class = df.HELPBOX;
+    df.InitWindowColors(wnd);
+    if (df.ThisHelp != null)
+        df.ThisHelp.*.hwnd = wnd;
+}
+
 pub export fn HelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch (message) {
         df.CREATE_WINDOW => {
-            return df.cHelpBoxProc(wnd, message, p1, p2);
-//            CreateWindowMsg(wnd);
+            CreateWindowMsg(wnd);
         },
         df.INITIATE_DIALOG => {
-//            return df.cHelpBoxProc(wnd, message, p1, p2);
             df.ReadHelp(wnd);
-            return root.BaseWndProc(df.HELPBOX, wnd, message, p1, p2);
-        },
-        else => {
-            return df.cHelpBoxProc(wnd, message, p1, p2);
-        }
-    }
-}
-
-pub export fn zHelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
-    switch (message) {
-        df.CREATE_WINDOW => {
-            _ = df.cHelpBoxProc(wnd, message, p1, p2);
-//            CreateWindowMsg(wnd);
-        },
-        df.INITIATE_DIALOG => {
-            _ = df.cHelpBoxProc(wnd, message, p1, p2);
-//            ReadHelp(wnd);
         },
         df.COMMAND => {
-            if (p2 != 0) {
-            } else {
-                const rtn = df.cHelpBoxProc(wnd, message, p1, p2);
-                if (rtn == df.TRUE)
-                    return rtn;
-//            if (CommandMsg(wnd, p1))
-//                return TRUE;
+            if (p2 == 0) {
+                if (df.HelpBoxCommandMsg(wnd, p1) > 0)
+                    return df.TRUE;
             }
         },
         df.KEYBOARD => {
-//            if (WindowMoving)
-//                break;
-//            if (KeyboardMsg(wnd, p1))
-//                return TRUE;
+            if (df.WindowMoving == 0) {
+                if (df.HelpBoxKeyboardMsg(wnd, p1) > 0)
+                return df.TRUE;
+            }
         },
         df.CLOSE_WINDOW => {
-            _ = df.cHelpBoxProc(wnd, message, p1, p2);
-//            if (ThisHelp != NULL)
-//                ThisHelp->hwnd = NULL;
-//            Helping = FALSE;
+            if (df.ThisHelp != null)
+                df.ThisHelp.*.hwnd = null;
+            df.Helping = df.FALSE;
         },
         else => {
         }

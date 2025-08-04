@@ -14,6 +14,7 @@ const hb = @import("HelpBox.zig");
 const editor = @import("Editor.zig");
 const editbox = @import("EditBox.zig");
 const text = @import("Text.zig");
+const mb = @import("MenuBar.zig");
 
 // ----------- classes.h ------------
 //
@@ -70,7 +71,7 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.TEXTBOX,      lb.ListBoxProc,     0             },  // LISTBOX
 //    .{WindowClass.TEXTBOX,      df.EditBoxProc,     0             },  // EDITBOX
     .{WindowClass.TEXTBOX,      editbox.EditBoxProc,     0             },  // EDITBOX
-    .{WindowClass.NORMAL,       df.MenuBarProc,     df.NOCLIP     },  // MENUBAR
+    .{WindowClass.NORMAL,       mb.MenuBarProc,     df.NOCLIP     },  // MENUBAR
     .{WindowClass.LISTBOX,      df.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
                                                     df.NOCLIP     |
                                                     df.HASBORDER  },
