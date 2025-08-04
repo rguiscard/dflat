@@ -4,7 +4,8 @@ const root = @import("root.zig");
 const Window = @import("Window.zig");
 const log = @import("Log.zig");
 const checkbox = @import("CheckBox.zig");
-//const DialogBox = @import("DialogBox.zig");
+const Dialogs = @import("Dialogs.zig");
+const DialogBox = @import("DialogBox.zig");
 const msg = @import("Message.zig").Message;
 const helpbox = @import("HelpBox.zig");
 
@@ -196,7 +197,9 @@ fn CommandMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) void {
 //            df.ShellDOS(wnd);
         },
         df.ID_DISPLAY => {
-//            if (DialogBox(wnd, &Display, TRUE, NULL))    {
+            const box = Dialogs.Display;
+            var dialog = DialogBox.init(@constCast(&box));
+            if (dialog.create(wnd, true, null)) {
 //                                if (inFocus == wnd->MenuBarWnd || inFocus == wnd->StatusBar)
 //                                        oldFocus = ApplicationWindow;
 //                                else
@@ -215,7 +218,7 @@ fn CommandMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) void {
 //                CreateStatusBar(wnd);
 //                SendMessage(wnd, SHOW_WINDOW, 0, 0);
 //                            SendMessage(oldFocus, SETFOCUS, TRUE, 0);
-//            }
+            }
         },
         df.ID_WINDOW => {
 //            df.ChooseWindow(wnd, df.CurrentMenuSelection-2);

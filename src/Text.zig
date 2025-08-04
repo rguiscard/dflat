@@ -18,7 +18,7 @@ pub export fn TextProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df
         else => {
         }
     }
-    return root.BaseWndProc(df.SPINBUTTON, wnd, message, p1, p2);
+    return root.BaseWndProc(df.TEXT, wnd, message, p1, p2);
 }
 
 //void drawText(WINDOW wnd) {

@@ -15,6 +15,9 @@ const editor = @import("Editor.zig");
 const editbox = @import("EditBox.zig");
 const text = @import("Text.zig");
 const mb = @import("MenuBar.zig");
+const popdown = @import("PopDown.zig");
+const radio = @import("RadioButton.zig");
+const normal = @import("Normal.zig");
 
 // ----------- classes.h ------------
 //
@@ -62,17 +65,15 @@ pub const WindowClass = enum (c_int) {
 // Probably should built this via comptime
 pub const classdefs = [_]struct{WindowClass,
                             ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int, isize} {
-    .{WindowClass.FORCEINTTYPE, df.NormalProc,      0             },  // Normal
-//    .{WindowClass.NORMAL,       df.ApplicationProc, df.VISIBLE    |   // Application
+    .{WindowClass.FORCEINTTYPE, normal.NormalProc,      0             },  // Normal
     .{WindowClass.NORMAL,       app.ApplicationProc, df.VISIBLE   |   // Application
                                                      df.SAVESELF  |
                                                      df.CONTROLBOX},
     .{WindowClass.NORMAL,       df.TextBoxProc,     0             },  // TEXTBOX
     .{WindowClass.TEXTBOX,      lb.ListBoxProc,     0             },  // LISTBOX
-//    .{WindowClass.TEXTBOX,      df.EditBoxProc,     0             },  // EDITBOX
     .{WindowClass.TEXTBOX,      editbox.EditBoxProc,     0             },  // EDITBOX
     .{WindowClass.NORMAL,       mb.MenuBarProc,     df.NOCLIP     },  // MENUBAR
-    .{WindowClass.LISTBOX,      df.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
+    .{WindowClass.LISTBOX,      popdown.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
                                                     df.NOCLIP     |
                                                     df.HASBORDER  },
     .{WindowClass.TEXTBOX,      pict.PictureProc,   0             },  // PICTUREBOX
@@ -85,21 +86,19 @@ pub const classdefs = [_]struct{WindowClass,
     .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
     .{WindowClass.EDITBOX,      combo.ComboProc,    0             },  // COMBOBOX
     .{WindowClass.TEXTBOX,      text.TextProc,        0             },  // TEXT
-    .{WindowClass.TEXTBOX,      df.RadioButtonProc, 0             },  // RADIOBUTTON
+    .{WindowClass.TEXTBOX,      radio.RadioButtonProc, 0             },  // RADIOBUTTON
     .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX
     .{WindowClass.LISTBOX,      spin.SpinButtonProc,  0             },  // SPINBUTTON
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // ERRORBOX
                                                     df.HASBORDER  },
     .{WindowClass.DIALOG,       null,               df.SHADOW     |   // MESSAGEBOX
                                                     df.HASBORDER  },
-//    .{WindowClass.DIALOG,       df.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
     .{WindowClass.DIALOG,       hb.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
                                                     df.SAVESELF   |
                                                     df.HASBORDER  |
                                                     df.NOCLIP     |
                                                     df.CONTROLBOX },
     .{WindowClass.TEXTBOX,      sb.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
-//    .{WindowClass.EDITBOX,      df.EditorProc,      0             },  // EDITOR
     .{WindowClass.EDITBOX,      editor.EditorProc,      0             },  // EDITOR
 
     // ========> Add new classes here <========

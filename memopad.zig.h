@@ -54,3 +54,9 @@ BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
 
 // memnubar.c
 int cMenuBarProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+
+// popdown.c
+int cPopDownProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+
+// normal.c
+int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
