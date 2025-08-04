@@ -6,6 +6,7 @@ const msg = @import("Message.zig");
 const Window = @import("Window.zig");
 const Dialogs = @import("Dialogs.zig");
 const checkbox = @import("CheckBox.zig");
+const helpbox = @import("HelpBox.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
@@ -110,8 +111,6 @@ fn CreateWindowMsg(wnd: df.WINDOW, p1: df.PARAM, p2: df.PARAM) c_int {
 
 // -------- COMMAND Message --------- 
 fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) df.BOOL {
-//    const db:*df.DBOX = @alignCast(@ptrCast(wnd.*.extension));
-//    const cmd:c_int = @intCast(p1);
     switch (p1) {
         df.ID_OK, df.ID_CANCEL => {
             if (p2 != 0)
@@ -125,13 +124,53 @@ fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) df.BOOL {
             return df.TRUE;
         },
         df.ID_HELP => {
-//            if ((int)p2 != 0)
-//                return TRUE;
-//            return DisplayHelp(wnd, db->HelpName);
+            if (p2 != 0)
+                return df.TRUE;
+            const db:*df.DBOX = @alignCast(@ptrCast(wnd.*.extension));
+            const rtn:c_uint = @intCast(helpbox.DisplayHelp(wnd, std.mem.span(db.*.HelpName)));
+            return rtn;
         },
         else => {
         }
     }
+    return df.FALSE;
+}
+
+// -------- LEFT_BUTTON Message ---------
+fn LeftButtonMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) c_int {
+    if ((df.WindowSizing>0) or (df.WindowMoving>0))
+        return df.TRUE;
+
+    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
+    if (df.HitControlBox(wnd, p1-win.GetLeft(), p2-win.GetTop())) {
+        df.PostMessage(wnd, df.KEYBOARD, ' ', df.ALTKEY);
+        return df.TRUE;
+    }
+//    const db:*df.DBOX = @alignCast(@ptrCast(wnd.*.extension));
+//    CTLWINDOW *ct = db->ctl;
+//    while (ct->Class)    {
+//        WINDOW cwnd = ct->wnd;
+//        if (ct->Class == COMBOBOX)    {
+//            if (p2 == GetTop(cwnd))    {
+//                if (p1 == GetRight(cwnd)+1)    {
+//                    SendMessage(cwnd, LEFT_BUTTON, p1, p2);
+//                    return TRUE;
+//                }
+//            }
+//            if (GetClass(inFocus) == LISTBOX)
+//                SendMessage(wnd, SETFOCUS, TRUE, 0);
+//        }
+//        else if (ct->Class == SPINBUTTON)    {
+//            if (p2 == GetTop(cwnd))    {
+//                if (p1 == GetRight(cwnd)+1 ||
+//                        p1 == GetRight(cwnd)+2)    {
+//                    SendMessage(cwnd, LEFT_BUTTON, p1, p2);
+//                    return TRUE;
+//                }
+//            }
+//        }
+//        ct++;
+//    }
     return df.FALSE;
 }
 
@@ -149,9 +188,8 @@ pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
                 return df.TRUE;
         },
         df.LEFT_BUTTON => {
-//            if (LeftButtonMsg(wnd, p1, p2))
-//                return TRUE;
-            return df.cDialogProc(wnd, message, p1, p2);
+            if (LeftButtonMsg(wnd, p1, p2) > 0)
+                return df.TRUE;
         },
         df.KEYBOARD => {
 //            if (KeyboardMsg(wnd, p1, p2))

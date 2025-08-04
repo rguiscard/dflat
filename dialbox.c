@@ -40,13 +40,14 @@ void ClearDialogBoxes(void)
 }
 
 /* -------- CREATE_WINDOW Message --------- */
+/*
 static int CreateWindowMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     DBOX *db = wnd->extension;
     CTLWINDOW *ct = db->ctl;
     WINDOW cwnd;
     int rtn, i;
-    /* ---- build a table of processed dialog boxes ---- */
+    // ---- build a table of processed dialog boxes ----
     for (i = 0; i < dbct; i++)
         if (db == dbs[i])
             break;
@@ -86,8 +87,9 @@ static int CreateWindowMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     return rtn;
 }
-
+*/
 /* -------- LEFT_BUTTON Message --------- */
+/*
 static BOOL LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     DBOX *db = wnd->extension;
@@ -123,6 +125,7 @@ static BOOL LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     return FALSE;
 }
+*/
 
 /* -------- KEYBOARD Message --------- */
 static BOOL KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
@@ -174,6 +177,7 @@ static BOOL KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* -------- COMMAND Message --------- */
+/*
 static BOOL CommandMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     DBOX *db = wnd->extension;
@@ -199,7 +203,7 @@ static BOOL CommandMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     return FALSE;
 }
-
+*/
 /* ----- window-processing module, DIALOG window class ----- */
 int cDialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
@@ -207,52 +211,52 @@ int cDialogProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
     DBOX *db = wnd->extension;
 
     switch (msg)    {
-        case CREATE_WINDOW:
-            return CreateWindowMsg(wnd, p1, p2);
-        case SHIFT_CHANGED:
-            if (wnd->Modal)
-                return TRUE;
-            break;
-        case LEFT_BUTTON:
-            if (LeftButtonMsg(wnd, p1, p2))
-                return TRUE;
-            break;
+//        case CREATE_WINDOW:
+//            return CreateWindowMsg(wnd, p1, p2);
+//        case SHIFT_CHANGED:
+//            if (wnd->Modal)
+//                return TRUE;
+//            break;
+//        case LEFT_BUTTON:
+//            if (LeftButtonMsg(wnd, p1, p2))
+//                return TRUE;
+//            break;
         case KEYBOARD:
             if (KeyboardMsg(wnd, p1, p2))
                 return TRUE;
             break;
-        case CLOSE_POPDOWN:
-            SysMenuOpen = FALSE;
-            break;
-        case LB_SELECTION:
-        case LB_CHOOSE:
-            if (SysMenuOpen)
-                return TRUE;
-            SendMessage(wnd, COMMAND, inFocusCommand(db), msg);
-            break;
-		case SETFOCUS:
-			if ((int)p1 && wnd->dfocus != NULL && isVisible(wnd))
-				return SendMessage(wnd->dfocus, SETFOCUS, TRUE, 0);
-			break;
-        case COMMAND:
-            if (CommandMsg(wnd, p1, p2))
-                return TRUE;
-            break;
-        case PAINT:
-            p2 = TRUE;
-            break;
-		case MOVE:
-		case SIZE:
-		    rtn = BaseWndProc(DIALOG, wnd, msg, p1, p2);
-			if (wnd->dfocus != NULL && isVisible(wnd))
-				SendMessage(wnd->dfocus, SETFOCUS, TRUE, 0);
-			return rtn;
-        case CLOSE_WINDOW:
-            if (!p1)    {
-                SendMessage(wnd, COMMAND, ID_CANCEL, 0);
-                return TRUE;
-            }
-            break;
+//        case CLOSE_POPDOWN:
+//            SysMenuOpen = FALSE;
+//            break;
+//        case LB_SELECTION:
+//        case LB_CHOOSE:
+//            if (SysMenuOpen)
+//                return TRUE;
+//            SendMessage(wnd, COMMAND, inFocusCommand(db), msg);
+//            break;
+//		case SETFOCUS:
+//			if ((int)p1 && wnd->dfocus != NULL && isVisible(wnd))
+//				return SendMessage(wnd->dfocus, SETFOCUS, TRUE, 0);
+//			break;
+//        case COMMAND:
+//            if (CommandMsg(wnd, p1, p2))
+//                return TRUE;
+//            break;
+//        case PAINT:
+//            p2 = TRUE;
+//            break;
+//		case MOVE:
+//		case SIZE:
+//		    rtn = BaseWndProc(DIALOG, wnd, msg, p1, p2);
+//			if (wnd->dfocus != NULL && isVisible(wnd))
+//				SendMessage(wnd->dfocus, SETFOCUS, TRUE, 0);
+//			return rtn;
+//        case CLOSE_WINDOW:
+//            if (!p1)    {
+//                SendMessage(wnd, COMMAND, ID_CANCEL, 0);
+//                return TRUE;
+//            }
+//            break;
         default:
             break;
     }

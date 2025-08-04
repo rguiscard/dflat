@@ -23,6 +23,7 @@ typedef struct    {
 
 int cInsideRect(int x, int y, RECT r);
 
+// helpbox.c
 struct helps *FindHelp(char *Help);
 void BuildHelpBox(WINDOW wnd);
 extern struct helps *FirstHelp;
@@ -34,9 +35,17 @@ extern FILE *helpfp;
 extern char hline [160];
 extern BOOL Helping;
 
+#define MAXHELPSTACK 100
+extern int HelpStack[MAXHELPSTACK];
+extern int stacked;
+
 FILE *OpenHelpFile(const char *fn, const char *md);
 int cHelpBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void ReadHelp(WINDOW);
+BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
+void SelectHelp(WINDOW, struct helps *, BOOL);
+
+//
 
 int cEditorProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
@@ -47,10 +56,6 @@ void drawText(WINDOW wnd);
 // editor.c
 int EditorKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
 int EditorSetTextMsg(WINDOW wnd, char *Buf);
-
-// helpbox.c
-BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1);
-BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
 
 // memnubar.c
 int cMenuBarProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);

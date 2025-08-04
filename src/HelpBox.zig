@@ -12,6 +12,10 @@ const DialogBox = @import("DialogBox.zig");
 //var Helping:bool = false;
 //var stacked:isize = 0;
 
+const MAXHEIGHT  = df.SCREENHEIGHT-10;
+const MAXHELPKEYWORDS = 50; // --- maximum keywords in a window ---
+const MAXHELPSTACK = 100;
+
 // ------------- CREATE_WINDOW message ------------
 fn CreateWindowMsg(wnd:df.WINDOW) void {
     df.Helping = df.TRUE;
@@ -19,6 +23,38 @@ fn CreateWindowMsg(wnd:df.WINDOW) void {
     df.InitWindowColors(wnd);
     if (df.ThisHelp != null)
         df.ThisHelp.*.hwnd = wnd;
+}
+
+// ------------- COMMAND message ------------
+fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM) bool {
+    switch (p1) {
+        df.ID_PREV => {
+            if (df.ThisHelp != null) {
+                const prevhlp:usize = @intCast(df.ThisHelp.*.prevhlp);
+                df.SelectHelp(wnd, df.FirstHelp+prevhlp, df.TRUE);
+            }
+            return true;
+        },
+        df.ID_NEXT => {
+            if (df.ThisHelp != null) {
+                const nexthlp:usize = @intCast(df.ThisHelp.*.nexthlp);
+                df.SelectHelp(wnd, df.FirstHelp+nexthlp, df.TRUE);
+            }
+            return true;
+        },
+        df.ID_BACK => {
+            if (df.stacked > 0) {
+                df.stacked -= 1;
+                const stacked:usize = @intCast(df.stacked);
+                const helpstack:usize = @intCast(df.HelpStack[stacked]);
+                df.SelectHelp(wnd, df.FirstHelp+helpstack, df.FALSE);
+            }
+            return true;
+        },
+        else => {
+        }
+    }
+    return false;
 }
 
 pub export fn HelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
@@ -31,7 +67,7 @@ pub export fn HelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2:
         },
         df.COMMAND => {
             if (p2 == 0) {
-                if (df.HelpBoxCommandMsg(wnd, p1) > 0)
+                if (CommandMsg(wnd, p1))
                     return df.TRUE;
             }
         },
@@ -51,15 +87,6 @@ pub export fn HelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2:
     }
     return root.BaseWndProc(df.HELPBOX, wnd, message, p1, p2);
 }
-
-// ----------- load the help text file ------------
-//pub fn LoadHelpFile(fname:[]const u8) void {
-//    if (root.global_allocator.dupe(u8, fname)) |f| {
-//        HelpFileName = f;
-//    } else |_| {
-//    }
-//    df.LoadHelpFile(@constCast(fname.ptr));
-//}
 
 // ---- strip tildes from the help name ----
 fn StripTildes(input: []const u8, buffer: *[30]u8) []const u8 {

@@ -23,8 +23,8 @@ struct helps *ThisHelp;
 int HelpCount;
 char HelpFileName[9];
 
-static int HelpStack[MAXHELPSTACK];
-static int stacked;
+int HelpStack[MAXHELPSTACK];
+int stacked;
 
 /* --- keywords in the current help text -------- */
 static struct keywords {
@@ -40,36 +40,13 @@ FILE *helpfp;
 char hline [160];
 BOOL Helping;
 
-static void SelectHelp(WINDOW, struct helps *, BOOL);
+void SelectHelp(WINDOW, struct helps *, BOOL);
 void ReadHelp(WINDOW);
 struct helps *FindHelp(char *);
 static void DisplayDefinition(WINDOW, char *);
 static void BestFit(WINDOW, DIALOGWINDOW *);
 
-BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1);
 BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
-
-/* ------------- COMMAND message ------------ */
-BOOL HelpBoxCommandMsg(WINDOW wnd, PARAM p1)
-{
-    switch ((int)p1)    {
-        case ID_PREV:
-            if (ThisHelp  != NULL)
-                SelectHelp(wnd, FirstHelp+(ThisHelp->prevhlp), TRUE);
-            return TRUE;
-        case ID_NEXT:
-            if (ThisHelp != NULL)
-                SelectHelp(wnd, FirstHelp+(ThisHelp->nexthlp), TRUE);
-            return TRUE;
-        case ID_BACK:
-			if (stacked)
-				SelectHelp(wnd, FirstHelp+HelpStack[--stacked], FALSE);
-            return TRUE;
-        default:
-            break;
-    }
-    return FALSE;
-}
 
 /* ------------- KEYBOARD message ------------ */
 BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1)
@@ -378,7 +355,7 @@ void BuildHelpBox(WINDOW wnd)
 }
 
 /* ----- select a new help window from its name ----- */
-static void SelectHelp(WINDOW wnd, struct helps *newhelp, BOOL recall)
+void SelectHelp(WINDOW wnd, struct helps *newhelp, BOOL recall)
 {
 	if (newhelp != NULL)	{
 		int i, x, y;
