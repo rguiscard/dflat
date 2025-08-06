@@ -174,6 +174,60 @@ fn LeftButtonMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) c_int {
     return df.FALSE;
 }
 
+fn KeyboardMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) c_uint {
+//    DBOX *db = wnd->extension;
+//    CTLWINDOW *ct;
+
+    _ = p2;
+
+    if ((df.WindowMoving>0) or (df.WindowSizing>0))
+        return df.FALSE;
+    switch (p1) {
+//        case SHIFT_HT:
+//        case BS:
+//        case UP:
+//            PrevFocus(db);
+//            break;
+//        case ALT_F6:
+//        case '\t':
+//        case FWD:
+//        case DN:
+//            NextFocus(db);
+//            break;
+//        case ' ':
+//            if (((int)p2 & ALTKEY) &&
+//                    TestAttribute(wnd, CONTROLBOX))    {
+//                SysMenuOpen = TRUE;
+//                BuildSystemMenu(wnd);
+//                                return TRUE;
+//            }
+//            break;
+//        case CTRL_F4:
+//        case ESC:
+//            SendMessage(wnd, COMMAND, ID_CANCEL, 0);
+//            break;
+//#ifdef INCLUDE_HELP
+//        case F1:
+//            ct = GetControl(inFocus);
+//            if (ct != NULL)
+//                if (DisplayHelp(wnd, ct->help))
+//                    return TRUE;
+//            break;
+//#endif
+//        default:
+//            /* ------ search all the shortcut keys ----- */
+//            if (dbShortcutKeys(db, (int) p1))
+//                                return TRUE;
+//            break;
+          else => {
+              // ------ search all the shortcut keys -----
+//            if (dbShortcutKeys(db, (int) p1))
+//                                return TRUE;
+          }
+    }
+    return wnd.*.Modal;
+}
+
 // ----- window-processing module, DIALOG window class -----
 pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     var p2_new = p2;
@@ -192,9 +246,8 @@ pub export fn DialogProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
                 return df.TRUE;
         },
         df.KEYBOARD => {
-//            if (KeyboardMsg(wnd, p1, p2))
-//                return TRUE;
-            return df.cDialogProc(wnd, message, p1, p2);
+            if (KeyboardMsg(wnd, p1, p2) > 0)
+                return df.TRUE;
         },
         df.CLOSE_POPDOWN => {
             SysMenuOpen = false;

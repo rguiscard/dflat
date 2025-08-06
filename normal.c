@@ -3,20 +3,20 @@
 #include "dflat.h"
 
 #ifdef INCLUDE_MULTI_WINDOWS
-static void near PaintOverLappers(WINDOW wnd);
-static void near PaintUnderLappers(WINDOW wnd);
+void PaintOverLappers(WINDOW wnd);
+void PaintUnderLappers(WINDOW wnd);
 #endif
 
 static BOOL InsideWindow(WINDOW, int, int);
 static void TerminateMoveSize(void);
 static void SaveBorder(RECT);
 static void RestoreBorder(RECT);
-static void GetVideoBuffer(WINDOW);
-static void PutVideoBuffer(WINDOW);
+void GetVideoBuffer(WINDOW);
+void PutVideoBuffer(WINDOW);
 #ifdef INCLUDE_MINIMIZE
 static RECT PositionIcon(WINDOW);
 #endif
-static void near dragborder(WINDOW, int, int);
+void dragborder(WINDOW, int, int);
 static void near sizeborder(WINDOW, int, int);
 static int px = -1, py = -1;
 static int diff;
@@ -34,55 +34,8 @@ CLASSDEFS classdefs[] = {
 };
 WINDOW HiddenWindow;
 
-/* --------- CREATE_WINDOW Message ---------- */
-static void CreateWindowMsg(WINDOW wnd)
-{
-    AppendWindow(wnd);
-    if (!SendMessage(NULL, MOUSE_INSTALLED, 0, 0))
-        ClearAttribute(wnd, VSCROLLBAR | HSCROLLBAR);
-    if (TestAttribute(wnd, SAVESELF) && isVisible(wnd))
-        GetVideoBuffer(wnd);
-}
-
-/* --------- SHOW_WINDOW Message ---------- */
-static void ShowWindowMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    if (GetParent(wnd) == NULL || isVisible(GetParent(wnd)))    {
-		WINDOW cwnd;
-        if (TestAttribute(wnd, SAVESELF) &&
-                        wnd->videosave == NULL)
-            GetVideoBuffer(wnd);
-        SetVisible(wnd);
-        SendMessage(wnd, PAINT, 0, TRUE);
-        SendMessage(wnd, BORDER, 0, 0);
-        /* --- show the children of this window --- */
-		cwnd = FirstWindow(wnd);
-		while (cwnd != NULL)	{
-            if (cwnd->condition != ISCLOSING)
-                SendMessage(cwnd, SHOW_WINDOW, p1, p2);
-			cwnd = NextWindow(cwnd);
-        }
-    }
-}
-
-/* --------- HIDE_WINDOW Message ---------- */
-static void HideWindowMsg(WINDOW wnd)
-{
-    if (isVisible(wnd))    {
-        ClearVisible(wnd);
-        /* --- paint what this window covered --- */
-	    if (TestAttribute(wnd, SAVESELF))
-            PutVideoBuffer(wnd);
-#ifdef INCLUDE_MULTI_WINDOWS
-        else
-            PaintOverLappers(wnd);
-#endif
-		wnd->wasCleared = FALSE;
-    }
-}
-
 /* --------- KEYBOARD Message ---------- */
-static BOOL KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
+BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     if (WindowMoving || WindowSizing)    {
         /* -- move or size a window with keyboard -- */
@@ -140,59 +93,6 @@ static BOOL KeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
             break;
     }
     return FALSE;
-}
-
-/* --------- COMMAND Message ---------- */
-static void CommandMsg(WINDOW wnd, PARAM p1)
-{
-    switch ((int)p1)    {
-        case ID_SYSMOVE:
-            SendMessage(wnd, CAPTURE_MOUSE, TRUE,
-                (PARAM) &dwnd);
-            SendMessage(wnd, CAPTURE_KEYBOARD, TRUE,
-                (PARAM) &dwnd);
-            SendMessage(wnd, MOUSE_CURSOR,
-                GetLeft(wnd), GetTop(wnd));
-            WindowMoving = TRUE;
-            dragborder(wnd, GetLeft(wnd), GetTop(wnd));
-            break;
-        case ID_SYSSIZE:
-            SendMessage(wnd, CAPTURE_MOUSE, TRUE,
-                (PARAM) &dwnd);
-            SendMessage(wnd, CAPTURE_KEYBOARD, TRUE,
-                (PARAM) &dwnd);
-            SendMessage(wnd, MOUSE_CURSOR,
-                GetRight(wnd), GetBottom(wnd));
-            WindowSizing = TRUE;
-            dragborder(wnd, GetLeft(wnd), GetTop(wnd));
-            break;
-        case ID_SYSCLOSE:
-            SendMessage(wnd, CLOSE_WINDOW, 0, 0);
-			SkipApplicationControls();
-            break;
-#ifdef INCLUDE_RESTORE
-        case ID_SYSRESTORE:
-            SendMessage(wnd, RESTORE, 0, 0);
-            break;
-#endif
-#ifdef INCLUDE_MINIMIZE
-        case ID_SYSMINIMIZE:
-            SendMessage(wnd, MINIMIZE, 0, 0);
-            break;
-#endif
-#ifdef INCLUDE_MAXIMIZE
-        case ID_SYSMAXIMIZE:
-            SendMessage(wnd, MAXIMIZE, 0, 0);
-            break;
-#endif
-#ifdef INCLUDE_HELP
-        case ID_HELP:
-            DisplayHelp(wnd,ClassNames[GetClass(wnd)]);
-            break;
-#endif
-        default:
-            break;
-    }
 }
 
 /* --------- SETFOCUS Message ---------- */
@@ -604,50 +504,6 @@ static void CloseWindowMsg(WINDOW wnd)
 int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
-        case CREATE_WINDOW:
-            CreateWindowMsg(wnd);
-            break;
-        case SHOW_WINDOW:
-            ShowWindowMsg(wnd, p1, p2);
-            break;
-        case HIDE_WINDOW:
-            HideWindowMsg(wnd);
-            break;
-        case INSIDE_WINDOW:
-            return InsideWindow(wnd, (int) p1, (int) p2);
-        case KEYBOARD:
-            if (KeyboardMsg(wnd, p1, p2))
-                return TRUE;
-            /* ------- fall through ------- */
-        case ADDSTATUS:
-        case SHIFT_CHANGED:
-            if (GetParent(wnd) != NULL)
-                PostMessage(GetParent(wnd), msg, p1, p2);
-            break;
-        case PAINT:
-            if (isVisible(wnd))	{
-#ifdef INCLUDE_MULTI_WINDOWS
-				if (wnd->wasCleared)
-					PaintUnderLappers(wnd);
-				else
-#endif
-				{
-					wnd->wasCleared = TRUE;
-	                ClearWindow(wnd, (RECT *)p1, ' ');
-				}
-			}
-            break;
-        case BORDER:
-            if (isVisible(wnd))    {
-                if (TestAttribute(wnd, HASBORDER))
-                    RepaintBorder(wnd, (RECT *)p1);
-                else if (TestAttribute(wnd, HASTITLEBAR))
-                    DisplayTitle(wnd, (RECT *)p1);
-            }
-            break;
-        case COMMAND:
-            CommandMsg(wnd, p1);
-            break;
         case SETFOCUS:
             SetFocusMsg(wnd, p1);
             break;
@@ -778,7 +634,7 @@ static void TerminateMoveSize(void)
     WindowMoving = WindowSizing = FALSE;
 }
 /* ---- build a dummy window border for moving or sizing --- */
-static void near dragborder(WINDOW wnd, int x, int y)
+void dragborder(WINDOW wnd, int x, int y)
 {
     RestoreBorder(dwnd.rc);
     /* ------- build the dummy window -------- */
@@ -924,13 +780,13 @@ static void PaintOverParents(WINDOW wnd)
     }
 }
 /* - paint the parts of all windows that a window is over - */
-static void near PaintOverLappers(WINDOW wnd)
+void PaintOverLappers(WINDOW wnd)
 {
     HiddenWindow = wnd;
     PaintOverParents(wnd);
 }
 /* --- paint those parts of a window that are overlapped --- */
-static void near PaintUnderLappers(WINDOW wnd)
+void PaintUnderLappers(WINDOW wnd)
 {
     WINDOW hwnd = NextWindow(wnd);
     while (hwnd != NULL)    {
@@ -1080,7 +936,7 @@ static RECT near ClipRect(WINDOW wnd)
 }
 
 /* -- get the video memory that is to be used by a window -- */
-static void GetVideoBuffer(WINDOW wnd)
+void GetVideoBuffer(WINDOW wnd)
 {
     RECT rc;
     int ht;
@@ -1095,7 +951,7 @@ static void GetVideoBuffer(WINDOW wnd)
 }
 
 /* -- put the video memory that is used by a window -- */
-static void PutVideoBuffer(WINDOW wnd)
+void PutVideoBuffer(WINDOW wnd)
 {
     if (wnd->videosave != NULL)    {
     	RECT rc;

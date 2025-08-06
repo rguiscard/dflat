@@ -62,48 +62,55 @@ pub const WindowClass = enum (c_int) {
     DUMMY,
 };
 
+//  Base Class  Processor  Attribute    Class Name
+//  ----------  ---------  -----------  ----------
+
 // Probably should built this via comptime
-pub const classdefs = [_]struct{WindowClass,
-                            ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int, isize} {
-    .{WindowClass.FORCEINTTYPE, normal.NormalProc,      0             },  // Normal
-    .{WindowClass.NORMAL,       app.ApplicationProc, df.VISIBLE   |   // Application
-                                                     df.SAVESELF  |
-                                                     df.CONTROLBOX},
-    .{WindowClass.NORMAL,       df.TextBoxProc,     0             },  // TEXTBOX
-    .{WindowClass.TEXTBOX,      lb.ListBoxProc,     0             },  // LISTBOX
-    .{WindowClass.TEXTBOX,      editbox.EditBoxProc,     0             },  // EDITBOX
-    .{WindowClass.NORMAL,       mb.MenuBarProc,     df.NOCLIP     },  // MENUBAR
-    .{WindowClass.LISTBOX,      popdown.PopDownProc,     df.SAVESELF   |   // POPDOWNMENU
-                                                    df.NOCLIP     |
-                                                    df.HASBORDER  },
-    .{WindowClass.TEXTBOX,      pict.PictureProc,   0             },  // PICTUREBOX
-    .{WindowClass.NORMAL,       df.DialogProc,      df.SHADOW     |   // DIALOG
-                                                    df.MOVEABLE   |
-                                                    df.CONTROLBOX |
-                                                    df.HASBORDER  |
-                                                    df.NOCLIP     },
-    .{WindowClass.NORMAL,       box.BoxProc,        df.HASBORDER  },  // BOX
-    .{WindowClass.TEXTBOX,      bt.ButtonProc,      df.SHADOW     },  // BUTTON
-    .{WindowClass.EDITBOX,      combo.ComboProc,    0             },  // COMBOBOX
-    .{WindowClass.TEXTBOX,      text.TextProc,        0             },  // TEXT
-    .{WindowClass.TEXTBOX,      radio.RadioButtonProc, 0             },  // RADIOBUTTON
-    .{WindowClass.TEXTBOX,      cb.CheckBoxProc,    0             },  // CHECKBOX
-    .{WindowClass.LISTBOX,      spin.SpinButtonProc,  0             },  // SPINBUTTON
-    .{WindowClass.DIALOG,       null,               df.SHADOW     |   // ERRORBOX
-                                                    df.HASBORDER  },
-    .{WindowClass.DIALOG,       null,               df.SHADOW     |   // MESSAGEBOX
-                                                    df.HASBORDER  },
-    .{WindowClass.DIALOG,       hb.HelpBoxProc,     df.MOVEABLE   |   // HELPBOX
-                                                    df.SAVESELF   |
-                                                    df.HASBORDER  |
-                                                    df.NOCLIP     |
-                                                    df.CONTROLBOX },
-    .{WindowClass.TEXTBOX,      sb.StatusBarProc,   df.NOCLIP     },  // STATUSBAR
-    .{WindowClass.EDITBOX,      editor.EditorProc,      0             },  // EDITOR
+pub const classdefs = [_]struct{
+    WindowClass,
+    ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,
+    isize,
+    []const u8} {
+
+    .{WindowClass.FORCEINTTYPE, normal.NormalProc,     0,             "NORMAL"},   // Normal
+    .{WindowClass.NORMAL,       app.ApplicationProc,   df.VISIBLE   |              // Application
+                                                       df.SAVESELF  |
+                                                       df.CONTROLBOX, "APPLICATION"},
+    .{WindowClass.NORMAL,       df.TextBoxProc,        0,             "TEXTBOX"},  // TEXTBOX
+    .{WindowClass.TEXTBOX,      lb.ListBoxProc,        0,             "LISTBOX"},  // LISTBOX
+    .{WindowClass.TEXTBOX,      editbox.EditBoxProc,   0,             "EDITBOX"},  // EDITBOX
+    .{WindowClass.NORMAL,       mb.MenuBarProc,        df.NOCLIP,     "MENUBAR"},  // MENUBAR
+    .{WindowClass.LISTBOX,      popdown.PopDownProc,   df.SAVESELF   |   // POPDOWNMENU
+                                                       df.NOCLIP     |
+                                                       df.HASBORDER,  "POPDOWNMENU"},
+    .{WindowClass.TEXTBOX,      pict.PictureProc,      0,             "PICTUREBOX"},  // PICTUREBOX
+    .{WindowClass.NORMAL,       df.DialogProc,         df.SHADOW     |   // DIALOG
+                                                       df.MOVEABLE   |
+                                                       df.CONTROLBOX |
+                                                       df.HASBORDER  |
+                                                       df.NOCLIP,     "DIALOG"},
+    .{WindowClass.NORMAL,       box.BoxProc,           df.HASBORDER,  "BOX"},  // BOX
+    .{WindowClass.TEXTBOX,      bt.ButtonProc,         df.SHADOW,     "BUTTON"},  // BUTTON
+    .{WindowClass.EDITBOX,      combo.ComboProc,       0,             "COMBOBOX"},  // COMBOBOX
+    .{WindowClass.TEXTBOX,      text.TextProc,         0,             "TEXT"},  // TEXT
+    .{WindowClass.TEXTBOX,      radio.RadioButtonProc, 0,             "RADIOBUTTON"},  // RADIOBUTTON
+    .{WindowClass.TEXTBOX,      cb.CheckBoxProc,       0,             "CHECKBOX"},  // CHECKBOX
+    .{WindowClass.LISTBOX,      spin.SpinButtonProc,   0,             "SPINBUTTON"},  // SPINBUTTON
+    .{WindowClass.DIALOG,       null,                  df.SHADOW     |   // ERRORBOX
+                                                       df.HASBORDER,  "ERRORBOX"},
+    .{WindowClass.DIALOG,       null,                  df.SHADOW     |   // MESSAGEBOX
+                                                       df.HASBORDER,  "MESSAGEBOX"},
+    .{WindowClass.DIALOG,       hb.HelpBoxProc,        df.MOVEABLE   |   // HELPBOX
+                                                       df.SAVESELF   |
+                                                       df.HASBORDER  |
+                                                       df.NOCLIP     |
+                                                       df.CONTROLBOX, "HELPBOX"},
+    .{WindowClass.TEXTBOX,      sb.StatusBarProc,      df.NOCLIP,     "STATUSBAR"},  // STATUSBAR
+    .{WindowClass.EDITBOX,      editor.EditorProc,     0,             "EDITOR"},  // EDITOR
 
     // ========> Add new classes here <========
 
     // ---------- pseudo classes to create enums, etc. ----------
-    .{WindowClass.FORCEINTTYPE, null,               0             },  // TITLEBAR
-    .{WindowClass.FORCEINTTYPE, null,               df.HASBORDER  },  // DUMMY
+    .{WindowClass.FORCEINTTYPE, null,               0,             "TITLEBAR"},  // TITLEBAR
+    .{WindowClass.FORCEINTTYPE, null,               df.HASBORDER,  "DUMMY"},  // DUMMY
 };

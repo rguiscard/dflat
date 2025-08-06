@@ -65,3 +65,9 @@ int cPopDownProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 // normal.c
 int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+void GetVideoBuffer(WINDOW wnd);
+void PutVideoBuffer(WINDOW wnd);
+void PaintOverLappers(WINDOW wnd);
+void PaintUnderLappers(WINDOW wnd);
+BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+void dragborder(WINDOW wnd, int x, int y);

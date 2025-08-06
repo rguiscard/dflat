@@ -3,6 +3,7 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
 const Dialogs = @import("Dialogs.zig");
+const DialogBox = @import("DialogBox.zig");
 
 var _allocator: std.mem.Allocator = undefined;
 var _fileSpec:?[]const u8 = null;
@@ -59,8 +60,8 @@ pub fn DlgFileOpen(allocator: std.mem.Allocator, Fspec: []const u8, Sspec: []con
     set_fileSpec(Fspec);
     set_srchSpec(Sspec);
 
-    const result = df.DialogBox(null, db, df.TRUE, DlgFnOpen);
-    const rtn = (result > 0);
+    var box = DialogBox.init(@constCast(db));
+    const rtn = box.create(null, true, DlgFnOpen);
     if (rtn) {
         if (_fileName) |n| {
             _ = df.strcpy(Fname, n.ptr);
