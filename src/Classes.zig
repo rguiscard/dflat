@@ -62,10 +62,9 @@ pub const WindowClass = enum (c_int) {
     DUMMY,
 };
 
-//  Base Class  Processor  Attribute    Class Name
-//  ----------  ---------  -----------  ----------
-
 // Probably should built this via comptime
+// Base Class  Processor  Attribute  Class Name
+// ----------  ---------  ---------  ----------
 pub const classdefs = [_]struct{
     WindowClass,
     ?*const fn (wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int,

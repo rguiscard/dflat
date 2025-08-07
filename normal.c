@@ -7,7 +7,6 @@ void PaintOverLappers(WINDOW wnd);
 void PaintUnderLappers(WINDOW wnd);
 #endif
 
-static BOOL InsideWindow(WINDOW, int, int);
 static void TerminateMoveSize(void);
 static void SaveBorder(RECT);
 static void RestoreBorder(RECT);
@@ -18,6 +17,7 @@ static RECT PositionIcon(WINDOW);
 #endif
 void dragborder(WINDOW, int, int);
 static void near sizeborder(WINDOW, int, int);
+void SetFocusMsg(WINDOW wnd, PARAM p1);
 static int px = -1, py = -1;
 static int diff;
 static struct window dwnd = {DUMMY, NULL, NormalProc,
@@ -96,7 +96,7 @@ BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* --------- SETFOCUS Message ---------- */
-static void SetFocusMsg(WINDOW wnd, PARAM p1)
+void SetFocusMsg(WINDOW wnd, PARAM p1)
 {
 	RECT rc = {0,0,0,0};
     if (p1 && wnd != NULL && inFocus != wnd)    {
@@ -184,6 +184,7 @@ static void SetFocusMsg(WINDOW wnd, PARAM p1)
 }
 
 /* --------- DOUBLE_CLICK Message ---------- */
+/*
 static void DoubleClickMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     int mx = (int) p1 - GetLeft(wnd);
@@ -195,6 +196,7 @@ static void DoubleClickMsg(WINDOW wnd, PARAM p1, PARAM p2)
 		}
 	}
 }
+*/
 
 /* --------- LEFT_BUTTON Message ---------- */
 static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
@@ -504,12 +506,12 @@ static void CloseWindowMsg(WINDOW wnd)
 int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
-        case SETFOCUS:
-            SetFocusMsg(wnd, p1);
-            break;
-        case DOUBLE_CLICK:
-            DoubleClickMsg(wnd, p1, p2);
-            break;
+//        case SETFOCUS:
+//            SetFocusMsg(wnd, p1);
+//            break;
+//        case DOUBLE_CLICK:
+//            DoubleClickMsg(wnd, p1, p2);
+//            break;
         case LEFT_BUTTON:
             LeftButtonMsg(wnd, p1, p2);
             break;
@@ -873,20 +875,6 @@ static void RestoreBorder(RECT rc)
         free(Bsave);
         Bsave = NULL;
     }
-}
-/* ----- test if screen coordinates are in a window ---- */
-static BOOL InsideWindow(WINDOW wnd, int x, int y)
-{
-    RECT rc;
-    rc = WindowRect(wnd);
-    if (!TestAttribute(wnd, NOCLIP))    {
-        WINDOW pwnd = GetParent(wnd);
-        while (pwnd != NULL)    {
-            rc = subRectangle(rc, ClientRect(pwnd));
-            pwnd = GetParent(pwnd);
-        }
-    }
-    return InsideRect(x, y, rc);
 }
 
 BOOL isDerivedFrom(WINDOW wnd, CLASS Class)

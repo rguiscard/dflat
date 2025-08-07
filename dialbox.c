@@ -39,40 +39,6 @@ void ClearDialogBoxes(void)
     dbct = 0;
 }
 
-/* ------- create and execute a dialog box ---------- */
-BOOL DialogBox(WINDOW wnd, DBOX *db, BOOL Modal,
-  int (*wndproc)(struct window *, enum messages, PARAM, PARAM))
-{
-    BOOL rtn = FALSE;
-    int x = db->dwnd.x, y = db->dwnd.y;
-    WINDOW DialogWnd;
-
-    DialogWnd = CreateWindow(DIALOG,
-                        db->dwnd.title,
-                        x, y,
-                        db->dwnd.h,
-                        db->dwnd.w,
-                        db,
-                        wnd,
-                        wndproc,
-                        (Modal ? SAVESELF : 0));
-	SendMessage(DialogWnd, SETFOCUS, TRUE, 0);
-    DialogWnd->Modal = Modal;
-	FirstFocus(db);
-    PostMessage(DialogWnd, INITIATE_DIALOG, 0, 0);
-    if (Modal)    {
-        SendMessage(DialogWnd, CAPTURE_MOUSE, 0, 0);
-        SendMessage(DialogWnd, CAPTURE_KEYBOARD, 0, 0);
-	    while (dispatch_message())
-    	    ;
-        rtn = DialogWnd->ReturnCode == ID_OK;
-        SendMessage(DialogWnd, RELEASE_MOUSE, 0, 0);
-        SendMessage(DialogWnd, RELEASE_KEYBOARD, 0, 0);
-	    SendMessage(DialogWnd, CLOSE_WINDOW, TRUE, 0);
-    }
-    return rtn;
-}
-
 /* ----- return command code of in-focus control window ---- */
 static int inFocusCommand(DBOX *db)
 {

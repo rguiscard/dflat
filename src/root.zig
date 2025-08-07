@@ -54,15 +54,9 @@ pub fn DefaultWndProc(wnd: df.WINDOW, mesg: df.MESSAGE, p1: df.PARAM, p2: df.PAR
     return BaseWndProc(klass, wnd, mesg, p1, p2);
 }
 
-// Export search.c function to c (used by editbox.c)
-pub export fn SearchText(wnd: df.WINDOW) callconv(.c) void {
-    search.SearchText(wnd);
-}
-pub export fn SearchNext(wnd: df.WINDOW) callconv(.c) void {
-    search.SearchNext(wnd);
-}
-pub export fn ReplaceText(wnd: df.WINDOW) callconv(.c) void {
-    search.ReplaceText(wnd);
+pub export fn DisplayHelp(wnd: df.WINDOW, Help:[*c]u8) callconv(.c) c_int {
+    const helpName = std.mem.span(Help);
+    return helpbox.DisplayHelp(wnd, helpName);
 }
 
 pub export fn add(a: i32, b: i32) i32 {

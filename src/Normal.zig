@@ -111,6 +111,18 @@ fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM) void {
     }
 }
 
+// --------- DOUBLE_CLICK Message ----------
+fn DoubleClickMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
+    const mx = p1 - df.GetLeft(wnd);
+    const my = p2 - df.GetTop(wnd);
+    if ((df.WindowSizing == 0) and (df.WindowMoving == 0)) {
+        if (df.HitControlBox(wnd, mx, my)) {
+            df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
+            df.SkipApplicationControls();
+        }
+    }
+}
+
 pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch (message) {
         df.CREATE_WINDOW => {
@@ -171,6 +183,56 @@ pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
         df.COMMAND => {
             CommandMsg(wnd, p1);
         },
+        df.SETFOCUS => {
+            df.SetFocusMsg(wnd, p1);
+        },
+        df.DOUBLE_CLICK => {
+            DoubleClickMsg(wnd, p1, p2);
+        },
+//        case LEFT_BUTTON:
+//            LeftButtonMsg(wnd, p1, p2);
+//            break;
+//        case MOUSE_MOVED:
+//            if (MouseMovedMsg(wnd, p1, p2))
+//                return TRUE;
+//            break;
+//        case BUTTON_RELEASED:
+//            if (WindowMoving || WindowSizing)    {
+//                if (WindowMoving)
+//                    PostMessage(wnd,MOVE,dwnd.rc.lf,dwnd.rc.tp);
+//                else
+//                    PostMessage(wnd,SIZE,dwnd.rc.rt,dwnd.rc.bt);
+//                TerminateMoveSize();
+//            }
+//            break;
+//        case MOVE:
+//            MoveMsg(wnd, p1, p2);
+//            break;
+//        case SIZE:    {
+//            SizeMsg(wnd, p1, p2);
+//            break;
+//        }
+//        case CLOSE_WINDOW:
+//            CloseWindowMsg(wnd);
+//            break;
+//        case MAXIMIZE:
+//            if (wnd->condition != ISMAXIMIZED)
+//                MaximizeMsg(wnd);
+//            break;
+//        case MINIMIZE:
+//            if (wnd->condition != ISMINIMIZED)
+//                MinimizeMsg(wnd);
+//            break;
+//        case RESTORE:
+//            if (wnd->condition != ISRESTORED)    {
+//                if (wnd->oldcondition == ISMAXIMIZED)
+//                    SendMessage(wnd, MAXIMIZE, 0, 0);
+//                else
+//                    RestoreMsg(wnd);
+//            }
+//            break;
+//        case DISPLAY_HELP:
+//            return DisplayHelp(wnd, (char *)p1);
         else => {
             return df.cNormalProc(wnd, message, p1, p2);
         }

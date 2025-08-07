@@ -45,7 +45,9 @@ void ReadHelp(WINDOW);
 BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1);
 void SelectHelp(WINDOW, struct helps *, BOOL);
 
-//
+// editbox.c
+#define EditBufLen(wnd) (isMultiLine(wnd)>0 ? EDITLEN : ENTRYLEN)
+int EditBoxCommandMsg(WINDOW wnd, PARAM p1);
 
 int cEditorProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
@@ -71,3 +73,4 @@ void PaintOverLappers(WINDOW wnd);
 void PaintUnderLappers(WINDOW wnd);
 BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
 void dragborder(WINDOW wnd, int x, int y);
+void SetFocusMsg(WINDOW wnd, PARAM p1);

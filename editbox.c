@@ -24,22 +24,8 @@ static BOOL TextMarking;
 static int ButtonX, ButtonY;
 static int PrevY = -1;
 
-extern void SearchText(WINDOW);
-extern void ReplaceText(WINDOW);
-extern void SearchNext(WINDOW);
+int EditBoxCommandMsg(WINDOW wnd, PARAM p1);
 
-/* ----------- CREATE_WINDOW Message ---------- */
-static int CreateWindowMsg(WINDOW wnd)
-{
-    int rtn = BaseWndProc(EDITBOX, wnd, CREATE_WINDOW, 0, 0);
-    wnd->MaxTextLength = MAXTEXTLEN+1;
-    wnd->textlen = EditBufLen(wnd);
-    wnd->InsertMode = TRUE;
-	if (isMultiLine(wnd))
-	    wnd->WordWrapMode = TRUE;
-	SendMessage(wnd, CLEARTEXT, 0, 0);
-    return rtn;
-}
 /* ----------- SETTEXT Message ---------- */
 static int SetTextMsg(WINDOW wnd, PARAM p1)
 {
@@ -846,19 +832,10 @@ static void ParagraphCmd(WINDOW wnd)
     BuildTextPointers(wnd);
 }
 /* ----------- COMMAND Message ---------- */
-static int CommandMsg(WINDOW wnd, PARAM p1)
+int EditBoxCommandMsg(WINDOW wnd, PARAM p1)
 {
     switch ((int)p1)    {
 #ifdef INCLUDE_EDITMENU
-		case ID_SEARCH:
-			SearchText(wnd);
-			return TRUE;
-		case ID_REPLACE:
-			ReplaceText(wnd);
-			return TRUE;
-		case ID_SEARCHNEXT:
-			SearchNext(wnd);
-			return TRUE;
 		case ID_CUT:
 			CopyToClipboard(wnd);
 			SendMessage(wnd, COMMAND, ID_DELETETEXT, 0);
@@ -914,8 +891,6 @@ int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     int rtn;
     switch (msg)    {
-        case CREATE_WINDOW:
-            return CreateWindowMsg(wnd);
         case ADDTEXT:
             return AddTextMsg(wnd, p1, p2);
         case SETTEXT:
@@ -966,10 +941,10 @@ int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
         case SHIFT_CHANGED:
             ShiftChangedMsg(wnd, p1);
             break;
-        case COMMAND:
-            if (CommandMsg(wnd, p1))
-                return TRUE;
-            break;
+//        case COMMAND:
+//            if (EditBoxCommandMsg(wnd, p1))
+//                return TRUE;
+//            break;
         case CLOSE_WINDOW:
             return CloseWindowMsg(wnd, p1, p2);
         default:
