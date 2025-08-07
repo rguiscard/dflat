@@ -71,6 +71,12 @@ void GetVideoBuffer(WINDOW wnd);
 void PutVideoBuffer(WINDOW wnd);
 void PaintOverLappers(WINDOW wnd);
 void PaintUnderLappers(WINDOW wnd);
-BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
-void dragborder(WINDOW wnd, int x, int y);
+//BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+//void dragborder(WINDOW wnd, int x, int y);
 void SetFocusMsg(WINDOW wnd, PARAM p1);
+void RestoreBorder(RECT);
+void SaveBorder(RECT rc);
+
+//extern int px;
+//extern int py;
+//extern int diff;

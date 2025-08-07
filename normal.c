@@ -8,20 +8,20 @@ void PaintUnderLappers(WINDOW wnd);
 #endif
 
 static void TerminateMoveSize(void);
-static void SaveBorder(RECT);
-static void RestoreBorder(RECT);
+void SaveBorder(RECT);
+void RestoreBorder(RECT);
 void GetVideoBuffer(WINDOW);
 void PutVideoBuffer(WINDOW);
 #ifdef INCLUDE_MINIMIZE
 static RECT PositionIcon(WINDOW);
 #endif
-void dragborder(WINDOW, int, int);
-static void near sizeborder(WINDOW, int, int);
+//void dragborder(WINDOW, int, int);
+//static void near sizeborder(WINDOW, int, int);
 void SetFocusMsg(WINDOW wnd, PARAM p1);
-static int px = -1, py = -1;
-static int diff;
-static struct window dwnd = {DUMMY, NULL, NormalProc,
-                                {-1,-1,-1,-1}};
+//int px = -1, py = -1;
+//int diff;
+//static struct window dwnd = {DUMMY, NULL, NormalProc,
+//                                {-1,-1,-1,-1}};
 static short *Bsave;
 static int Bht, Bwd;
 BOOL WindowMoving;
@@ -35,25 +35,26 @@ CLASSDEFS classdefs[] = {
 WINDOW HiddenWindow;
 
 /* --------- KEYBOARD Message ---------- */
+/*
 BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     if (WindowMoving || WindowSizing)    {
-        /* -- move or size a window with keyboard -- */
+        // -- move or size a window with keyboard -- 
         int x, y;
         x=WindowMoving?GetLeft(&dwnd):GetRight(&dwnd);
         y=WindowMoving?GetTop(&dwnd):GetBottom(&dwnd);
         switch ((int)p1)    {
-            case ESC:
-                TerminateMoveSize();
-                return TRUE;
-            case UP:
-                if (y)
-                    --y;
-                break;
-            case DN:
-                if (y < SCREENHEIGHT-1)
-                    y++;
-                break;
+//            case ESC:
+//                TerminateMoveSize();
+//                return TRUE;
+//            case UP:
+//                if (y)
+//                    --y;
+//                break;
+//            case DN:
+//                if (y < SCREENHEIGHT-1)
+//                    y++;
+//                break;
             case FWD:
                 if (x < SCREENWIDTH-1)
                     x++;
@@ -67,7 +68,7 @@ BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
             default:
                 return TRUE;
         }
-        /* -- use the mouse functions to move/size - */
+        // -- use the mouse functions to move/size -
         SendMessage(wnd, MOUSE_CURSOR, x, y);
         SendMessage(wnd, MOUSE_MOVED, x, y);
         return TRUE;
@@ -94,6 +95,7 @@ BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     return FALSE;
 }
+*/
 
 /* --------- SETFOCUS Message ---------- */
 void SetFocusMsg(WINDOW wnd, PARAM p1)
@@ -199,6 +201,7 @@ static void DoubleClickMsg(WINDOW wnd, PARAM p1, PARAM p2)
 */
 
 /* --------- LEFT_BUTTON Message ---------- */
+/*
 static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     int mx = (int) p1 - GetLeft(wnd);
@@ -210,23 +213,23 @@ static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
         return;
     }
     if (my == 0 && mx > -1 && mx < WindowWidth(wnd))  {
-        /* ---------- hit the top border -------- */
+        // ---------- hit the top border --------
         if (TestAttribute(wnd, MINMAXBOX) &&
                 TestAttribute(wnd, HASTITLEBAR))  {
             if (mx == WindowWidth(wnd)-2)    {
                 if (wnd->condition != ISRESTORED)
-                    /* --- hit the restore box --- */
+                    // --- hit the restore box ---
                     SendMessage(wnd, RESTORE, 0, 0);
 #ifdef INCLUDE_MAXIMIZE
                 else
-                    /* --- hit the maximize box --- */
+                    // --- hit the maximize box ---
                     SendMessage(wnd, MAXIMIZE, 0, 0);
 #endif
                 return;
             }
 #ifdef INCLUDE_MINIMIZE
             if (mx == WindowWidth(wnd)-3)    {
-                /* --- hit the minimize box --- */
+                // --- hit the minimize box --- 
                 if (wnd->condition != ISMINIMIZED)
                     SendMessage(wnd, MINIMIZE, 0, 0);
                 return;
@@ -250,7 +253,7 @@ static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     if (mx == WindowWidth(wnd)-1 &&
             my == WindowHeight(wnd)-1)    {
-        /* ------- hit the resize corner ------- */
+        // ------- hit the resize corner -------
 #ifdef INCLUDE_MINIMIZE
         if (wnd->condition == ISMINIMIZED)
             return;
@@ -263,8 +266,8 @@ static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
                 return;
             if (TestAttribute(GetParent(wnd),HASBORDER))
                 return;
-            /* ----- resizing a maximized window over a
-                    borderless parent ----- */
+            // ----- resizing a maximized window over a
+                    borderless parent ----- 
             wnd = GetParent(wnd);
 	        if (!TestAttribute(wnd, SIZEABLE))
     	        return;
@@ -276,8 +279,9 @@ static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
         dragborder(wnd, GetLeft(wnd), GetTop(wnd));
     }
 }
-
+*/
 /* --------- MOUSE_MOVED Message ---------- */
+/*
 static BOOL MouseMovedMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     if (WindowMoving)    {
@@ -315,6 +319,7 @@ static BOOL MouseMovedMsg(WINDOW wnd, PARAM p1, PARAM p2)
     }
     return FALSE;
 }
+*/
 
 #ifdef INCLUDE_MAXIMIZE
 /* --------- MAXIMIZE Message ---------- */
@@ -397,6 +402,7 @@ static void RestoreMsg(WINDOW wnd)
 #endif
 
 /* --------- MOVE Message ---------- */
+/*
 static void MoveMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     WINDOW cwnd;
@@ -424,8 +430,10 @@ static void MoveMsg(WINDOW wnd, PARAM p1, PARAM p2)
     if (wasVisible)
         SendMessage(wnd, SHOW_WINDOW, 0, 0);
 }
+*/
 
 /* --------- SIZE Message ---------- */
+/*
 static void SizeMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     BOOL wasVisible = isVisible(wnd);
@@ -461,6 +469,7 @@ static void SizeMsg(WINDOW wnd, PARAM p1, PARAM p2)
     if (wasVisible)
         SendMessage(wnd, SHOW_WINDOW, 0, 0);
 }
+*/
 
 /* --------- CLOSE_WINDOW Message ---------- */
 static void CloseWindowMsg(WINDOW wnd)
@@ -512,29 +521,29 @@ int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 //        case DOUBLE_CLICK:
 //            DoubleClickMsg(wnd, p1, p2);
 //            break;
-        case LEFT_BUTTON:
-            LeftButtonMsg(wnd, p1, p2);
-            break;
-        case MOUSE_MOVED:
-            if (MouseMovedMsg(wnd, p1, p2))
-                return TRUE;
-            break;
-        case BUTTON_RELEASED:
-            if (WindowMoving || WindowSizing)    {
-                if (WindowMoving)
-                    PostMessage(wnd,MOVE,dwnd.rc.lf,dwnd.rc.tp);
-                else
-                    PostMessage(wnd,SIZE,dwnd.rc.rt,dwnd.rc.bt);
-                TerminateMoveSize();
-            }
-            break;
-        case MOVE:
-            MoveMsg(wnd, p1, p2);
-            break;
-        case SIZE:    {
-            SizeMsg(wnd, p1, p2);
-            break;
-        }
+//        case LEFT_BUTTON:
+//            LeftButtonMsg(wnd, p1, p2);
+//            break;
+//        case MOUSE_MOVED:
+//            if (MouseMovedMsg(wnd, p1, p2))
+//                return TRUE;
+//            break;
+//        case BUTTON_RELEASED:
+//            if (WindowMoving || WindowSizing)    {
+//                if (WindowMoving)
+//                    PostMessage(wnd,MOVE,dwnd.rc.lf,dwnd.rc.tp);
+//                else
+//                    PostMessage(wnd,SIZE,dwnd.rc.rt,dwnd.rc.bt);
+//                TerminateMoveSize();
+//            }
+//            break;
+//        case MOVE:
+//            MoveMsg(wnd, p1, p2);
+//            break;
+//        case SIZE:    {
+//            SizeMsg(wnd, p1, p2);
+//            break;
+//        }
         case CLOSE_WINDOW:
             CloseWindowMsg(wnd);
             break;
@@ -626,6 +635,7 @@ static RECT PositionIcon(WINDOW wnd)
 #endif
 
 /* ----- terminate the move or size operation ----- */
+/*
 static void TerminateMoveSize(void)
 {
     px = py = -1;
@@ -635,11 +645,13 @@ static void TerminateMoveSize(void)
     RestoreBorder(dwnd.rc);
     WindowMoving = WindowSizing = FALSE;
 }
+*/
 /* ---- build a dummy window border for moving or sizing --- */
+/*
 void dragborder(WINDOW wnd, int x, int y)
 {
     RestoreBorder(dwnd.rc);
-    /* ------- build the dummy window -------- */
+    // ------- build the dummy window --------
     dwnd.rc.lf = x;
     dwnd.rc.tp = y;
     dwnd.rc.rt = dwnd.rc.lf+WindowWidth(wnd)-1;
@@ -652,7 +664,9 @@ void dragborder(WINDOW wnd, int x, int y)
     SaveBorder(dwnd.rc);
     RepaintBorder(&dwnd, NULL);
 }
+*/
 /* ---- write the dummy window border for sizing ---- */
+/*
 static void near sizeborder(WINDOW wnd, int rt, int bt)
 {
     int leftmost = GetLeft(wnd)+10;
@@ -674,7 +688,7 @@ static void near sizeborder(WINDOW wnd, int rt, int bt)
     if (rt != px || bt != py)
         RestoreBorder(dwnd.rc);
 
-    /* ------- change the dummy window -------- */
+    // ------- change the dummy window -------- 
     dwnd.ht = bt-dwnd.rc.tp+1;
     dwnd.wd = rt-dwnd.rc.lf+1;
     dwnd.rc.rt = rt;
@@ -686,6 +700,7 @@ static void near sizeborder(WINDOW wnd, int rt, int bt)
         RepaintBorder(&dwnd, NULL);
     }
 }
+*/
 
 #ifdef INCLUDE_MULTI_WINDOWS
 /* ----- adjust a rectangle to include the shadow ----- */
@@ -835,7 +850,7 @@ void PaintUnderLappers(WINDOW wnd)
 #endif /* #ifdef INCLUDE_MULTI_WINDOWS */
 
 /* --- save video area to be used by dummy window border --- */
-static void SaveBorder(RECT rc)
+void SaveBorder(RECT rc)
 {
     RECT lrc;
     int i;
@@ -856,7 +871,7 @@ static void SaveBorder(RECT rc)
     }
 }
 /* ---- restore video area used by dummy window border ---- */
-static void RestoreBorder(RECT rc)
+void RestoreBorder(RECT rc)
 {
     if (Bsave != NULL)    {
         RECT lrc;
