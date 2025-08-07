@@ -22,7 +22,7 @@ pub export fn SystemMenuProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, 
             df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
         },
         df.DOUBLE_CLICK => {
-            if (p2 == win.GetTop(df.GetParent(wnd))) {
+            if (p2 == df.GetTop(df.GetParent(wnd))) {
                 df.PostMessage(df.GetParent(wnd), message, p1, p2);
                 _ = df.SendMessage(wnd, df.CLOSE_WINDOW, df.TRUE, 0);
             }
@@ -43,26 +43,24 @@ pub export fn SystemMenuProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, 
 // ------- Build a system menu --------
 pub export fn BuildSystemMenu(wnd: df.WINDOW) callconv(.c) void {
     const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
-//    int lf, tp, ht, wd;
-//    WINDOW SystemMenuWnd;
-//
+
+    var lf:c_int = @intCast(win.GetLeft()+1);
+    var tp:c_int = @intCast(win.GetTop()+1);
+    const ht:c_int = df.MenuHeight(&df.SystemMenu.PullDown[0].Selections);
+    const wd:c_int = df.MenuWidth(&df.SystemMenu.PullDown[0].Selections);
+
 //    SystemMenu.PullDown[0].Selections[6].Accelerator = 
 //        (GetClass(wnd) == APPLICATION) ? ALT_F4 : CTRL_F4;
-
-    const lf = win.GetLeft()+1;
-    const tp = win.GetTop(wnd)+1;
-    const ht = df.MenuHeight(df.SystemMenu.PullDown[0].Selections);
-    const wd = df.MenuWidth(df.SystemMenu.PullDown[0].Selections);
 
     if (lf+wd > df.SCREENWIDTH-1)
         lf = (df.SCREENWIDTH-1) - wd;
     if (tp+ht > df.SCREENHEIGHT-2)
         tp = (df.SCREENHEIGHT-2) - ht;
 
-    const SystemMenuWnd = df.CreateWindow(df.POPDOWNMENU, null,
-                lf,tp,ht,wd,null,wnd,SystemMenuProc, 0);
+    const SystemMenuWin = Window.create(df.POPDOWNMENU, null,
+                lf,tp,ht,wd,null,wnd,SystemMenuProc, 0, root.global_allocator);
+    const SystemMenuWnd = SystemMenuWin.win;
 
-    _ = SystemMenuWnd;
 //    if (wnd->condition == ISRESTORED)
 //        DeactivateCommand(&SystemMenu, ID_SYSRESTORE);
 //    else
@@ -93,8 +91,8 @@ pub export fn BuildSystemMenu(wnd: df.WINDOW) callconv(.c) void {
 //    else
 //        ActivateCommand(&SystemMenu, ID_SYSMAXIMIZE);
 //
-//    SendMessage(SystemMenuWnd, BUILD_SELECTIONS,
-//                (PARAM) &SystemMenu.PullDown[0], 0);
-//    SendMessage(SystemMenuWnd, SETFOCUS, TRUE, 0);
-//    SendMessage(SystemMenuWnd, SHOW_WINDOW, 0, 0);
+    _ = df.SendMessage(SystemMenuWnd, df.BUILD_SELECTIONS,
+                  @intCast(@intFromPtr(&df.SystemMenu.PullDown[0])), 0);
+    _ = df.SendMessage(SystemMenuWnd, df.SETFOCUS, df.TRUE, 0);
+    _ = df.SendMessage(SystemMenuWnd, df.SHOW_WINDOW, 0, 0);
 }

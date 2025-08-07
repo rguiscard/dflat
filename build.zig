@@ -52,7 +52,6 @@ pub fn build(b: *std.Build) void {
             "popdown.c",
             "editbox.c",
             "editor.c",
-            "sysmenu.c",
 
             "dialbox.c",
             "text.c",

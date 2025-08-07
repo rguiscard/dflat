@@ -571,10 +571,10 @@ int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
             }
             break;
 #endif
-#ifdef INCLUDE_HELP
-        case DISPLAY_HELP:
-            return DisplayHelp(wnd, (char *)p1);
-#endif
+//#ifdef INCLUDE_HELP
+//        case DISPLAY_HELP:
+//            return DisplayHelp(wnd, (char *)p1);
+//#endif
         default:
             break;
     }

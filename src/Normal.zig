@@ -4,6 +4,7 @@ const root = @import("root.zig");
 const Window = @import("Window.zig");
 const helpbox = @import("HelpBox.zig");
 const Classes = @import("Classes.zig");
+const sysmenu = @import("SysMenu.zig");
 
 var dummyWnd:?Window = null;
 var px:c_int = -1;
@@ -230,7 +231,8 @@ fn LeftButtonMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
     if ((df.WindowSizing>0) or (df.WindowMoving>0))
         return;
     if (df.HitControlBox(wnd, mx, my)) {
-        df.BuildSystemMenu(wnd);
+//        df.BuildSystemMenu(wnd);
+        sysmenu.BuildSystemMenu(wnd);
         return;
     }
     if ((my == 0) and (mx > -1) and (mx < df.WindowWidth(wnd))) {
@@ -486,8 +488,11 @@ pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
 //                    RestoreMsg(wnd);
 //            }
 //            break;
-//        case DISPLAY_HELP:
-//            return DisplayHelp(wnd, (char *)p1);
+        df.DISPLAY_HELP => {
+            const p1_addr:usize = @intCast(p1);
+            const pp1:[*c]u8 = @ptrFromInt(p1_addr);
+            return helpbox.DisplayHelp(wnd, std.mem.span(pp1));
+        },
         else => {
             return df.cNormalProc(wnd, message, p1, p2);
         }
