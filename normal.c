@@ -15,13 +15,7 @@ void PutVideoBuffer(WINDOW);
 #ifdef INCLUDE_MINIMIZE
 static RECT PositionIcon(WINDOW);
 #endif
-//void dragborder(WINDOW, int, int);
-//static void near sizeborder(WINDOW, int, int);
 void SetFocusMsg(WINDOW wnd, PARAM p1);
-//int px = -1, py = -1;
-//int diff;
-//static struct window dwnd = {DUMMY, NULL, NormalProc,
-//                                {-1,-1,-1,-1}};
 static short *Bsave;
 static int Bht, Bwd;
 BOOL WindowMoving;
@@ -33,69 +27,6 @@ CLASSDEFS classdefs[] = {
     #include "classes.h"
 };
 WINDOW HiddenWindow;
-
-/* --------- KEYBOARD Message ---------- */
-/*
-BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    if (WindowMoving || WindowSizing)    {
-        // -- move or size a window with keyboard -- 
-        int x, y;
-        x=WindowMoving?GetLeft(&dwnd):GetRight(&dwnd);
-        y=WindowMoving?GetTop(&dwnd):GetBottom(&dwnd);
-        switch ((int)p1)    {
-//            case ESC:
-//                TerminateMoveSize();
-//                return TRUE;
-//            case UP:
-//                if (y)
-//                    --y;
-//                break;
-//            case DN:
-//                if (y < SCREENHEIGHT-1)
-//                    y++;
-//                break;
-            case FWD:
-                if (x < SCREENWIDTH-1)
-                    x++;
-                break;
-            case BS:
-                if (x)
-                    --x;
-                break;
-            case '\r':
-                SendMessage(wnd,BUTTON_RELEASED,x,y);
-            default:
-                return TRUE;
-        }
-        // -- use the mouse functions to move/size -
-        SendMessage(wnd, MOUSE_CURSOR, x, y);
-        SendMessage(wnd, MOUSE_MOVED, x, y);
-        return TRUE;
-    }
-    switch ((int)p1)    {
-        case F1:
-            SendMessage(wnd, COMMAND, ID_HELP, 0);
-            return TRUE;
-        case ' ':
-            if ((int)p2 & ALTKEY)
-                if (TestAttribute(wnd, HASTITLEBAR))
-                    if (TestAttribute(wnd, CONTROLBOX))
-                        BuildSystemMenu(wnd);
-            return TRUE;
-        case CTRL_F4:
-            if (TestAttribute(wnd, CONTROLBOX))	{
-            	SendMessage(wnd, CLOSE_WINDOW, 0, 0);
-				SkipApplicationControls();
-	            return TRUE;
-			}
-			break;
-        default:
-            break;
-    }
-    return FALSE;
-}
-*/
 
 /* --------- SETFOCUS Message ---------- */
 void SetFocusMsg(WINDOW wnd, PARAM p1)
@@ -185,142 +116,6 @@ void SetFocusMsg(WINDOW wnd, PARAM p1)
     }
 }
 
-/* --------- DOUBLE_CLICK Message ---------- */
-/*
-static void DoubleClickMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    int mx = (int) p1 - GetLeft(wnd);
-    int my = (int) p2 - GetTop(wnd);
-    if (!WindowSizing && !WindowMoving)	{
-        if (HitControlBox(wnd, mx, my))	{
-            PostMessage(wnd, CLOSE_WINDOW, 0, 0);
-			SkipApplicationControls();
-		}
-	}
-}
-*/
-
-/* --------- LEFT_BUTTON Message ---------- */
-/*
-static void LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    int mx = (int) p1 - GetLeft(wnd);
-    int my = (int) p2 - GetTop(wnd);
-    if (WindowSizing || WindowMoving)
-        return;
-    if (HitControlBox(wnd, mx, my))    {
-        BuildSystemMenu(wnd);
-        return;
-    }
-    if (my == 0 && mx > -1 && mx < WindowWidth(wnd))  {
-        // ---------- hit the top border --------
-        if (TestAttribute(wnd, MINMAXBOX) &&
-                TestAttribute(wnd, HASTITLEBAR))  {
-            if (mx == WindowWidth(wnd)-2)    {
-                if (wnd->condition != ISRESTORED)
-                    // --- hit the restore box ---
-                    SendMessage(wnd, RESTORE, 0, 0);
-#ifdef INCLUDE_MAXIMIZE
-                else
-                    // --- hit the maximize box ---
-                    SendMessage(wnd, MAXIMIZE, 0, 0);
-#endif
-                return;
-            }
-#ifdef INCLUDE_MINIMIZE
-            if (mx == WindowWidth(wnd)-3)    {
-                // --- hit the minimize box --- 
-                if (wnd->condition != ISMINIMIZED)
-                    SendMessage(wnd, MINIMIZE, 0, 0);
-                return;
-            }
-#endif
-        }
-#ifdef INCLUDE_MAXIMIZE
-        if (wnd->condition == ISMAXIMIZED)
-            return;
-#endif
-        if (TestAttribute(wnd, MOVEABLE))    {
-            WindowMoving = TRUE;
-            px = mx;
-            py = my;
-            diff = (int) mx;
-            SendMessage(wnd, CAPTURE_MOUSE, TRUE,
-                (PARAM) &dwnd);
-            dragborder(wnd, GetLeft(wnd), GetTop(wnd));
-        }
-        return;
-    }
-    if (mx == WindowWidth(wnd)-1 &&
-            my == WindowHeight(wnd)-1)    {
-        // ------- hit the resize corner -------
-#ifdef INCLUDE_MINIMIZE
-        if (wnd->condition == ISMINIMIZED)
-            return;
-#endif
-        if (!TestAttribute(wnd, SIZEABLE))
-            return;
-#ifdef INCLUDE_MAXIMIZE
-        if (wnd->condition == ISMAXIMIZED)    {
-            if (GetParent(wnd) == NULL)
-                return;
-            if (TestAttribute(GetParent(wnd),HASBORDER))
-                return;
-            // ----- resizing a maximized window over a
-                    borderless parent ----- 
-            wnd = GetParent(wnd);
-	        if (!TestAttribute(wnd, SIZEABLE))
-    	        return;
-        }
-#endif
-        WindowSizing = TRUE;
-        SendMessage(wnd, CAPTURE_MOUSE,
-            TRUE, (PARAM) &dwnd);
-        dragborder(wnd, GetLeft(wnd), GetTop(wnd));
-    }
-}
-*/
-/* --------- MOUSE_MOVED Message ---------- */
-/*
-static BOOL MouseMovedMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    if (WindowMoving)    {
-        int leftmost = 0, topmost = 0,
-            bottommost = SCREENHEIGHT-2,
-            rightmost = SCREENWIDTH-2;
-        int x = (int) p1 - diff;
-        int y = (int) p2;
-        if (GetParent(wnd) != NULL &&
-                !TestAttribute(wnd, NOCLIP))    {
-            WINDOW wnd1 = GetParent(wnd);
-            topmost    = GetClientTop(wnd1);
-            leftmost   = GetClientLeft(wnd1);
-            bottommost = GetClientBottom(wnd1);
-            rightmost  = GetClientRight(wnd1);
-        }
-        if (x < leftmost || x > rightmost ||
-                y < topmost || y > bottommost)    {
-            x = max(x, leftmost);
-            x = min(x, rightmost);
-            y = max(y, topmost);
-            y = min(y, bottommost);
-            SendMessage(NULL,MOUSE_CURSOR,x+diff,y);
-        }
-        if (x != px || y != py)    {
-            px = x;
-            py = y;
-            dragborder(wnd, x, y);
-        }
-        return TRUE;
-    }
-    if (WindowSizing)    {
-        sizeborder(wnd, (int) p1, (int) p2);
-        return TRUE;
-    }
-    return FALSE;
-}
-*/
-
 #ifdef INCLUDE_MAXIMIZE
 /* --------- MAXIMIZE Message ---------- */
 static void MaximizeMsg(WINDOW wnd)
@@ -401,76 +196,6 @@ static void RestoreMsg(WINDOW wnd)
 }
 #endif
 
-/* --------- MOVE Message ---------- */
-/*
-static void MoveMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    WINDOW cwnd;
-    BOOL wasVisible = isVisible(wnd);
-    int xdif = (int) p1 - wnd->rc.lf;
-    int ydif = (int) p2 - wnd->rc.tp;
-
-    if (xdif == 0 && ydif == 0)
-        return;
-	wnd->wasCleared = FALSE;
-    if (wasVisible)
-        SendMessage(wnd, HIDE_WINDOW, 0, 0);
-    wnd->rc.lf = (int) p1;
-    wnd->rc.tp = (int) p2;
-    wnd->rc.rt = GetLeft(wnd)+WindowWidth(wnd)-1;
-    wnd->rc.bt = GetTop(wnd)+WindowHeight(wnd)-1;
-    if (wnd->condition == ISRESTORED)
-        wnd->RestoredRC = wnd->rc;
-
-	cwnd = FirstWindow(wnd);
-	while (cwnd != NULL)	{
-        SendMessage(cwnd, MOVE, cwnd->rc.lf+xdif, cwnd->rc.tp+ydif);
-		cwnd = NextWindow(cwnd);
-    }
-    if (wasVisible)
-        SendMessage(wnd, SHOW_WINDOW, 0, 0);
-}
-*/
-
-/* --------- SIZE Message ---------- */
-/*
-static void SizeMsg(WINDOW wnd, PARAM p1, PARAM p2)
-{
-    BOOL wasVisible = isVisible(wnd);
-    WINDOW cwnd;
-    RECT rc;
-    int xdif = (int) p1 - wnd->rc.rt;
-    int ydif = (int) p2 - wnd->rc.bt;
-
-    if (xdif == 0 && ydif == 0)
-        return;
-	wnd->wasCleared = FALSE;
-    if (wasVisible)
-        SendMessage(wnd, HIDE_WINDOW, 0, 0);
-    wnd->rc.rt = (int) p1;
-    wnd->rc.bt = (int) p2;
-    wnd->ht = GetBottom(wnd)-GetTop(wnd)+1;
-    wnd->wd = GetRight(wnd)-GetLeft(wnd)+1;
-
-    if (wnd->condition == ISRESTORED)
-        wnd->RestoredRC = WindowRect(wnd);
-
-#ifdef INCLUDE_MAXIMIZE
-    rc = ClientRect(wnd);
-
-	cwnd = FirstWindow(wnd);
-	while (cwnd != NULL)	{
-        if (cwnd->condition == ISMAXIMIZED)
-            SendMessage(cwnd, SIZE, RectRight(rc), RectBottom(rc));
-		cwnd = NextWindow(cwnd);
-    }
-
-#endif
-    if (wasVisible)
-        SendMessage(wnd, SHOW_WINDOW, 0, 0);
-}
-*/
-
 /* --------- CLOSE_WINDOW Message ---------- */
 static void CloseWindowMsg(WINDOW wnd)
 {
@@ -515,35 +240,6 @@ static void CloseWindowMsg(WINDOW wnd)
 int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
-//        case SETFOCUS:
-//            SetFocusMsg(wnd, p1);
-//            break;
-//        case DOUBLE_CLICK:
-//            DoubleClickMsg(wnd, p1, p2);
-//            break;
-//        case LEFT_BUTTON:
-//            LeftButtonMsg(wnd, p1, p2);
-//            break;
-//        case MOUSE_MOVED:
-//            if (MouseMovedMsg(wnd, p1, p2))
-//                return TRUE;
-//            break;
-//        case BUTTON_RELEASED:
-//            if (WindowMoving || WindowSizing)    {
-//                if (WindowMoving)
-//                    PostMessage(wnd,MOVE,dwnd.rc.lf,dwnd.rc.tp);
-//                else
-//                    PostMessage(wnd,SIZE,dwnd.rc.rt,dwnd.rc.bt);
-//                TerminateMoveSize();
-//            }
-//            break;
-//        case MOVE:
-//            MoveMsg(wnd, p1, p2);
-//            break;
-//        case SIZE:    {
-//            SizeMsg(wnd, p1, p2);
-//            break;
-//        }
         case CLOSE_WINDOW:
             CloseWindowMsg(wnd);
             break;
@@ -571,10 +267,6 @@ int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
             }
             break;
 #endif
-//#ifdef INCLUDE_HELP
-//        case DISPLAY_HELP:
-//            return DisplayHelp(wnd, (char *)p1);
-//#endif
         default:
             break;
     }
@@ -633,74 +325,6 @@ static RECT PositionIcon(WINDOW wnd)
     return rc;
 }
 #endif
-
-/* ----- terminate the move or size operation ----- */
-/*
-static void TerminateMoveSize(void)
-{
-    px = py = -1;
-    diff = 0;
-    SendMessage(&dwnd, RELEASE_MOUSE, TRUE, 0);
-    SendMessage(&dwnd, RELEASE_KEYBOARD, TRUE, 0);
-    RestoreBorder(dwnd.rc);
-    WindowMoving = WindowSizing = FALSE;
-}
-*/
-/* ---- build a dummy window border for moving or sizing --- */
-/*
-void dragborder(WINDOW wnd, int x, int y)
-{
-    RestoreBorder(dwnd.rc);
-    // ------- build the dummy window --------
-    dwnd.rc.lf = x;
-    dwnd.rc.tp = y;
-    dwnd.rc.rt = dwnd.rc.lf+WindowWidth(wnd)-1;
-    dwnd.rc.bt = dwnd.rc.tp+WindowHeight(wnd)-1;
-    dwnd.ht = WindowHeight(wnd);
-    dwnd.wd = WindowWidth(wnd);
-    dwnd.parent = GetParent(wnd);
-    dwnd.attrib = VISIBLE | HASBORDER | NOCLIP;
-    InitWindowColors(&dwnd);
-    SaveBorder(dwnd.rc);
-    RepaintBorder(&dwnd, NULL);
-}
-*/
-/* ---- write the dummy window border for sizing ---- */
-/*
-static void near sizeborder(WINDOW wnd, int rt, int bt)
-{
-    int leftmost = GetLeft(wnd)+10;
-    int topmost = GetTop(wnd)+3;
-    int bottommost = SCREENHEIGHT-1;
-    int rightmost  = SCREENWIDTH-1;
-    if (GetParent(wnd))    {
-        bottommost = min(bottommost,
-            GetClientBottom(GetParent(wnd)));
-        rightmost  = min(rightmost,
-            GetClientRight(GetParent(wnd)));
-    }
-    rt = min(rt, rightmost);
-    bt = min(bt, bottommost);
-    rt = max(rt, leftmost);
-    bt = max(bt, topmost);
-    SendMessage(NULL, MOUSE_CURSOR, rt, bt);
-
-    if (rt != px || bt != py)
-        RestoreBorder(dwnd.rc);
-
-    // ------- change the dummy window -------- 
-    dwnd.ht = bt-dwnd.rc.tp+1;
-    dwnd.wd = rt-dwnd.rc.lf+1;
-    dwnd.rc.rt = rt;
-    dwnd.rc.bt = bt;
-    if (rt != px || bt != py)    {
-        px = rt;
-        py = bt;
-        SaveBorder(dwnd.rc);
-        RepaintBorder(&dwnd, NULL);
-    }
-}
-*/
 
 #ifdef INCLUDE_MULTI_WINDOWS
 /* ----- adjust a rectangle to include the shadow ----- */
