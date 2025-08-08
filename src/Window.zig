@@ -151,9 +151,14 @@ pub fn GetClientRight(self: *TopLevelFields) isize {
     return self.GetRight() - self.TopBorderAdj();
 }
 
-pub fn getParent(self: *TopLevelFields) df.WINDOW {
+pub fn getParent(self: *TopLevelFields) ?*TopLevelFields {
     const wnd = self.win;
-    return wnd.*.parent;
+    const parent = wnd.*.parent;
+    if (parent) |w| {
+        const pwin:*TopLevelFields = @constCast(@fieldParentPtr("win", &w));
+        return pwin;
+    }
+    return null;
 }
 
 pub fn firstWindow(self: *TopLevelFields) df.WINDOW {
@@ -161,9 +166,12 @@ pub fn firstWindow(self: *TopLevelFields) df.WINDOW {
     return wnd.*.firstchild;
 }
 
-pub fn lastWindow(self: *TopLevelFields) df.WINDOW {
-    const wnd = self.win;
-    return wnd.*.lastchild;
+pub fn lastWindow(self: *TopLevelFields) ?*TopLevelFields {
+    const child = self.win.*.lastchild;
+    if (child) |c| {
+        return @constCast(@fieldParentPtr("win", &c));
+    }
+    return null;
 }
 
 pub fn nextWindow(self: *TopLevelFields) df.WINDOW {
@@ -171,9 +179,17 @@ pub fn nextWindow(self: *TopLevelFields) df.WINDOW {
     return wnd.*.nextsibling;
 }
 
-pub fn prevWindow(self: *TopLevelFields) df.WINDOW {
+pub fn prevWindow(self: *TopLevelFields) ?*TopLevelFields {
+    const prevsibling = self.win.*.prevsibling;
+    if (prevsibling) |s| {
+        return @constCast(@fieldParentPtr("win", &s));
+    }
+    return null;
+}
+
+pub fn GetClass(self: *TopLevelFields) df.CLASS {
     const wnd = self.win;
-    return wnd.*.prevsibling;
+    return wnd.*.Class;
 }
 
 pub fn GetAttribute(self: *TopLevelFields) c_int {

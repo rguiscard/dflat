@@ -8,6 +8,7 @@ const Dialogs = @import("Dialogs.zig");
 const DialogBox = @import("DialogBox.zig");
 const msg = @import("Message.zig").Message;
 const helpbox = @import("HelpBox.zig");
+const normal = @import("Normal.zig");
 
 var ScreenHeight:c_int = 0;
 var WindowSel:c_int = 0;
@@ -31,7 +32,7 @@ pub export fn ApplicationProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM,
 //            if ((int)p1 == (inFocus != wnd))    {
             if (((df.inFocus != wnd) and (p1 != 0)) or 
                 ((df.inFocus == wnd) and (p1 == 0))) {
-                SetFocusMsg(wnd, if (p1 == 0) false else true);
+                SetFocusMsg(win, if (p1 == 0) false else true);
                 return df.TRUE;
             }
         },
@@ -50,7 +51,8 @@ pub export fn ApplicationProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM,
             return df.TRUE;
         },
         df.PAINT => {
-            if (df.isVisible(wnd) > 0)    {
+//            if (df.isVisible(wnd) > 0)    {
+            if (normal.isVisible(win))    {
 //                int cl = cfg.Texture ? APPLCHAR : ' ';
                 var cl:u8 = ' ';
                 if (df.cfg.Texture > 0)
@@ -96,22 +98,24 @@ fn AddStatusMsg(win: *Window, p1: df.PARAM) void {
 }
 
 // -------- SETFOCUS Message --------
-fn SetFocusMsg(wnd:df.WINDOW, p1:bool) void {
-    if (p1)
+fn SetFocusMsg(win:*Window, p1:bool) void {
+    const wnd = win.win;
+    if (p1) {
         _ = df.SendMessage(df.inFocus, df.SETFOCUS, df.FALSE, 0);
+    }
     df.inFocus = if (p1) wnd else null;
     _ = df.SendMessage(null, df.HIDE_CURSOR, 0, 0);
-    if (df.isVisible(wnd) > 0) {
-        _ = df.SendMessage(wnd, df.BORDER, 0, 0);
+
+    if (normal.isVisible(win)) {
+        _ = win.sendMessage(msg.BORDER, 0, 0);
     } else {
-        _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
+        _ = win.sendMessage(msg.SHOW_WINDOW, 0, 0);
     }
 }
 
 // ------- SIZE Message --------
 fn SizeMsg(win:*Window, p1:df.PARAM, p2:df.PARAM) void {
-    var WasVisible = false;
-    WasVisible = (df.isVisible(win.win) > 0);
+    const WasVisible = normal.isVisible(win);
     if (WasVisible)
         _ = win.sendMessage(msg.HIDE_WINDOW, 0, 0);
     var p1_new = p1;
@@ -596,18 +600,20 @@ fn SetScreenHeight(height: c_int) void {
 // ----- Close all document windows -----
 fn CloseAll(win:*Window, closing:bool) void {
     const wnd = win.win;
-    _ = df.SendMessage(wnd, df.SETFOCUS, df.TRUE, 0);
+    _ = win.sendMessage(msg.SETFOCUS, df.TRUE, 0);
+
     var wnd1:df.WINDOW = df.LastWindow(wnd);
     var wnd2:df.WINDOW = undefined;
     while (wnd1 != null) {
         wnd2 = df.PrevWindow(wnd1);
         if ((df.isVisible(wnd1) > 0) and df.GetClass(wnd1) != df.MENUBAR and
                                         df.GetClass(wnd1) != df.STATUSBAR) {
-              wnd.*.attrib = wnd.*.attrib & ~df.VISIBLE; // FIXME, should use ClearVisible() macro
+              wnd1.*.attrib = wnd1.*.attrib & ~df.VISIBLE; // FIXME, should use ClearVisible() macro
               _ = df.SendMessage(wnd1, df.CLOSE_WINDOW, 0, 0);
         }
         wnd1 = wnd2;
     }
+
     if (closing == false)
         _ = win.sendMessage(msg.PAINT, 0, 0);
 }
