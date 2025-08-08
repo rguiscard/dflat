@@ -365,53 +365,52 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
             CtlCreateWindowMsg(wnd);
         },
         df.KEYBOARD => {
-//            if (CtlKeyboardMsg(wnd, p1, p2))
-//                return TRUE;
-            return df.ControlProc(wnd, message, p1, p2);
+            if (df.CtlKeyboardMsg(wnd, p1, p2) > 0)
+                return df.TRUE;
         },
         df.PAINT => {
-//            FixColors(wnd);
-//            if (GetClass(wnd) == EDITBOX ||
-//                    GetClass(wnd) == LISTBOX ||
-//                        GetClass(wnd) == TEXTBOX)
-//                SetScrollBars(wnd);
-            return df.ControlProc(wnd, message, p1, p2);
+            FixColors(wnd);
+            if ((df.GetClass(wnd) == df.EDITBOX) or
+                (df.GetClass(wnd) == df.LISTBOX) or
+                (df.GetClass(wnd) == df.TEXTBOX)) {
+                SetScrollBars(wnd);
+            }
         },
         df.BORDER => {
-//                        FixColors(wnd);
-//            if (GetClass(wnd) == EDITBOX)    {
-//                WINDOW oldFocus = inFocus;
-//                inFocus = NULL;
-//                DefaultWndProc(wnd, msg, p1, p2);
-//                inFocus = oldFocus;
-//                return TRUE;
-//            }
-            return df.ControlProc(wnd, message, p1, p2);
+            FixColors(wnd);
+            if (df.GetClass(wnd) == df.EDITBOX) {
+                const oldFocus = df.inFocus;
+                df.inFocus = null;
+                _ = root.DefaultWndProc(wnd, message, p1, p2);
+                df.inFocus = oldFocus;
+                return df.TRUE;
+            }
         },
         df.SETFOCUS => {
             const db:?*df.DBOX = if (df.GetParent(wnd) != null) @alignCast(@ptrCast(df.GetParent(wnd).*.extension)) else null;
             const pwnd = df.GetParent(wnd);
             if (p1 > 0) {
-//                                WINDOW oldFocus = inFocus;
-//                                if (pwnd && GetClass(oldFocus) != APPLICATION &&
-//                                                !isAncestor(inFocus, pwnd))     {
-//                                        inFocus = NULL;
-//                                        SendMessage(oldFocus, BORDER, 0, 0);
-//                                        SendMessage(pwnd, SHOW_WINDOW, 0, 0);
-//                                        inFocus = oldFocus;
-//                                        ClearVisible(oldFocus);
-//                                }
-//                                if (GetClass(oldFocus) == APPLICATION &&
-//                                                NextWindow(pwnd) != NULL)
-//                                        pwnd->wasCleared = FALSE;
-//                DefaultWndProc(wnd, msg, p1, p2);
-//                                SetVisible(oldFocus);
-//                                if (pwnd != NULL)       {
-//                                        pwnd->dfocus = wnd;
-//                        SendMessage(pwnd, COMMAND,
-//                        inFocusCommand(db), ENTERFOCUS);
-//                                }
-//                return TRUE;
+//                const oldFocus = df.inFocus;
+//                if ((pwnd != null) and (df.GetClass(oldFocus) != df.APPLICATION) and
+//                                       (df.isAncestor(df.inFocus, pwnd) == 0)) {
+//                    df.inFocus = null;
+//                    _ = df.SendMessage(oldFocus, df.BORDER, 0, 0);
+//                    _ = df.SendMessage(pwnd, df.SHOW_WINDOW, 0, 0);
+//                    df.inFocus = oldFocus;
+////                    df.ClearVisible(oldFocus);
+//                }
+//                if ((df.GetClass(oldFocus) == df.APPLICATION) and
+//                    df.NextWindow(pwnd) != null) {
+//                    pwnd.*.wasCleared = df.FALSE;
+//                }
+//                _ = root.DefaultWndProc(wnd, message, p1, p2);
+//                df.SetVisible(oldFocus);
+//                if (pwnd != null) {
+//                    pwnd.*.dfocus = wnd;
+//                    _ = df.SendMessage(pwnd, df.COMMAND,
+//                        inFocusCommand(db), df.ENTERFOCUS);
+//                }
+//                return df.TRUE;
                 return df.ControlProc(wnd, message, p1, p2);
             } else {
                 _ = df.SendMessage(pwnd, df.COMMAND,
@@ -419,8 +418,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
             }
         },
         df.CLOSE_WINDOW => {
-//            CtlCloseWindowMsg(wnd);
-            return df.ControlProc(wnd, message, p1, p2);
+            df.CtlCloseWindowMsg(wnd);
         },
         else => {
         }
@@ -440,6 +438,45 @@ fn CtlCreateWindowMsg(wnd: df.WINDOW) void {
     }
     wnd.*.extension = null;
 }
+
+fn FixColors(wnd:df.WINDOW) void {
+    const ct = wnd.*.ct;
+    if (ct.*.Class != df.BUTTON) {
+        if ((ct.*.Class != df.SPINBUTTON) and (ct.*.Class != df.COMBOBOX)) {
+            if ((ct.*.Class != df.EDITBOX) and (ct.*.Class != df.LISTBOX)) {
+                wnd.*.WindowColors[df.FRAME_COLOR][df.FG] =
+                                        df.GetParent(wnd).*.WindowColors[df.FRAME_COLOR][df.FG];
+                wnd.*.WindowColors[df.FRAME_COLOR][df.BG] =
+                                        df.GetParent(wnd).*.WindowColors[df.FRAME_COLOR][df.BG];
+                wnd.*.WindowColors[df.STD_COLOR][df.FG] =
+                                        df.GetParent(wnd).*.WindowColors[df.STD_COLOR][df.FG];
+                wnd.*.WindowColors[df.STD_COLOR][df.BG] =
+                                        df.GetParent(wnd).*.WindowColors[df.STD_COLOR][df.BG];
+            }
+        }
+    }
+}
+
+// --- dynamically add or remove scroll bars
+//                            from a control window ----
+fn SetScrollBars(wnd:df.WINDOW) void {
+    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
+
+    const oldattr = win.GetAttribute();
+    if (wnd.*.wlines > win.ClientHeight()) {
+        win.AddAttribute(df.VSCROLLBAR);
+    } else {
+        win.ClearAttribute(df.VSCROLLBAR);
+    }
+    if (wnd.*.textwidth > win.ClientWidth()) {
+        win.AddAttribute(df.HSCROLLBAR);
+    } else {
+        win.ClearAttribute(df.HSCROLLBAR);
+    }
+    if (win.GetAttribute() != oldattr)
+        _ = win.sendMessage(msg.Message.BORDER, 0, 0);
+}
+
 
 // ---- change the focus to the first control ---
 fn FirstFocus(self: *TopLevelFields) void {

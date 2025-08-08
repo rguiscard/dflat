@@ -7,7 +7,6 @@ void PaintOverLappers(WINDOW wnd);
 void PaintUnderLappers(WINDOW wnd);
 #endif
 
-static void TerminateMoveSize(void);
 void SaveBorder(RECT);
 void RestoreBorder(RECT);
 void GetVideoBuffer(WINDOW);
@@ -16,6 +15,12 @@ void PutVideoBuffer(WINDOW);
 static RECT PositionIcon(WINDOW);
 #endif
 void SetFocusMsg(WINDOW wnd, PARAM p1);
+
+void sizeborder(WINDOW, int, int);
+int px = -1, py = -1;
+int diff;
+struct window dwnd = {DUMMY, NULL, NormalProc,
+                                {-1,-1,-1,-1}};
 static short *Bsave;
 static int Bht, Bwd;
 BOOL WindowMoving;
@@ -325,6 +330,41 @@ static RECT PositionIcon(WINDOW wnd)
     return rc;
 }
 #endif
+
+/* ---- write the dummy window border for sizing ---- */
+void sizeborder(WINDOW wnd, int rt, int bt)
+{
+    int leftmost = GetLeft(wnd)+10;
+    int topmost = GetTop(wnd)+3;
+    int bottommost = SCREENHEIGHT-1;
+    int rightmost  = SCREENWIDTH-1;
+    if (GetParent(wnd))    {
+        bottommost = min(bottommost,
+            GetClientBottom(GetParent(wnd)));
+        rightmost  = min(rightmost,
+            GetClientRight(GetParent(wnd)));
+    }
+    rt = min(rt, rightmost);
+    bt = min(bt, bottommost);
+    rt = max(rt, leftmost);
+    bt = max(bt, topmost);
+    SendMessage(NULL, MOUSE_CURSOR, rt, bt);
+
+    if (rt != px || bt != py)
+        RestoreBorder(dwnd.rc);
+
+    /* ------- change the dummy window -------- */
+    dwnd.ht = bt-dwnd.rc.tp+1;
+    dwnd.wd = rt-dwnd.rc.lf+1;
+    dwnd.rc.rt = rt;
+    dwnd.rc.bt = bt;
+    if (rt != px || bt != py)    {
+        px = rt;
+        py = bt;
+        SaveBorder(dwnd.rc);
+        RepaintBorder(&dwnd, NULL);
+    }
+}
 
 #ifdef INCLUDE_MULTI_WINDOWS
 /* ----- adjust a rectangle to include the shadow ----- */

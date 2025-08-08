@@ -15,6 +15,9 @@ static BOOL SysMenuOpen;
 static DBOX **dbs = NULL;
 static int dbct = 0;
 
+BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+void CtlCloseWindowMsg(WINDOW wnd);
+
 /* --- clear all heap allocations to control text fields --- */
 void ClearDialogBoxes(void)
 {
@@ -317,7 +320,7 @@ static void CtlCreateWindowMsg(WINDOW wnd)
 }
 
 /* ------- KEYBOARD Message (Control) ----- */
-static BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
+BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     CTLWINDOW *ct = GetControl(wnd);
     switch ((int) p1)    {
@@ -385,7 +388,7 @@ static BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* ------- CLOSE_WINDOW Message (Control) ----- */
-static void CtlCloseWindowMsg(WINDOW wnd)
+void CtlCloseWindowMsg(WINDOW wnd)
 {
     CTLWINDOW *ct = GetControl(wnd);
     if (ct != NULL)    {

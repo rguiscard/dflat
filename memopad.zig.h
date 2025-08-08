@@ -71,12 +71,14 @@ void GetVideoBuffer(WINDOW wnd);
 void PutVideoBuffer(WINDOW wnd);
 void PaintOverLappers(WINDOW wnd);
 void PaintUnderLappers(WINDOW wnd);
-//BOOL NormalKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
-//void dragborder(WINDOW wnd, int x, int y);
 void SetFocusMsg(WINDOW wnd, PARAM p1);
 void RestoreBorder(RECT);
 void SaveBorder(RECT rc);
+void sizeborder(WINDOW, int, int);
+extern int px, py;
+extern int diff;
+extern struct window dwnd;
 
-//extern int px;
-//extern int py;
-//extern int diff;
+// dialbox.c
+BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
+void CtlCloseWindowMsg(WINDOW wnd);
