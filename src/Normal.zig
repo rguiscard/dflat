@@ -7,6 +7,9 @@ const Classes = @import("Classes.zig");
 const sysmenu = @import("SysMenu.zig");
 
 var dummyWnd:?Window = null;
+var px:c_int = -1;
+var py:c_int = -1;
+var diff:c_int = 0;
 
 fn getDummy() Window {
     if(dummyWnd == null) {
@@ -267,9 +270,9 @@ fn LeftButtonMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
 //#endif
         if (df.TestAttribute(wnd, df.MOVEABLE)>0)    {
             df.WindowMoving = df.TRUE;
-            df.px = @intCast(mx);
-            df.py = @intCast(my);
-            df.diff = @intCast(mx);
+            px = @intCast(mx);
+            py = @intCast(my);
+            diff = @intCast(mx);
             _ = df.SendMessage(wnd, df.CAPTURE_MOUSE, df.TRUE, @intCast(@intFromPtr(&dwnd)));
             dragborder(wnd, df.GetLeft(wnd), df.GetTop(wnd));
         }
@@ -308,7 +311,7 @@ fn MouseMovedMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) bool {
         var topmost:c_int = 0;
         var bottommost:c_int = df.SCREENHEIGHT-2;
         var rightmost:c_int = df.SCREENWIDTH-2;
-        var x:c_int = @intCast(p1 - df.diff);
+        var x:c_int = @intCast(p1 - diff);
         var y:c_int = @intCast(p2);
         if ((df.GetParent(wnd) != null) and 
                 (df.TestAttribute(wnd, df.NOCLIP) == 0)) {
@@ -326,17 +329,18 @@ fn MouseMovedMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) bool {
             x = @min(x, rightmost);
             y = @max(y, topmost);
             y = @min(y, bottommost);
-            _ = df.SendMessage(null,df.MOUSE_CURSOR,x+df.diff,y);
+            _ = df.SendMessage(null,df.MOUSE_CURSOR,x+diff,y);
         }
-        if ((x != df.px) or  (y != df.py))    {
-            df.px = x;
-            df.py = y;
+        if ((x != px) or  (y != py))    {
+            px = x;
+            py = y;
             dragborder(wnd, x, y);
         }
         return true;
     }
     if (df.WindowSizing>0) {
-        df.sizeborder(wnd, @intCast(p1), @intCast(p2));
+//        df.sizeborder(wnd, @intCast(p1), @intCast(p2));
+        sizeborder(wnd, @intCast(p1), @intCast(p2));
         return true;
     }
     return false;
@@ -519,9 +523,9 @@ fn InsideWindow(wnd:df.WINDOW, x:c_int, y:c_int) c_int{
 
 // ----- terminate the move or size operation -----
 fn TerminateMoveSize(dwnd:df.WINDOW) void {
-    df.px = -1;
-    df.py = -1;
-    df.diff = 0;
+    px = -1;
+    py = -1;
+    diff = 0;
     _ = df.SendMessage(dwnd, df.RELEASE_MOUSE, df.TRUE, 0);
     _ = df.SendMessage(dwnd, df.RELEASE_KEYBOARD, df.TRUE, 0);
     df.RestoreBorder(dwnd.*.rc);
@@ -576,7 +580,7 @@ fn sizeborder(wnd:df.WINDOW, rt:c_int, bt:c_int) void {
     new_bt = @max(new_bt, topmost);
     _ = df.SendMessage(null, df.MOUSE_CURSOR, new_rt, new_bt);
 
-    if ((rt != df.px) or (bt != df.py))
+    if ((rt != px) or (bt != py))
         df.RestoreBorder(dwnd.*.rc);
 
     // ------- change the dummy window --------
@@ -584,9 +588,9 @@ fn sizeborder(wnd:df.WINDOW, rt:c_int, bt:c_int) void {
     dwnd.*.wd = rt-dwnd.*.rc.lf+1;
     dwnd.*.rc.rt = rt;
     dwnd.*.rc.bt = bt;
-    if ((rt != df.px) or (bt != df.py)) {
-        df.px = rt;
-        df.py = bt;
+    if ((rt != px) or (bt != py)) {
+        px = rt;
+        py = bt;
         df.SaveBorder(dwnd.*.rc);
         df.RepaintBorder(dwnd, null);
     }

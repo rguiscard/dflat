@@ -388,28 +388,31 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
             const db:?*df.DBOX = if (df.GetParent(wnd) != null) @alignCast(@ptrCast(df.GetParent(wnd).*.extension)) else null;
             const pwnd = df.GetParent(wnd);
             if (p1 > 0) {
-//                const oldFocus = df.inFocus;
-//                if ((pwnd != null) and (df.GetClass(oldFocus) != df.APPLICATION) and
-//                                       (df.isAncestor(df.inFocus, pwnd) == 0)) {
-//                    df.inFocus = null;
-//                    _ = df.SendMessage(oldFocus, df.BORDER, 0, 0);
-//                    _ = df.SendMessage(pwnd, df.SHOW_WINDOW, 0, 0);
-//                    df.inFocus = oldFocus;
+                const oldFocus = df.inFocus;
+                const oldWin:*Window = @constCast(@fieldParentPtr("win", &oldFocus));
+                if ((pwnd != null) and (df.GetClass(oldFocus) != df.APPLICATION) and
+                                       (df.isAncestor(df.inFocus, pwnd) == 0)) {
+                    df.inFocus = null;
+                    _ = df.SendMessage(oldFocus, df.BORDER, 0, 0);
+                    _ = df.SendMessage(pwnd, df.SHOW_WINDOW, 0, 0);
+                    df.inFocus = oldFocus;
 //                    df.ClearVisible(oldFocus);
-//                }
-//                if ((df.GetClass(oldFocus) == df.APPLICATION) and
-//                    df.NextWindow(pwnd) != null) {
-//                    pwnd.*.wasCleared = df.FALSE;
-//                }
-//                _ = root.DefaultWndProc(wnd, message, p1, p2);
+                    oldWin.ClearVisible();
+                }
+                if ((df.GetClass(oldFocus) == df.APPLICATION) and
+                    df.NextWindow(pwnd) != null) {
+                    pwnd.*.wasCleared = df.FALSE;
+                }
+                _ = root.DefaultWndProc(wnd, message, p1, p2);
 //                df.SetVisible(oldFocus);
-//                if (pwnd != null) {
-//                    pwnd.*.dfocus = wnd;
-//                    _ = df.SendMessage(pwnd, df.COMMAND,
-//                        inFocusCommand(db), df.ENTERFOCUS);
-//                }
-//                return df.TRUE;
-                return df.ControlProc(wnd, message, p1, p2);
+                oldWin.SetVisible();
+                if (pwnd != null) {
+                    pwnd.*.dfocus = wnd;
+                    _ = df.SendMessage(pwnd, df.COMMAND,
+                        inFocusCommand(db), df.ENTERFOCUS);
+                }
+                return df.TRUE;
+//                return df.ControlProc(wnd, message, p1, p2);
             } else {
                 _ = df.SendMessage(pwnd, df.COMMAND,
                     inFocusCommand(db), df.LEAVEFOCUS);

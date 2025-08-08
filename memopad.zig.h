@@ -75,8 +75,6 @@ void SetFocusMsg(WINDOW wnd, PARAM p1);
 void RestoreBorder(RECT);
 void SaveBorder(RECT rc);
 void sizeborder(WINDOW, int, int);
-extern int px, py;
-extern int diff;
 extern struct window dwnd;
 
 // dialbox.c

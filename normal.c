@@ -16,9 +16,9 @@ static RECT PositionIcon(WINDOW);
 #endif
 void SetFocusMsg(WINDOW wnd, PARAM p1);
 
-void sizeborder(WINDOW, int, int);
-int px = -1, py = -1;
-int diff;
+//void sizeborder(WINDOW, int, int);
+//int px = -1, py = -1;
+//int diff;
 struct window dwnd = {DUMMY, NULL, NormalProc,
                                 {-1,-1,-1,-1}};
 static short *Bsave;
@@ -332,6 +332,7 @@ static RECT PositionIcon(WINDOW wnd)
 #endif
 
 /* ---- write the dummy window border for sizing ---- */
+/*
 void sizeborder(WINDOW wnd, int rt, int bt)
 {
     int leftmost = GetLeft(wnd)+10;
@@ -353,7 +354,7 @@ void sizeborder(WINDOW wnd, int rt, int bt)
     if (rt != px || bt != py)
         RestoreBorder(dwnd.rc);
 
-    /* ------- change the dummy window -------- */
+    // ------- change the dummy window --------
     dwnd.ht = bt-dwnd.rc.tp+1;
     dwnd.wd = rt-dwnd.rc.lf+1;
     dwnd.rc.rt = rt;
@@ -365,6 +366,7 @@ void sizeborder(WINDOW wnd, int rt, int bt)
         RepaintBorder(&dwnd, NULL);
     }
 }
+*/
 
 #ifdef INCLUDE_MULTI_WINDOWS
 /* ----- adjust a rectangle to include the shadow ----- */

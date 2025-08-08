@@ -196,6 +196,21 @@ pub fn TestAttribute(self: *TopLevelFields, attr: c_int) bool {
     return (wnd.*.attrib & attr) > 0;
 }
 
+pub fn isHidden(self: *TopLevelFields) bool {
+    const wnd = self.win;
+    return (wnd.*.attrib & df.VISIBLE) == 0;
+}
+
+pub fn SetVisible(self: *TopLevelFields) void {
+    const wnd = self.win;
+    wnd.*.attrib |= df.VISIBLE;
+}
+
+pub fn ClearVisible(self: *TopLevelFields) void {
+    const wnd = self.win;
+    wnd.*.attrib &= ~df.VISIBLE;
+}
+
 // ------------- edit box prototypes -----------
 pub fn CurrChar(self: *TopLevelFields) [*c]u8 {
     const w = self.win;
