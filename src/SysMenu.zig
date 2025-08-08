@@ -58,7 +58,7 @@ pub export fn BuildSystemMenu(wnd: df.WINDOW) callconv(.c) void {
         tp = (df.SCREENHEIGHT-2) - ht;
 
     const SystemMenuWin = Window.create(df.POPDOWNMENU, null,
-                lf,tp,ht,wd,null,wnd,SystemMenuProc, 0, root.global_allocator);
+                lf,tp,ht,wd,null,wnd,SystemMenuProc, 0);
     const SystemMenuWnd = SystemMenuWin.win;
 
 //    if (wnd->condition == ISRESTORED)

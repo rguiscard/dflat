@@ -30,8 +30,10 @@ pub const listbox = @import("ListBox.zig");
 pub const helpbox = @import("HelpBox.zig");
 pub const text = @import("Text.zig");
 
-pub var global_allocator:std.mem.Allocator = undefined;
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+pub var global_allocator:std.mem.Allocator = gpa.allocator();
 
+// Replace default allocator
 pub fn setGlobalAllocator(allocator: std.mem.Allocator) void {
     global_allocator = allocator;
 }

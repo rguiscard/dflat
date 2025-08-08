@@ -404,8 +404,7 @@ fn CreateMenu(win: *Window) void {
                         null,
                         wnd,
                         null,
-                        0,
-                        root.global_allocator);
+                        0);
 
     win.win.*.MenuBarWnd = mwnd.win;
 
@@ -431,8 +430,7 @@ fn CreateStatusBar(win: *Window) void {
                             null,
                             wnd,
                             null,
-                            0,
-                            root.global_allocator);
+                            0);
         win.win.*.StatusBar = sbar.win;
         sbar.AddAttribute(df.VISIBLE);
     }

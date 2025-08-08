@@ -52,8 +52,7 @@ pub fn BarChart(pwnd: df.WINDOW) void {
                     df.SHADOW     |
                     df.CONTROLBOX |
                     df.MOVEABLE   |
-                    df.HASBORDER,
-                    root.global_allocator
+                    df.HASBORDER
         );
         if (Bwnd) |w| {
             var win = w;

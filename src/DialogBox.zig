@@ -8,11 +8,11 @@ const Dialogs = @import("Dialogs.zig");
 const checkbox = @import("CheckBox.zig");
 const helpbox = @import("HelpBox.zig");
 
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-const allocator = gpa.allocator();
-
 var SysMenuOpen = false;
 const MAXCONTROLS = 30;
+
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+const allocator = gpa.allocator();
 var dbs = std.ArrayList(*df.DBOX).init(allocator);
 
 // Handle DBOX from dflat
@@ -98,8 +98,7 @@ fn CreateWindowMsg(wnd: df.WINDOW, p1: df.PARAM, p2: df.PARAM) c_int {
                         ctl,
                         wnd,
                         ControlProc,
-                        attrib,
-                        root.global_allocator);
+                        attrib);
         if ((ctl.*.Class == df.EDITBOX or ctl.*.Class == df.TEXTBOX or
                 ctl.*.Class == df.COMBOBOX) and
                     ctl.*.itext != null) {
@@ -312,8 +311,7 @@ pub fn create(self: *TopLevelFields, wnd: df.WINDOW, Modal: bool,
                         self.box,
                         wnd,
                         wndproc,
-                        save,
-                        root.global_allocator);
+                        save);
     const DialogWnd = win.win;
 
     _ = win.sendMessage(msg.Message.SETFOCUS, df.TRUE, 0);
@@ -397,7 +395,7 @@ fn ControlProc(wnd:df.WINDOW, message: df.MESSAGE, p1:df.PARAM, p2: df.PARAM) ca
 //                    _ = df.SendMessage(oldFocus, df.BORDER, 0, 0);
 //                    _ = df.SendMessage(pwnd, df.SHOW_WINDOW, 0, 0);
 //                    df.inFocus = oldFocus;
-////                    df.ClearVisible(oldFocus);
+//                    df.ClearVisible(oldFocus);
 //                }
 //                if ((df.GetClass(oldFocus) == df.APPLICATION) and
 //                    df.NextWindow(pwnd) != null) {

@@ -192,8 +192,7 @@ pub fn Calendar(pwnd: df.WINDOW) void {
                     df.MINMAXBOX  |
                     df.CONTROLBOX |
                     df.MOVEABLE   |
-                    df.HASBORDER,
-                    root.global_allocator
+                    df.HASBORDER
         );
     }
     if (Cwnd) |c| {

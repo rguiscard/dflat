@@ -68,7 +68,6 @@ pub fn WatchIcon() Window {
                     mx, my, 3, 5,
                     null, null,
                     WatchIconProc,
-                    df.VISIBLE | df.HASBORDER | df.SHADOW | df.SAVESELF,
-                    root.global_allocator);
+                    df.VISIBLE | df.HASBORDER | df.SHADOW | df.SAVESELF);
     return win;
 }

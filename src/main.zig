@@ -31,8 +31,7 @@ pub fn main() !void {
                         df.SIZEABLE  |
                         df.HASBORDER |
                         df.MINMAXBOX |
-                        df.HASSTATUSBAR,
-                        allocator);
+                        df.HASSTATUSBAR);
 
     df.LoadHelpFile(&DFlatApplication);
 
@@ -224,9 +223,7 @@ fn OpenPadWindow(wnd: df.WINDOW, filename: []const u8) void {
                 df.MOVEABLE   |
                 df.HASBORDER  |
                 df.SIZEABLE   |
-                df.MULTILINE,
-                allocator
-    );
+                df.MULTILINE);
 
     if (std.mem.eql(u8, fname, sUntitled) == false) {
         if (win1.setTitle(filename)) |_| {
@@ -274,7 +271,7 @@ fn SaveFile(wnd: df.WINDOW, Saveas: bool) void {
     }
     if (wnd.*.extension != df.NULL) {
         const m:[]const u8 = "Saving the file";
-        var mwin = mp.msgbox.MomentaryMessage(m, allocator);
+        var mwin = mp.msgbox.MomentaryMessage(m);
 
         const extension:[*c]u8 = @ptrCast(wnd.*.extension);
         const path:[:0]const u8 = std.mem.span(extension);

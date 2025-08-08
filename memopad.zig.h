@@ -82,3 +82,14 @@ extern struct window dwnd;
 // dialbox.c
 BOOL CtlKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);
 void CtlCloseWindowMsg(WINDOW wnd);
+
+// window.c
+WINDOW cCreateWindow(
+    CLASS Class,
+    const char *ttl,
+    int left, int top,
+    int height, int width,
+    void *extension,
+    WINDOW parent,
+    int (*wndproc)(struct window *,enum messages,PARAM,PARAM),
+    int attrib);
