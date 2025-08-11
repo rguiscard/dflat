@@ -5,6 +5,7 @@ const Window = @import("Window.zig");
 const helpbox = @import("HelpBox.zig");
 const Classes = @import("Classes.zig");
 const sysmenu = @import("SysMenu.zig");
+const lists = @import("Lists.zig");
 
 var dummyWnd:?Window = null;
 var px:c_int = -1;
@@ -24,7 +25,8 @@ fn getDwnd() df.WINDOW {
 
 // --------- CREATE_WINDOW Message ----------
 fn CreateWindowMsg(wnd:df.WINDOW) void {
-    df.AppendWindow(wnd);
+//    df.AppendWindow(wnd);
+    lists.zAppendWindow(wnd);
     const rtn = df.SendMessage(null, df.MOUSE_INSTALLED, 0, 0);
     if (rtn == 0) {
         // FIXME: should use Window function
@@ -101,7 +103,8 @@ fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM) void {
         },
         df.ID_SYSCLOSE => {
             _ = df.SendMessage(wnd, df.CLOSE_WINDOW, 0, 0);
-            df.SkipApplicationControls();
+//            df.SkipApplicationControls();
+            lists.zSkipApplicationControls();
         },
         df.ID_SYSRESTORE => {
             _ = df.SendMessage(wnd, df.RESTORE, 0, 0);
@@ -128,7 +131,8 @@ fn DoubleClickMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
     if ((df.WindowSizing == 0) and (df.WindowMoving == 0)) {
         if (df.HitControlBox(wnd, mx, my)) {
             df.PostMessage(wnd, df.CLOSE_WINDOW, 0, 0);
-            df.SkipApplicationControls();
+//            df.SkipApplicationControls();
+            lists.zSkipApplicationControls();
         }
     }
 }

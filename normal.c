@@ -33,6 +33,11 @@ CLASSDEFS classdefs[] = {
 };
 WINDOW HiddenWindow;
 
+void zReFocus(WINDOW wnd);
+void zRemoveWindow(WINDOW wnd);
+void zSetNextFocus(void);
+void zSetPrevFocus(void);
+
 /* --------- SETFOCUS Message ---------- */
 void SetFocusMsg(WINDOW wnd, PARAM p1)
 {
@@ -103,7 +108,7 @@ void SetFocusMsg(WINDOW wnd, PARAM p1)
 		}
 		if (that != NULL && !ValidRect(rc) && isVisible(wnd))
 			This = NULL;
-		ReFocus(wnd);
+		zReFocus(wnd);
 		if (This != NULL &&
 				(!isVisible(This) || !TestAttribute(This, SAVESELF)))	{
 			wnd->wasCleared = FALSE;
@@ -166,7 +171,7 @@ static void MinimizeMsg(WINDOW wnd)
     SendMessage(wnd, SIZE,
         RectRight(rc), RectBottom(rc));
 	if (wnd == inFocus)
-	    SetNextFocus();
+	    zSetNextFocus();
     if (wnd->restored_attrib == 0)
         wnd->restored_attrib = wnd->attrib;
     ClearAttribute(wnd,
@@ -228,14 +233,14 @@ static void CloseWindowMsg(WINDOW wnd)
 
     /* --- change focus if this window had it -- */
 	if (wnd == inFocus)
-	    SetPrevFocus();
+	    zSetPrevFocus();
     /* -- free memory allocated to this window - */
     if (wnd->title != NULL)
         free(wnd->title);
     if (wnd->videosave != NULL)
         free(wnd->videosave);
     /* -- remove window from parent's list of children -- */
-	RemoveWindow(wnd);
+	zRemoveWindow(wnd);
     if (wnd == inFocus)
         inFocus = NULL;
     free(wnd);

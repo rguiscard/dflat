@@ -26,6 +26,8 @@ char HelpFileName[9];
 int HelpStack[MAXHELPSTACK];
 int stacked;
 
+void zReFocus(WINDOW wnd);
+
 /* --- keywords in the current help text -------- */
 static struct keywords {
 	struct helps *hkey;
@@ -391,7 +393,7 @@ void SelectHelp(WINDOW wnd, struct helps *newhelp, BOOL recall)
 		}
 		/* --- read the help text into the help window --- */
 		ReadHelp(wnd);
-		ReFocus(wnd);
+		zReFocus(wnd);
 		SendMessage(wnd, SHOW_WINDOW, 0, 0);
 	}
 }
