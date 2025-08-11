@@ -599,19 +599,34 @@ fn SetScreenHeight(height: c_int) void {
 
 // ----- Close all document windows -----
 fn CloseAll(win:*Window, closing:bool) void {
-    const wnd = win.win;
     _ = win.sendMessage(msg.SETFOCUS, df.TRUE, 0);
 
-    var wnd1:df.WINDOW = df.LastWindow(wnd);
-    var wnd2:df.WINDOW = undefined;
-    while (wnd1 != null) {
-        wnd2 = df.PrevWindow(wnd1);
-        if ((df.isVisible(wnd1) > 0) and df.GetClass(wnd1) != df.MENUBAR and
-                                        df.GetClass(wnd1) != df.STATUSBAR) {
-              wnd1.*.attrib = wnd1.*.attrib & ~df.VISIBLE; // FIXME, should use ClearVisible() macro
-              _ = df.SendMessage(wnd1, df.CLOSE_WINDOW, 0, 0);
+    // FIXME: there is a weird issue, probably becasue wnd1 is closed but win1 is not.
+    // Therefore, we need to keep wnd1 and wnd2, but cannot use win1 and win2;
+    if (win.lastWindow()) |w1| {
+        var wnd1 = w1.win;
+        var wnd2:df.WINDOW = undefined;
+//        var win1:*Window = @constCast(@fieldParentPtr("win", &wnd1));
+        while (true) {
+            const win1:*Window = @constCast(@fieldParentPtr("win", &wnd1));
+            const win2 = win1.prevWindow();
+            if (win2) |w2| {
+                wnd2 = w2.win;
+            } else {
+                wnd2 = null;
+            }
+            if (normal.isVisible(win1) and (win1.GetClass() != df.MENUBAR) and
+                                             (win1.GetClass() != df.STATUSBAR)) {
+                  win1.ClearVisible();
+                  _ = win1.sendMessage(msg.CLOSE_WINDOW, 0, 0);
+            }
+            if (win2 == null) {
+                break;
+            } else {
+                wnd1 = wnd2;
+                // win1 = win2.?;
+            }
         }
-        wnd1 = wnd2;
     }
 
     if (closing == false)

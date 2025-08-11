@@ -621,14 +621,10 @@ fn sizeborder(wnd:df.WINDOW, rt:c_int, bt:c_int) void {
 pub fn isVisible(win:*Window) bool {
     var wwin:?*Window = win;
     while (wwin) |w| {
-        if (w.isHidden())
+        if (w.isHidden()) {
             return false;
+        }
         wwin = w.getParent();
-//        if (w.getParent()) |pwin| {
-//            wwin = pwin;
-//        } else {
-//            break;
-//        }
     }
     return true;
 }

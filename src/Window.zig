@@ -212,9 +212,11 @@ pub fn TestAttribute(self: *TopLevelFields, attr: c_int) bool {
     return (wnd.*.attrib & attr) > 0;
 }
 
+// #define isHidden(w) (!(GetAttribute(w) & VISIBLE))
 pub fn isHidden(self: *TopLevelFields) bool {
     const wnd = self.win;
-    return (wnd.*.attrib & df.VISIBLE) == 0;
+    const rtn =  (wnd.*.attrib & df.VISIBLE);
+    return (rtn == 0);
 }
 
 pub fn SetVisible(self: *TopLevelFields) void {
