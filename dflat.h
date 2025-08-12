@@ -369,8 +369,8 @@ void WriteTextLine(WINDOW, RECT *, int, BOOL);
                                 wnd->BlkBegCol  ||    \
                                 wnd->BlkEndCol)
 void MarkTextBlock(WINDOW, int, int, int, int);
-#define ClearTextBlock(wnd) wnd->BlkBegLine = wnd->BlkEndLine =  \
-                        wnd->BlkBegCol  = wnd->BlkEndCol = 0;
+#define ClearTextBlock(wnd) wnd->BlkBegLine = 0; wnd->BlkEndLine = 0;  \
+                        wnd->BlkBegCol = 0; wnd->BlkEndCol = 0;
 #define TextBlockBegin(wnd) (TextLine(wnd,wnd->BlkBegLine)+wnd->BlkBegCol)
 #define TextBlockEnd(wnd)   (TextLine(wnd,wnd->BlkEndLine)+wnd->BlkEndCol)
 #define GetText(w)        ((w)->text)

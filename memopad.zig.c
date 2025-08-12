@@ -104,8 +104,9 @@ void PrepEditMenu(void *w, struct Menu *mnu)
 				ActivateCommand(&MainMenu, ID_DELETETEXT);
 			}
 			ActivateCommand(&MainMenu, ID_PARAGRAPH);
-			if (!TestAttribute(wnd, READONLY) &&
-						Clipboard != NULL)
+			// FIXME: we do not check whether Clipboard has content for now.
+//			if (!TestAttribute(wnd, READONLY) &&
+//						Clipboard != NULL)
 				ActivateCommand(&MainMenu, ID_PASTE);
 			if (wnd->DeletedText != NULL)
 				ActivateCommand(&MainMenu, ID_UNDO);
@@ -222,4 +223,11 @@ void LogMessages (WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 int cInsideRect(int x, int y, RECT r) {
     return within((x), RectLeft(r), RectRight(r)) &&
     within((y), RectTop(r), RectBottom(r));
+}
+
+void cClearTextBlock(WINDOW wnd) {
+    wnd->BlkBegLine = 0;
+    wnd->BlkEndLine = 0;
+    wnd->BlkBegCol = 0;
+    wnd->BlkEndCol = 0;
 }

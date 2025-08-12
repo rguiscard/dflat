@@ -388,6 +388,45 @@ fn SizeMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
         _ = df.SendMessage(wnd, df.SHOW_WINDOW, 0, 0);
 }
 
+// --------- CLOSE_WINDOW Message ----------
+fn CloseWindowMsg(wnd:df.WINDOW) void {
+    wnd.*.condition = df.ISCLOSING;
+    // ----------- hide this window ------------
+    _ = df.SendMessage(wnd, df.HIDE_WINDOW, 0, 0);
+
+    // --- close the children of this window ---
+    var cwnd = wnd.*.lastchild;
+    while (cwnd != null) {
+        if (df.inFocus == cwnd) {
+            df.inFocus = wnd;
+        }
+        _ = df.SendMessage(cwnd,df.CLOSE_WINDOW,0,0);
+        cwnd = wnd.*.lastchild;
+    }
+
+    // ----- release captured resources ------
+    if (wnd.*.PrevClock != null)
+        _ = df.SendMessage(wnd, df.RELEASE_CLOCK, 0, 0);
+    if (wnd.*.PrevMouse != null)
+        _ = df.SendMessage(wnd, df.RELEASE_MOUSE, 0, 0);
+    if (wnd.*.PrevKeyboard != null)
+        _ = df.SendMessage(wnd, df.RELEASE_KEYBOARD, 0, 0);
+
+    // --- change focus if this window had it --
+    if (wnd == df.inFocus)
+        lists.zSetPrevFocus();
+    // -- free memory allocated to this window --
+    if (wnd.*.title != null)
+        df.free(wnd.*.title);
+    if (wnd.*.videosave != null)
+        df.free(wnd.*.videosave);
+    // -- remove window from parent's list of children --
+        lists.zRemoveWindow(wnd);
+    if (wnd == df.inFocus)
+        df.inFocus = null;
+    df.free(wnd);
+}
+
 pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
     switch (message) {
         df.CREATE_WINDOW => {
@@ -480,9 +519,9 @@ pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
         df.SIZE => {
             SizeMsg(wnd, p1, p2);
         },
-//        case CLOSE_WINDOW:
-//            CloseWindowMsg(wnd);
-//            break;
+        df.CLOSE_WINDOW => {
+            CloseWindowMsg(wnd);
+        },
 //        case MAXIMIZE:
 //            if (wnd->condition != ISMAXIMIZED)
 //                MaximizeMsg(wnd);

@@ -91,3 +91,6 @@ WINDOW cCreateWindow(
     WINDOW parent,
     int (*wndproc)(struct window *,enum messages,PARAM,PARAM),
     int attrib);
+
+
+void cClearTextBlock(WINDOW wnd);

@@ -206,53 +206,10 @@ static void RestoreMsg(WINDOW wnd)
 }
 #endif
 
-/* --------- CLOSE_WINDOW Message ---------- */
-static void CloseWindowMsg(WINDOW wnd)
-{
-    WINDOW cwnd;
-    wnd->condition = ISCLOSING;
-    /* ----------- hide this window ------------ */
-    SendMessage(wnd, HIDE_WINDOW, 0, 0);
-
-    /* --- close the children of this window --- */
-	cwnd = LastWindow(wnd);
-	while (cwnd != NULL)	{
-        if (inFocus == cwnd)
-            inFocus = wnd;
-        SendMessage(cwnd,CLOSE_WINDOW,0,0);
-		cwnd = LastWindow(wnd);
-    }
-
-	/* ----- release captured resources ------ */
-    if (wnd->PrevClock != NULL)
-        SendMessage(wnd, RELEASE_CLOCK, 0, 0);
-    if (wnd->PrevMouse != NULL)
-        SendMessage(wnd, RELEASE_MOUSE, 0, 0);
-    if (wnd->PrevKeyboard != NULL)
-        SendMessage(wnd, RELEASE_KEYBOARD, 0, 0);
-
-    /* --- change focus if this window had it -- */
-	if (wnd == inFocus)
-	    zSetPrevFocus();
-    /* -- free memory allocated to this window - */
-    if (wnd->title != NULL)
-        free(wnd->title);
-    if (wnd->videosave != NULL)
-        free(wnd->videosave);
-    /* -- remove window from parent's list of children -- */
-	zRemoveWindow(wnd);
-    if (wnd == inFocus)
-        inFocus = NULL;
-    free(wnd);
-}
-
 /* ---- Window-processing module for NORMAL window class ---- */
 int cNormalProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
-        case CLOSE_WINDOW:
-            CloseWindowMsg(wnd);
-            break;
 #ifdef INCLUDE_MAXIMIZE
         case MAXIMIZE:
             if (wnd->condition != ISMAXIMIZED)

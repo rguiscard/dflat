@@ -3,6 +3,7 @@ const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const Window = @import("Window.zig");
 const search = @import("Search.zig");
+const clipboard = @import("Clipboard.zig");
 
 // ----------- CREATE_WINDOW Message ----------
 fn CreateWindowMsg(wnd:df.WINDOW) c_int {
@@ -49,8 +50,27 @@ fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM) c_int {
             search.SearchNext(wnd);
             return df.TRUE;
         },
+        df.ID_CUT => {
+            clipboard.CopyToClipboard(wnd);
+            _ = df.SendMessage(wnd, df.COMMAND, df.ID_DELETETEXT, 0);
+            _ = df.SendMessage(wnd, df.PAINT, 0, 0);
+            return df.TRUE;
+        },
+        df.ID_COPY => {
+            clipboard.CopyToClipboard(wnd);
+            df.cClearTextBlock(wnd);
+            _ = df.SendMessage(wnd, df.PAINT, 0, 0);
+            return df.TRUE;
+        },
+        df.ID_PASTE => {
+            _ = clipboard.PasteFromClipboard(wnd);
+            _ = df.SendMessage(wnd, df.PAINT, 0, 0);
+            return df.TRUE;
+        },
         else => {
             return df.EditBoxCommandMsg(wnd, p1);
         }
     }
+
+    return df.FALSE;
 }

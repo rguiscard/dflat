@@ -835,21 +835,20 @@ static void ParagraphCmd(WINDOW wnd)
 int EditBoxCommandMsg(WINDOW wnd, PARAM p1)
 {
     switch ((int)p1)    {
-#ifdef INCLUDE_EDITMENU
-		case ID_CUT:
-			CopyToClipboard(wnd);
-			SendMessage(wnd, COMMAND, ID_DELETETEXT, 0);
-			SendMessage(wnd, PAINT, 0, 0);
-			return TRUE;
-		case ID_COPY:
-			CopyToClipboard(wnd);
-			ClearTextBlock(wnd);
-			SendMessage(wnd, PAINT, 0, 0);
-			return TRUE;
-		case ID_PASTE:
-			PasteFromClipboard(wnd);
-			SendMessage(wnd, PAINT, 0, 0);
-			return TRUE;
+//		case ID_CUT:
+//			CopyToClipboard(wnd);
+//			SendMessage(wnd, COMMAND, ID_DELETETEXT, 0);
+//			SendMessage(wnd, PAINT, 0, 0);
+//			return TRUE;
+//		case ID_COPY:
+//			CopyToClipboard(wnd);
+//			ClearTextBlock(wnd);
+//			SendMessage(wnd, PAINT, 0, 0);
+//			return TRUE;
+//		case ID_PASTE:
+//			PasteFromClipboard(wnd);
+//			SendMessage(wnd, PAINT, 0, 0);
+//			return TRUE;
         case ID_DELETETEXT:
             DeleteTextCmd(wnd);
 			SendMessage(wnd, PAINT, 0, 0);
@@ -866,7 +865,6 @@ int EditBoxCommandMsg(WINDOW wnd, PARAM p1)
             ParagraphCmd(wnd);
 			SendMessage(wnd, PAINT, 0, 0);
             return TRUE;
-#endif
         default:
             break;
     }
