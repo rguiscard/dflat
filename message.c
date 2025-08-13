@@ -2,9 +2,9 @@
 
 #include "dflat.h"
 
-static int px = -1, py = -1;
-static int pmx = -1, pmy = -1;
-static int mx, my;
+//static int px = -1, py = -1;
+//static int pmx = -1, pmy = -1;
+//static int mx, my;
 static int handshaking = 0;
 BOOL AllocTesting = FALSE;
 jmp_buf AllocError;
@@ -59,6 +59,8 @@ static void StopMsg(void)
     hide_mousecursor();
 }
 
+int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+
 /* ------------ initialize the message system --------- */
 BOOL init_messages(void)
 {
@@ -78,9 +80,9 @@ BOOL init_messages(void)
 	set_mousetravel(0, SCREENWIDTH-1, 0, SCREENHEIGHT-1);
 	savecursor();
 	hidecursor();
-    px = py = -1;
-    pmx = pmy = -1;
-    mx = my = 0;
+//    px = py = -1;
+//    pmx = pmy = -1;
+//    mx = my = 0;
     CaptureMouse = CaptureKeyboard = NULL;
     NoChildCaptureMouse = FALSE;
     NoChildCaptureKeyboard = FALSE;
@@ -126,7 +128,7 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 #ifdef INCLUDE_LOGGING
 	LogMessages(wnd, msg, p1, p2);
 #endif
-    if (wnd != NULL)
+    if (wnd != NULL) {
         switch (msg)    {
             case PAINT:
             case BORDER:
@@ -154,9 +156,19 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
                 rtn = (*wnd->wndproc)(wnd, msg, p1, p2);
                 break;
         }
+    }
     /* ----- window processor returned true or the message was sent
         to no window at all (NULL) ----- */
     if (rtn != FALSE)    {
+        rtn = ProcessMessage(wnd, msg, p1, p2);
+    }
+    return rtn;
+}
+
+// This one follows SendMessage();
+int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
+{
+    int rtn = TRUE, x, y;
         /* --------- process messages that a window sends to the
             system itself ---------- */
         switch (msg)    {
@@ -309,7 +321,6 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
             default:
                 break;
         }
-    }
     return rtn;
 }
 

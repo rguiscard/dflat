@@ -94,3 +94,6 @@ WINDOW cCreateWindow(
 
 
 void cClearTextBlock(WINDOW wnd);
+
+// message.c
+int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);

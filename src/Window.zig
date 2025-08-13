@@ -273,18 +273,62 @@ pub fn ClearTextBlock(self: *TopLevelFields) void {
 
 // --------- message prototypes -----------
 
-pub fn sendMessage(self: *TopLevelFields, msg: message, p1: df.PARAM, p2: df.PARAM) isize {
-    const x = @intFromEnum(msg);
-    const m:df.MESSAGE = @intCast(x);
-    return df.SendMessage(self.win, m, p1, p2);
-}
-
 pub fn sendTextMessage(self: *TopLevelFields, msg: message, p1: []u8, p2: df.PARAM) isize {
     // message should only be df.SETTEXT ?
     const buf:[*c]u8 = p1.ptr;
+    return self.sendMessage(msg, @intCast(@intFromPtr(buf)), p2);
+}
+
+// --------- send a message to a window -----------
+pub fn sendMessage(self: *TopLevelFields, msg:message, p1:df.PARAM, p2:df.PARAM) c_int {
+    const wnd = self.win;
     const x = @intFromEnum(msg);
     const m:df.MESSAGE = @intCast(x);
-    return df.SendMessage(self.win, m, @intCast(@intFromPtr(buf)), p2);
+    var rtn:c_int = df.TRUE;
+
+    df.LogMessages(wnd, m, p1, p2);
+    if (wnd != null) {
+        switch (msg) {
+            message.PAINT, message.BORDER => {
+                // ------- don't send these messages unless the
+                //    window is visible --------
+                if (df.isVisible(wnd)>0) {
+                    if (wnd.*.wndproc) |wndproc| {
+                        rtn = wndproc(wnd, m, p1, p2);
+                    }
+                }
+            },
+            message.RIGHT_BUTTON, message.LEFT_BUTTON, message.DOUBLE_CLICK, message.BUTTON_RELEASED => {
+                // --- don't send these messages unless the
+                //  window is visible or has captured the mouse --
+                if ((df.isVisible(wnd)>0) or (wnd == df.CaptureMouse)) {
+                    if (wnd.*.wndproc) |wndproc| {
+                        rtn = wndproc(wnd, m, p1, p2);
+                    }
+                }
+            },
+            message.KEYBOARD, message.SHIFT_CHANGED => {
+                // ------- don't send these messages unless the
+                //  window is visible or has captured the keyboard --
+                if ((df.isVisible(wnd)>0) or (wnd == df.CaptureKeyboard)) {
+                    if (wnd.*.wndproc) |wndproc| {
+                        rtn = wndproc(wnd, m, p1, p2);
+                    }
+                }
+            },
+            else => {
+                if (wnd.*.wndproc) |wndproc| {
+                    rtn = wndproc(wnd, m, p1, p2);
+                }
+            }
+        }
+    }
+    // ----- window processor returned true or the message was sent
+    //  to no window at all (NULL) -----
+    if (rtn != df.FALSE)    {
+        rtn = df.ProcessMessage(wnd, m, p1, p2);
+    }
+    return rtn;
 }
 
 pub fn deinit(self: *TopLevelFields) void {
