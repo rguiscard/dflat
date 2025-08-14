@@ -289,7 +289,8 @@ pub fn sendMessage(self: *TopLevelFields, msg:message, p1:df.PARAM, p2:df.PARAM)
     df.LogMessages(wnd, m, p1, p2);
     if (wnd != null) {
         switch (msg) {
-            message.PAINT, message.BORDER => {
+            message.PAINT,
+            message.BORDER => {
                 // ------- don't send these messages unless the
                 //    window is visible --------
                 if (df.isVisible(wnd)>0) {
@@ -298,7 +299,10 @@ pub fn sendMessage(self: *TopLevelFields, msg:message, p1:df.PARAM, p2:df.PARAM)
                     }
                 }
             },
-            message.RIGHT_BUTTON, message.LEFT_BUTTON, message.DOUBLE_CLICK, message.BUTTON_RELEASED => {
+            message.RIGHT_BUTTON,
+            message.LEFT_BUTTON,
+            message.DOUBLE_CLICK,
+            message.BUTTON_RELEASED => {
                 // --- don't send these messages unless the
                 //  window is visible or has captured the mouse --
                 if ((df.isVisible(wnd)>0) or (wnd == df.CaptureMouse)) {
@@ -307,7 +311,8 @@ pub fn sendMessage(self: *TopLevelFields, msg:message, p1:df.PARAM, p2:df.PARAM)
                     }
                 }
             },
-            message.KEYBOARD, message.SHIFT_CHANGED => {
+            message.KEYBOARD,
+            message.SHIFT_CHANGED => {
                 // ------- don't send these messages unless the
                 //  window is visible or has captured the keyboard --
                 if ((df.isVisible(wnd)>0) or (wnd == df.CaptureKeyboard)) {

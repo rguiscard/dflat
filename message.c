@@ -5,7 +5,7 @@
 //static int px = -1, py = -1;
 //static int pmx = -1, pmy = -1;
 //static int mx, my;
-static int handshaking = 0;
+//static int handshaking = 0;
 BOOL AllocTesting = FALSE;
 jmp_buf AllocError;
 BOOL AltDown = FALSE;
@@ -29,9 +29,9 @@ static int EventQueueOnCtr;
 static int EventQueueOffCtr;
 static int EventQueueCtr;
 
-static int MsgQueueOnCtr;
-static int MsgQueueOffCtr;
-static int MsgQueueCtr;
+//static int MsgQueueOnCtr;
+//static int MsgQueueOffCtr;
+//static int MsgQueueCtr;
 
 static int lagdelay = FIRSTDELAY;
 
@@ -48,7 +48,11 @@ char time_string[] = "         ";
 
 static WINDOW Cwnd;
 
-static void StopMsg(void)
+int dispatch_message_queue();
+int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+void StopMsg(void);
+
+void StopMsg(void)
 {
 #ifndef BUILD_SMALL_DFLAT
 	ClearClipboard();
@@ -59,34 +63,38 @@ static void StopMsg(void)
     hide_mousecursor();
 }
 
-int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
-
 /* ------------ initialize the message system --------- */
 BOOL init_messages(void)
 {
     int cols, rows;
 
+    /*
 	AllocTesting = TRUE;
 	if (setjmp(AllocError) != 0)	{
 		StopMsg();
 		return FALSE;
 	}
+	*/
+    /*
     tty_init(MouseTracking|CatchISig|ExitLastLine|FullBuffer);
     if (tty_getsize(&cols, &rows) > 0) {
         SCREENWIDTH = min(cols, MAXCOLS-1);
         SCREENHEIGHT = rows - 1;
     }
+    */
+    /*
     resetmouse();
 	set_mousetravel(0, SCREENWIDTH-1, 0, SCREENHEIGHT-1);
 	savecursor();
 	hidecursor();
+	*/
 //    px = py = -1;
 //    pmx = pmy = -1;
 //    mx = my = 0;
-    CaptureMouse = CaptureKeyboard = NULL;
+//    CaptureMouse = CaptureKeyboard = NULL;
     NoChildCaptureMouse = FALSE;
     NoChildCaptureKeyboard = FALSE;
-    MsgQueueOnCtr = MsgQueueOffCtr = MsgQueueCtr = 0;
+//    MsgQueueOnCtr = MsgQueueOffCtr = MsgQueueCtr = 0;
     EventQueueOnCtr = EventQueueOffCtr = EventQueueCtr = 0;
     PostMessage(NULL,START,0,0);
     lagdelay = FIRSTDELAY;
@@ -107,7 +115,8 @@ void PostEvent(MESSAGE event, int p1, int p2)
 }
 
 /* ----- post a message and parameters to msg queue ---- */
-void PostMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
+/*
+void cPostMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     if (MsgQueueCtr != MAXMESSAGES)    {
         MsgQueue[MsgQueueOnCtr].wnd = wnd;
@@ -119,6 +128,7 @@ void PostMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
         MsgQueueCtr++;
     }
 }
+*/
 
 /* --------- send a message to a window ----------- */
 int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
@@ -381,16 +391,16 @@ static WINDOW MouseWindow(int x, int y)
 	return Mwnd;
 }
 
+/*
 void handshake(void)
 {
 #if MSDOS
-	/*
-	handshaking++;
-	dispatch_message();
-	--handshaking;
-	*/
+	// handshaking++;
+	// dispatch_message();
+	// --handshaking;
 #endif
 }
+*/
 
 /* ---- dispatch messages to the message proc function ---- */
 BOOL dispatch_message(void)
@@ -423,11 +433,11 @@ BOOL dispatch_message(void)
         switch (ev.event)    {
             case SHIFT_CHANGED:
             case KEYBOARD:
-				if (!handshaking)
+//				if (!0)
 	                SendMessage(Kwnd, ev.event, ev.mx, ev.my);
                 break;
             case LEFT_BUTTON:
-				if (!handshaking)	{
+//				if (!0)	{
 		        	Mwnd = MouseWindow(ev.mx, ev.my);
                 	if (!CaptureMouse ||
                         	(!NoChildCaptureMouse &&
@@ -435,13 +445,13 @@ BOOL dispatch_message(void)
                     	if (Mwnd != inFocus)
                         	SendMessage(Mwnd, SETFOCUS, TRUE, 0);
                 	SendMessage(Mwnd, LEFT_BUTTON, ev.mx, ev.my);
-				}
+//				}
                 break;
             case BUTTON_RELEASED:
             case DOUBLE_CLICK:
             case RIGHT_BUTTON:
-				if (handshaking)
-					break;
+//				if (0)
+//					break;
             case MOUSE_MOVED:
 		        Mwnd = MouseWindow(ev.mx, ev.my);
                 SendMessage(Mwnd, ev.event, ev.mx, ev.my);
@@ -457,6 +467,11 @@ BOOL dispatch_message(void)
         }
     }
     /* ------ dequeue and process messages ----- */
+    int to_continue = dispatch_message_queue();
+    if (to_continue == FALSE) {
+        return FALSE;
+    }
+/*
     while (MsgQueueCtr > 0)  {
         struct msgs mq;
 
@@ -472,8 +487,31 @@ BOOL dispatch_message(void)
 			return FALSE;
 		}
     }
+*/
 #if VIDEO_FB
     convert_screen_to_ansi();
 #endif
     return TRUE;
 }
+
+// ------ dequeue and process messages -----
+/*
+int c_dispatch_message_queue() {
+    while (MsgQueueCtr > 0)  {
+        struct msgs mq;
+
+		mq = MsgQueue[MsgQueueOffCtr];
+        if (++MsgQueueOffCtr == MAXMESSAGES)
+            MsgQueueOffCtr = 0;
+        --MsgQueueCtr;
+        SendMessage(mq.wnd, mq.msg, mq.p1, mq.p2);
+        if (mq.msg == ENDDIALOG)
+			return FALSE;
+        if (mq.msg == STOP)	{
+		    PostMessage(NULL, STOP, 0, 0);
+			return FALSE;
+		}
+    }
+    return TRUE;
+}
+*/

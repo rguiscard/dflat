@@ -97,3 +97,6 @@ void cClearTextBlock(WINDOW wnd);
 
 // message.c
 int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+void StopMsg(void);
+extern BOOL AllocTesting;
+extern jmp_buf AllocError;

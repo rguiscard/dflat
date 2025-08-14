@@ -2,9 +2,85 @@ const std = @import("std");
 const df = @import("ImportC.zig").df;
 const Window = @import("Window.zig");
 
+const MAXMESSAGES = 100;
+
+var MsgQueueOnCtr:usize = 0;
+var MsgQueueOffCtr:usize = 0;
+var MsgQueueCtr:usize = 0;
+
+// ---------- message queue ---------
+const Msg = struct {
+    wnd:df.WINDOW,
+    msg:df.MESSAGE,
+    p1:df.PARAM,
+    p2:df.PARAM,
+};
+
+var MsgQueue = [_]Msg{.{.wnd=null, .msg=0, .p1=0, .p2=0}}**MAXMESSAGES;
+
+// ----- post a message and parameters to msg queue ----
+pub export fn PostMessage(wnd:df.WINDOW, msg:df.MESSAGE, p1:df.PARAM, p2:df.PARAM) callconv(.c) void {
+    if (MsgQueueCtr != MAXMESSAGES) {
+        MsgQueue[MsgQueueOnCtr].wnd = wnd;
+        MsgQueue[MsgQueueOnCtr].msg = msg;
+        MsgQueue[MsgQueueOnCtr].p1 = p1;
+        MsgQueue[MsgQueueOnCtr].p2 = p2;
+        MsgQueueOnCtr += 1;
+        if (MsgQueueOnCtr == MAXMESSAGES) {
+            MsgQueueOnCtr = 0;
+        }
+        MsgQueueCtr += 1;
+    }
+}
+
+// ------ dequeue and process messages -----
+pub export fn dispatch_message_queue() callconv(.c) c_int {
+    while (MsgQueueCtr > 0) {
+        const mq = MsgQueue[MsgQueueOffCtr];
+        MsgQueueOffCtr += 1;
+        if (MsgQueueOffCtr == MAXMESSAGES) {
+            MsgQueueOffCtr = 0;
+        }
+        MsgQueueCtr -= 1;
+        _ = df.SendMessage(mq.wnd, mq.msg, mq.p1, mq.p2);
+        if (mq.msg == df.ENDDIALOG) {
+            return df.FALSE;
+        }
+        if (mq.msg == df.STOP) {
+            _ = df.PostMessage(null, df.STOP, 0, 0);
+            return df.FALSE;
+        }
+    }
+    return df.TRUE;
+}
+
 // ------------ initialize the message system ---------
 pub fn init_messages() bool {
-    return (df.init_messages() > 0);
+    var cols:c_int = 0;
+    var rows:c_int = 0;
+
+    df.AllocTesting = df.TRUE;
+    if (df.setjmp(&df.AllocError) != 0) {
+        df.StopMsg();
+        return false;
+    }
+
+    _ = df.tty_init(df.MouseTracking|df.CatchISig|df.ExitLastLine|df.FullBuffer);
+    if (df.tty_getsize(&cols, &rows) > 0) {
+        df.SCREENWIDTH = @min(cols, df.MAXCOLS-1);
+        df.SCREENHEIGHT = rows - 1;
+    }
+
+    df.resetmouse();
+    df.set_mousetravel(0, df.SCREENWIDTH-1, 0, df.SCREENHEIGHT-1);
+    df.savecursor();
+    df.hidecursor();
+
+    df.CaptureMouse = null;
+    df.CaptureKeyboard = null;
+
+    _ = df.init_messages();
+    return true;
 }
 
 // ---- dispatch messages to the message proc function ----
