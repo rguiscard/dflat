@@ -33,27 +33,6 @@ pub export fn PostMessage(wnd:df.WINDOW, msg:df.MESSAGE, p1:df.PARAM, p2:df.PARA
     }
 }
 
-// ------ dequeue and process messages -----
-pub export fn dispatch_message_queue() callconv(.c) c_int {
-    while (MsgQueueCtr > 0) {
-        const mq = MsgQueue[MsgQueueOffCtr];
-        MsgQueueOffCtr += 1;
-        if (MsgQueueOffCtr == MAXMESSAGES) {
-            MsgQueueOffCtr = 0;
-        }
-        MsgQueueCtr -= 1;
-        _ = df.SendMessage(mq.wnd, mq.msg, mq.p1, mq.p2);
-        if (mq.msg == df.ENDDIALOG) {
-            return df.FALSE;
-        }
-        if (mq.msg == df.STOP) {
-            _ = df.PostMessage(null, df.STOP, 0, 0);
-            return df.FALSE;
-        }
-    }
-    return df.TRUE;
-}
-
 // ------------ initialize the message system ---------
 pub fn init_messages() bool {
     var cols:c_int = 0;
@@ -85,7 +64,33 @@ pub fn init_messages() bool {
 
 // ---- dispatch messages to the message proc function ----
 pub fn dispatch_message() bool {
-    return (df.dispatch_message() > 0);
+    // -------- collect mouse and keyboard events -------
+    df.collect_events();
+
+    df.cdispatch_message();
+
+    // ------ dequeue and process messages -----
+    while (MsgQueueCtr > 0) {
+        const mq = MsgQueue[MsgQueueOffCtr];
+        MsgQueueOffCtr += 1;
+        if (MsgQueueOffCtr == MAXMESSAGES) {
+            MsgQueueOffCtr = 0;
+        }
+        MsgQueueCtr -= 1;
+        _ = df.SendMessage(mq.wnd, mq.msg, mq.p1, mq.p2);
+        if (mq.msg == df.ENDDIALOG) {
+            return false;
+        }
+        if (mq.msg == df.STOP) {
+            _ = df.PostMessage(null, df.STOP, 0, 0);
+            return false;
+        }
+    }
+
+    // #define VIDEO_FB 1
+    df.convert_screen_to_ansi();
+
+    return true;
 }
 
 // ----------- dflatmsg.h ------------
