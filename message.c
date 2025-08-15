@@ -21,7 +21,7 @@ static volatile int clocktimer  = -1;
 
 static WINDOW Cwnd;
 
-int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+int cProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void StopMsg(void);
 
 void StopMsg(void)
@@ -85,13 +85,13 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
     /* ----- window processor returned true or the message was sent
         to no window at all (NULL) ----- */
     if (rtn != FALSE)    {
-        rtn = ProcessMessage(wnd, msg, p1, p2);
+        rtn = cProcessMessage(wnd, msg, p1, p2);
     }
     return rtn;
 }
 
 // This one follows SendMessage();
-int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
+int cProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     int rtn = TRUE, x, y;
         /* --------- process messages that a window sends to the

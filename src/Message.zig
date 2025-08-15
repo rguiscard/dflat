@@ -60,6 +60,22 @@ pub export fn PostMessage(wnd:df.WINDOW, msg:df.MESSAGE, p1:df.PARAM, p2:df.PARA
     }
 }
 
+// This one follows SendMessage(), either from message.c or Window.zig
+pub fn ProcessMessage(wnd:df.WINDOW, msg:df.MESSAGE, p1:df.PARAM, p2:df.PARAM) c_int {
+    var rtn = df.TRUE;
+    // --------- process messages that a window sends to the
+    //        system itself ----------
+    switch (msg) {
+//        df.STOP => {
+//                                StopMsg();
+//        },
+        else => {
+            rtn = df.cProcessMessage(wnd, msg, p1, p2);
+        }
+    }
+    return rtn;
+}
+
 // ------------ initialize the message system ---------
 pub fn init_messages() bool {
     var cols:c_int = 0;

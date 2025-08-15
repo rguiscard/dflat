@@ -2,6 +2,7 @@ const std = @import("std");
 const df = @import("ImportC.zig").df;
 const root = @import("root.zig");
 const message = @import("Message.zig").Message;
+const queue = @import("Message.zig");
 
 win: df.WINDOW,
 title: ?[]const u8 = null,
@@ -331,7 +332,7 @@ pub fn sendMessage(self: *TopLevelFields, msg:message, p1:df.PARAM, p2:df.PARAM)
     // ----- window processor returned true or the message was sent
     //  to no window at all (NULL) -----
     if (rtn != df.FALSE)    {
-        rtn = df.ProcessMessage(wnd, m, p1, p2);
+        rtn = queue.ProcessMessage(wnd, m, p1, p2);
     }
     return rtn;
 }

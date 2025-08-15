@@ -14,13 +14,12 @@ var py:c_int = -1;
 var diff:c_int = 0;
 
 fn getDummy() df.WINDOW {
-    return &df.dwnd;
-
-//    if(dummyWnd == null) {
+    if(dummyWnd == null) {
+        dummyWnd = Window.init(&df.dwnd, root.global_allocator);
 //        dummyWnd = Window.create(df.DUMMY, null, -1, -1, -1, -1, null, null, NormalProc, 0);
-//    }
-//    const wnd = dummyWnd.?.win;
-//    return wnd;
+    }
+    const wnd = dummyWnd.?.win;
+    return wnd;
 }
 
 
