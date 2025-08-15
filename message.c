@@ -7,6 +7,7 @@ jmp_buf AllocError;
 BOOL AltDown = FALSE;
 
 /* ---------- event queue ---------- */
+/*
 static struct events    {
     MESSAGE event;
     int mx;
@@ -16,6 +17,7 @@ static struct events    {
 static int EventQueueOnCtr;
 static int EventQueueOffCtr;
 static int EventQueueCtr;
+*/
 
 static int lagdelay = FIRSTDELAY;
 
@@ -32,7 +34,6 @@ static volatile int clocktimer  = -1;
 
 static WINDOW Cwnd;
 
-int dispatch_message_queue();
 int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void StopMsg(void);
 
@@ -52,14 +53,15 @@ BOOL init_messages(void)
 {
     NoChildCaptureMouse = FALSE;
     NoChildCaptureKeyboard = FALSE;
-    EventQueueOnCtr = EventQueueOffCtr = EventQueueCtr = 0;
+//    EventQueueOnCtr = EventQueueOffCtr = EventQueueCtr = 0;
     PostMessage(NULL,START,0,0);
     lagdelay = FIRSTDELAY;
 	return TRUE;
 }
 
 /* ----- post an event and parameters to event queue ---- */
-void PostEvent(MESSAGE event, int p1, int p2)
+/*
+void cPostEvent(MESSAGE event, int p1, int p2)
 {
     if (EventQueueCtr != MAXMESSAGES)    {
         EventQueue[EventQueueOnCtr].event = event;
@@ -70,6 +72,7 @@ void PostEvent(MESSAGE event, int p1, int p2)
         EventQueueCtr++;
     }
 }
+*/
 
 /* --------- send a message to a window ----------- */
 int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
@@ -333,20 +336,20 @@ static WINDOW MouseWindow(int x, int y)
 }
 
 /* ---- dispatch messages to the message proc function ---- */
-void cdispatch_message(void)
+void cdispatch_message(MESSAGE ev_event, int ev_mx, int ev_my)
 {
     WINDOW Mwnd, Kwnd;
     // -------- collect mouse and keyboard events -------
     //collect_events();
     
     /* --------- dequeue and process events -------- */
-    while (EventQueueCtr > 0)  {
-        struct events ev;
-			
-		ev = EventQueue[EventQueueOffCtr];
-        if (++EventQueueOffCtr == MAXMESSAGES)
-            EventQueueOffCtr = 0;
-        --EventQueueCtr;
+//    while (EventQueueCtr > 0)  {
+//        struct events ev;
+//			
+//		ev = EventQueue[EventQueueOffCtr];
+//        if (++EventQueueOffCtr == MAXMESSAGES)
+//            EventQueueOffCtr = 0;
+//        --EventQueueCtr;
 
         /* ------ get the window in which a
                         keyboard event occurred ------ */
@@ -361,37 +364,37 @@ void cdispatch_message(void)
 
         /* -------- send mouse and keyboard messages to the
             window that should get them -------- */
-        switch (ev.event)    {
+        switch (ev_event)    {
             case SHIFT_CHANGED:
             case KEYBOARD:
-	                SendMessage(Kwnd, ev.event, ev.mx, ev.my);
+	                SendMessage(Kwnd, ev_event, ev_mx, ev_my);
                 break;
             case LEFT_BUTTON:
-		        	Mwnd = MouseWindow(ev.mx, ev.my);
+		        	Mwnd = MouseWindow(ev_mx, ev_my);
                 	if (!CaptureMouse ||
                         	(!NoChildCaptureMouse &&
 								isAncestor(Mwnd, CaptureMouse)))
                     	if (Mwnd != inFocus)
                         	SendMessage(Mwnd, SETFOCUS, TRUE, 0);
-                	SendMessage(Mwnd, LEFT_BUTTON, ev.mx, ev.my);
+                	SendMessage(Mwnd, LEFT_BUTTON, ev_mx, ev_my);
                 break;
             case BUTTON_RELEASED:
             case DOUBLE_CLICK:
             case RIGHT_BUTTON:
             case MOUSE_MOVED:
-		        Mwnd = MouseWindow(ev.mx, ev.my);
-                SendMessage(Mwnd, ev.event, ev.mx, ev.my);
+		        Mwnd = MouseWindow(ev_mx, ev_my);
+                SendMessage(Mwnd, ev_event, ev_mx, ev_my);
                 break;
 #if MSDOS	// FIXME add MK_FP
             case CLOCKTICK:
-                SendMessage(Cwnd, ev.event,
-                    (PARAM) MK_FP(ev.mx, ev.my), 0);
+                SendMessage(Cwnd, ev_event,
+                    (PARAM) MK_FP(ev_mx, ev_my), 0);
 				break;
 #endif
             default:
                 break;
         }
-    }
+//    }
     /* ------ dequeue and process messages ----- */
     /*
     int to_continue = dispatch_message_queue();

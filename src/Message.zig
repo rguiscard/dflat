@@ -4,9 +4,18 @@ const Window = @import("Window.zig");
 
 const MAXMESSAGES = 100;
 
-var MsgQueueOnCtr:usize = 0;
-var MsgQueueOffCtr:usize = 0;
-var MsgQueueCtr:usize = 0;
+// ---------- event queue ----------
+const Evt = struct {
+    event:df.MESSAGE,
+    mx:c_int,
+    my:c_int,
+};
+
+var EventQueue = [_]Evt{.{.event=0, .mx=0, .my=0}}**MAXMESSAGES;
+
+var EventQueueOnCtr:usize = 0;
+var EventQueueOffCtr:usize = 0;
+var EventQueueCtr:usize = 0;
 
 // ---------- message queue ---------
 const Msg = struct {
@@ -17,6 +26,24 @@ const Msg = struct {
 };
 
 var MsgQueue = [_]Msg{.{.wnd=null, .msg=0, .p1=0, .p2=0}}**MAXMESSAGES;
+
+var MsgQueueOnCtr:usize = 0;
+var MsgQueueOffCtr:usize = 0;
+var MsgQueueCtr:usize = 0;
+
+// ----- post an event and parameters to event queue ----
+pub export fn PostEvent(event:df.MESSAGE, p1:c_int, p2:c_int) callconv(.c) void {
+    if (EventQueueCtr != MAXMESSAGES) {
+        EventQueue[EventQueueOnCtr].event = event;
+        EventQueue[EventQueueOnCtr].mx = p1;
+        EventQueue[EventQueueOnCtr].my = p2;
+        EventQueueOnCtr += 1;
+        if (EventQueueOnCtr == MAXMESSAGES) {
+            EventQueueOnCtr = 0;
+        }
+        EventQueueCtr += 1;
+    }
+}
 
 // ----- post a message and parameters to msg queue ----
 pub export fn PostMessage(wnd:df.WINDOW, msg:df.MESSAGE, p1:df.PARAM, p2:df.PARAM) callconv(.c) void {
@@ -67,7 +94,16 @@ pub fn dispatch_message() bool {
     // -------- collect mouse and keyboard events -------
     df.collect_events();
 
-    df.cdispatch_message();
+    // --------- dequeue and process events --------
+    while (EventQueueCtr > 0)  {
+        const ev = EventQueue[EventQueueOffCtr];
+        EventQueueOffCtr += 1;
+        if (EventQueueOffCtr == MAXMESSAGES)
+            EventQueueOffCtr = 0;
+        EventQueueCtr -= 1;
+
+        df.cdispatch_message(ev.event, ev.mx, ev.my);
+    }
 
     // ------ dequeue and process messages -----
     while (MsgQueueCtr > 0) {

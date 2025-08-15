@@ -100,4 +100,4 @@ int ProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void StopMsg(void);
 extern BOOL AllocTesting;
 extern jmp_buf AllocError;
-void cdispatch_message(void);
+void cdispatch_message(MESSAGE event, int mx, int my);
