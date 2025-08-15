@@ -33,29 +33,27 @@ BOOL isCascadedCommand(MBAR *mn, int cmd)
     return FALSE;
 }
 
-/*
-void cActivateCommand(MBAR *mn, int cmd)
+void ActivateCommand(MBAR *mn, int cmd)
 {
     struct PopDown *pd = FindCmd(mn, cmd);
     if (pd != NULL)
         pd->Attrib &= ~INACTIVE;
 }
 
-void cDeactivateCommand(MBAR *mn, int cmd)
+void DeactivateCommand(MBAR *mn, int cmd)
 {
     struct PopDown *pd = FindCmd(mn, cmd);
     if (pd != NULL)
         pd->Attrib |= INACTIVE;
 }
 
-BOOL cisActive(MBAR *mn, int cmd)
+BOOL isActive(MBAR *mn, int cmd)
 {
     struct PopDown *pd = FindCmd(mn, cmd);
     if (pd != NULL)
         return !(pd->Attrib & INACTIVE);
     return FALSE;
 }
-*/
 
 BOOL GetCommandToggle(MBAR *mn, int cmd)
 {

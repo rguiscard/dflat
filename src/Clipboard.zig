@@ -5,7 +5,7 @@ const Window = @import("Window.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
-var Clipboard = std.ArrayList(u8).init(allocator);
+pub var Clipboard = std.ArrayList(u8).init(allocator);
 
 // This also clear the items.
 fn getClipboard() *std.ArrayList(u8) {

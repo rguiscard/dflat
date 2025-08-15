@@ -29,6 +29,8 @@ pub const pictbox = @import("PictBox.zig");
 pub const listbox = @import("ListBox.zig");
 pub const helpbox = @import("HelpBox.zig");
 pub const text = @import("Text.zig");
+pub const menu = @import("Menu.zig");
+pub const clipboard = @import("Clipboard.zig");
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 pub var global_allocator:std.mem.Allocator = gpa.allocator();

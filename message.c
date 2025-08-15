@@ -6,19 +6,6 @@ BOOL AllocTesting = FALSE;
 jmp_buf AllocError;
 BOOL AltDown = FALSE;
 
-/* ---------- event queue ---------- */
-/*
-static struct events    {
-    MESSAGE event;
-    int mx;
-    int my;
-} EventQueue[MAXMESSAGES];
-
-static int EventQueueOnCtr;
-static int EventQueueOffCtr;
-static int EventQueueCtr;
-*/
-
 static int lagdelay = FIRSTDELAY;
 
 //static volatile int keyportvalue;	/* for watching for key release */
@@ -53,26 +40,10 @@ BOOL init_messages(void)
 {
     NoChildCaptureMouse = FALSE;
     NoChildCaptureKeyboard = FALSE;
-//    EventQueueOnCtr = EventQueueOffCtr = EventQueueCtr = 0;
     PostMessage(NULL,START,0,0);
     lagdelay = FIRSTDELAY;
 	return TRUE;
 }
-
-/* ----- post an event and parameters to event queue ---- */
-/*
-void cPostEvent(MESSAGE event, int p1, int p2)
-{
-    if (EventQueueCtr != MAXMESSAGES)    {
-        EventQueue[EventQueueOnCtr].event = event;
-        EventQueue[EventQueueOnCtr].mx = p1;
-        EventQueue[EventQueueOnCtr].my = p2;
-        if (++EventQueueOnCtr == MAXMESSAGES)
-            EventQueueOnCtr = 0;
-        EventQueueCtr++;
-    }
-}
-*/
 
 /* --------- send a message to a window ----------- */
 int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
@@ -339,18 +310,7 @@ static WINDOW MouseWindow(int x, int y)
 void cdispatch_message(MESSAGE ev_event, int ev_mx, int ev_my)
 {
     WINDOW Mwnd, Kwnd;
-    // -------- collect mouse and keyboard events -------
-    //collect_events();
-    
-    /* --------- dequeue and process events -------- */
-//    while (EventQueueCtr > 0)  {
-//        struct events ev;
-//			
-//		ev = EventQueue[EventQueueOffCtr];
-//        if (++EventQueueOffCtr == MAXMESSAGES)
-//            EventQueueOffCtr = 0;
-//        --EventQueueCtr;
-
+    /* process event -------- */
         /* ------ get the window in which a
                         keyboard event occurred ------ */
         Kwnd = inFocus;
@@ -394,16 +354,4 @@ void cdispatch_message(MESSAGE ev_event, int ev_mx, int ev_my)
             default:
                 break;
         }
-//    }
-    /* ------ dequeue and process messages ----- */
-    /*
-    int to_continue = dispatch_message_queue();
-    if (to_continue == FALSE) {
-        return FALSE;
-    }
-    */
-#if VIDEO_FB
-    //convert_screen_to_ansi();
-#endif
-    //return TRUE;
 }

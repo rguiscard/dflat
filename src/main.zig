@@ -379,6 +379,69 @@ fn OurEditorProc(wnd: df.WINDOW, msg: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) ca
     return mp.DefaultWndProc(wnd, msg, p1, p2);
 }
 
+pub export fn PrepFileMenu(w:?*anyopaque, mnu:*df.Menu) void {
+    _ = mnu;
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_SAVE);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_SAVEAS);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_DELETEFILE);
+    if (w) |ww| {
+        const wnd:df.WINDOW = @ptrCast(@alignCast(ww));
+        if (df.GetClass(wnd) == df.EDITBOX) {
+            if (df.isMultiLine(wnd)>0) {
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_SAVE);
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_SAVEAS);
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_DELETEFILE);
+            }
+        }
+    }
+}
+
+pub export fn PrepEditMenu(w:?*anyopaque, mnu:*df.Menu) void {
+    _ = mnu;
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_CUT);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_COPY);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_CLEAR);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_DELETETEXT);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_PARAGRAPH);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_PASTE);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_UNDO);
+    if (w) |ww| {
+        const wnd:df.WINDOW = @ptrCast(@alignCast(ww));
+        if (df.GetClass(wnd) == df.EDITBOX) {
+           if (df.isMultiLine(wnd)>0) {
+               if (df.TextBlockMarked(wnd)) {
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_CUT);
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_COPY);
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_CLEAR);
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_DELETETEXT);
+               }
+               mp.menu.ActivateCommand(&df.MainMenu, df.ID_PARAGRAPH);
+               if ((df.TestAttribute(wnd, df.READONLY) == 0) and (mp.clipboard.Clipboard.items.len > 0)) {
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_PASTE);
+               }
+               if (wnd.*.DeletedText != null)
+                   mp.menu.ActivateCommand(&df.MainMenu, df.ID_UNDO);
+           }
+        }
+    }
+}
+
+pub export fn PrepSearchMenu(w:?*anyopaque, mnu:*df.Menu) void {
+    _ = mnu;
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_SEARCH);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_REPLACE);
+    mp.menu.DeactivateCommand(&df.MainMenu, df.ID_SEARCHNEXT);
+    if (w) |ww| {
+        const wnd:df.WINDOW = @ptrCast(@alignCast(ww));
+        if (df.GetClass(wnd) == df.EDITBOX) {
+            if (df.isMultiLine(wnd)>0) {
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_SEARCH);
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_REPLACE);
+                mp.menu.ActivateCommand(&df.MainMenu, df.ID_SEARCHNEXT);
+            }
+        }
+    }
+}
 
 const std = @import("std");
 

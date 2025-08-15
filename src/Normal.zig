@@ -8,20 +8,21 @@ const sysmenu = @import("SysMenu.zig");
 const lists = @import("Lists.zig");
 
 var dummyWnd:?Window = null;
+var dummy:df.WINDOW = null;
 var px:c_int = -1;
 var py:c_int = -1;
 var diff:c_int = 0;
 
-fn getDummy() Window {
-    if(dummyWnd == null) {
-        dummyWnd = Window.create(df.DUMMY, null, -1, -1, -1, -1, null, null, NormalProc, 0, root.global_allocator);
-    }
-    return dummyWnd.?;
+fn getDummy() df.WINDOW {
+    return &df.dwnd;
+
+//    if(dummyWnd == null) {
+//        dummyWnd = Window.create(df.DUMMY, null, -1, -1, -1, -1, null, null, NormalProc, 0);
+//    }
+//    const wnd = dummyWnd.?.win;
+//    return wnd;
 }
 
-fn getDwnd() df.WINDOW {
-    return &df.dwnd;
-}
 
 // --------- CREATE_WINDOW Message ----------
 fn CreateWindowMsg(wnd:df.WINDOW) void {
@@ -79,8 +80,7 @@ fn HideWindowMsg(wnd:df.WINDOW) void {
 
 // --------- COMMAND Message ----------
 fn CommandMsg(wnd:df.WINDOW, p1:df.PARAM) void {
-//    const dummy = getDummy();
-    const dwnd = getDwnd();
+    const dwnd = getDummy();
     switch (p1) {
         df.ID_SYSMOVE => {
             _ = df.SendMessage(wnd, df.CAPTURE_MOUSE, df.TRUE,
@@ -140,8 +140,7 @@ fn DoubleClickMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
 // --------- KEYBOARD Message ----------
 fn KeyboardMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) bool {
     _ = p2;
-//    const dummy = getDummy();
-    const dwnd = getDwnd();
+    const dwnd = getDummy();
     if ((df.WindowMoving>0) or (df.WindowSizing>0)) {
         // -- move or size a window with keyboard --
         const x = if (df.WindowMoving>0) df.GetLeft(dwnd) else df.GetRight(dwnd);
@@ -233,8 +232,7 @@ fn MoveMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
 
 // --------- LEFT_BUTTON Message ---------- 
 fn LeftButtonMsg(wnd:df.WINDOW, p1:df.PARAM, p2:df.PARAM) void {
-//    const dummy = getDummy();
-    const dwnd = getDwnd();
+    const dwnd = getDummy();
     const mx = p1 - df.GetLeft(wnd);
     const my = p2 - df.GetTop(wnd);
     if ((df.WindowSizing>0) or (df.WindowMoving>0))
@@ -503,8 +501,7 @@ pub export fn NormalProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: 
         },
         df.BUTTON_RELEASED => {
             if ((df.WindowMoving>0) or (df.WindowSizing>0)) {
-//                const dummy = getDummy();
-                const dwnd = getDwnd();
+                const dwnd = getDummy();
                 if (df.WindowMoving > 0) {
                     df.PostMessage(wnd,df.MOVE,dwnd.*.rc.lf,dwnd.*.rc.tp);
                 } else {
@@ -578,8 +575,7 @@ fn TerminateMoveSize(dwnd:df.WINDOW) void {
 
 // ---- build a dummy window border for moving or sizing ---
 fn dragborder(wnd:df.WINDOW, x:c_int, y:c_int) void {
-//    const dummy = getDummy();
-    const dwnd = getDwnd();
+    const dwnd = getDummy();
 
     df.RestoreBorder(dwnd.*.rc);
     // ------- build the dummy window --------
@@ -602,8 +598,7 @@ fn sizeborder(wnd:df.WINDOW, rt:c_int, bt:c_int) void {
     // FIXME: it assumes Window is used.
 //    const win:*Window = @constCast(@fieldParentPtr("win", &wnd));
 
-//    const dummy = getDummy();
-    const dwnd = getDwnd();
+    const dwnd = getDummy();
 
     const leftmost:c_int = @intCast(df.GetLeft(wnd)+10);
     const topmost:c_int = @intCast(df.GetTop(wnd)+3);

@@ -55,65 +55,6 @@ void FixTabMenu(void)
 	}
 }
 
-void PrepFileMenu(void *w, struct Menu *mnu)
-{
-	WINDOW wnd = w;
-	DeactivateCommand(&MainMenu, ID_SAVE);
-	DeactivateCommand(&MainMenu, ID_SAVEAS);
-	DeactivateCommand(&MainMenu, ID_DELETEFILE);
-	if (wnd != NULL && GetClass(wnd) == EDITBOX) {
-		if (isMultiLine(wnd))	{
-			ActivateCommand(&MainMenu, ID_SAVE);
-			ActivateCommand(&MainMenu, ID_SAVEAS);
-			ActivateCommand(&MainMenu, ID_DELETEFILE);
-		}
-	}
-}
-
-void PrepSearchMenu(void *w, struct Menu *mnu)
-{
-	WINDOW wnd = w;
-	DeactivateCommand(&MainMenu, ID_SEARCH);
-	DeactivateCommand(&MainMenu, ID_REPLACE);
-	DeactivateCommand(&MainMenu, ID_SEARCHNEXT);
-	if (wnd != NULL && GetClass(wnd) == EDITBOX) {
-		if (isMultiLine(wnd))	{
-			ActivateCommand(&MainMenu, ID_SEARCH);
-			ActivateCommand(&MainMenu, ID_REPLACE);
-			ActivateCommand(&MainMenu, ID_SEARCHNEXT);
-		}
-	}
-}
-
-void PrepEditMenu(void *w, struct Menu *mnu)
-{
-	WINDOW wnd = w;
-	DeactivateCommand(&MainMenu, ID_CUT);
-	DeactivateCommand(&MainMenu, ID_COPY);
-	DeactivateCommand(&MainMenu, ID_CLEAR);
-	DeactivateCommand(&MainMenu, ID_DELETETEXT);
-	DeactivateCommand(&MainMenu, ID_PARAGRAPH);
-	DeactivateCommand(&MainMenu, ID_PASTE);
-	DeactivateCommand(&MainMenu, ID_UNDO);
-	if (wnd != NULL && GetClass(wnd) == EDITBOX) {
-		if (isMultiLine(wnd))	{
-			if (TextBlockMarked(wnd))	{
-				ActivateCommand(&MainMenu, ID_CUT);
-				ActivateCommand(&MainMenu, ID_COPY);
-				ActivateCommand(&MainMenu, ID_CLEAR);
-				ActivateCommand(&MainMenu, ID_DELETETEXT);
-			}
-			ActivateCommand(&MainMenu, ID_PARAGRAPH);
-			// FIXME: we do not check whether Clipboard has content for now.
-//			if (!TestAttribute(wnd, READONLY) &&
-//						Clipboard != NULL)
-				ActivateCommand(&MainMenu, ID_PASTE);
-			if (wnd->DeletedText != NULL)
-				ActivateCommand(&MainMenu, ID_UNDO);
-		}
-	}
-}
-
 /* ----------- Prepare the Window menu ------------ */
 void PrepWindowMenu(void *w, struct Menu *mnu)
 {

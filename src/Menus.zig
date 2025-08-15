@@ -4,6 +4,7 @@ const root = @import("root.zig");
 const Window = @import("Window.zig");
 const DialogBox = @import("DialogBox.zig");
 const msg = @import("Message.zig").Message;
+const menu = @import("Menu.zig");
 
 pub const MAXPULLDOWNS  = 15;
 pub const MAXSELECTIONS  = 20;
