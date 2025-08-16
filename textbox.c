@@ -12,6 +12,8 @@ static char *GetTextLine(WINDOW, int);
 BOOL VSliding;
 BOOL HSliding;
 
+int cTextBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+
 /* ------------ ADDTEXT Message -------------- */
 static BOOL AddTextMsg(WINDOW wnd, char *txt)
 {
@@ -435,7 +437,7 @@ static void CloseWindowMsg(WINDOW wnd)
 }
 
 /* ----------- TEXTBOX Message-processing Module ----------- */
-int TextBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
+int cTextBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
         case CREATE_WINDOW:

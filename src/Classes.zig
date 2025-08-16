@@ -13,11 +13,13 @@ const spin = @import("SpinButton.zig");
 const hb = @import("HelpBox.zig");
 const editor = @import("Editor.zig");
 const editbox = @import("EditBox.zig");
+const textbox = @import("TextBox.zig");
 const text = @import("Text.zig");
 const mb = @import("MenuBar.zig");
 const popdown = @import("PopDown.zig");
 const radio = @import("RadioButton.zig");
 const normal = @import("Normal.zig");
+const dialbox = @import("DialogBox.zig");
 
 // ----------- classes.h ------------
 //
@@ -75,7 +77,7 @@ pub const classdefs = [_]struct{
     .{WindowClass.NORMAL,       app.ApplicationProc,   df.VISIBLE   |              // Application
                                                        df.SAVESELF  |
                                                        df.CONTROLBOX, "APPLICATION"},
-    .{WindowClass.NORMAL,       df.TextBoxProc,        0,             "TEXTBOX"},  // TEXTBOX
+    .{WindowClass.NORMAL,       textbox.TextBoxProc,   0,             "TEXTBOX"},  // TEXTBOX
     .{WindowClass.TEXTBOX,      lb.ListBoxProc,        0,             "LISTBOX"},  // LISTBOX
     .{WindowClass.TEXTBOX,      editbox.EditBoxProc,   0,             "EDITBOX"},  // EDITBOX
     .{WindowClass.NORMAL,       mb.MenuBarProc,        df.NOCLIP,     "MENUBAR"},  // MENUBAR
@@ -83,7 +85,7 @@ pub const classdefs = [_]struct{
                                                        df.NOCLIP     |
                                                        df.HASBORDER,  "POPDOWNMENU"},
     .{WindowClass.TEXTBOX,      pict.PictureProc,      0,             "PICTUREBOX"},  // PICTUREBOX
-    .{WindowClass.NORMAL,       df.DialogProc,         df.SHADOW     |   // DIALOG
+    .{WindowClass.NORMAL,       dialbox.DialogProc,    df.SHADOW     |   // DIALOG
                                                        df.MOVEABLE   |
                                                        df.CONTROLBOX |
                                                        df.HASBORDER  |

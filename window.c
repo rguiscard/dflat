@@ -9,26 +9,27 @@ int foreground, background;   /* current video colors */
 static void TopLine(WINDOW, int, RECT);
 
 /* --------- create a window ------------ */
+/*
 WINDOW cCreateWindow(
-    CLASS Class,              /* class of this window       */
-    const char *ttl,          /* title or NULL              */
-    int left, int top,        /* upper left coordinates     */
-    int height, int width,    /* dimensions                 */
-    void *extension,          /* pointer to additional data */
-    WINDOW parent,            /* parent of this window      */
+    CLASS Class,              // class of this window       //
+    const char *ttl,          // title or NULL              //
+    int left, int top,        // upper left coordinates     //
+    int height, int width,    // dimensions                 //
+    void *extension,          // pointer to additional data //
+    WINDOW parent,            // parent of this window      //
     int (*wndproc)(struct window *,enum messages,PARAM,PARAM),
-    int attrib)               /* window attribute           */
+    int attrib)               // window attribute           //
 {
     WINDOW wnd = DFcalloc(1, sizeof(struct window));
     get_videomode();
     if (wnd != NULL)    {
         CLASS base;
-        /* ----- height, width = -1: fill the screen ------- */
+        // ----- height, width = -1: fill the screen ------- //
         if (height == -1)
             height = SCREENHEIGHT;
         if (width == -1)
             width = SCREENWIDTH;
-        /* ----- coordinates -1, -1 = center the window ---- */
+        // ----- coordinates -1, -1 = center the window ---- //
         if (left == -1)
             wnd->rc.lf = (SCREENWIDTH-width)/2;
         else
@@ -45,7 +46,7 @@ WINDOW cCreateWindow(
             wnd->wndproc = classdefs[Class].wndproc;
         else
             wnd->wndproc = wndproc;
-        /* ---- derive attributes of base classes ---- */
+        // ---- derive attributes of base classes ---- //
         base = Class;
         while (base != -1)    {
             AddAttribute(wnd, classdefs[base].attrib);
@@ -53,7 +54,7 @@ WINDOW cCreateWindow(
         }
         if (parent)	{
 			if (!TestAttribute(wnd, NOCLIP))    {
-            	/* -- keep upper left within borders of parent - */
+            	// -- keep upper left within borders of parent - //
             	wnd->rc.lf = max(wnd->rc.lf,GetClientLeft(parent));
             	wnd->rc.tp = max(wnd->rc.tp,GetClientTop(parent));
         	}
@@ -78,6 +79,7 @@ WINDOW cCreateWindow(
     }
     return wnd;
 }
+*/
 
 /* -------- add a title to a window --------- */
 void AddTitle(WINDOW wnd, const char *ttl)

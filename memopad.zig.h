@@ -31,6 +31,9 @@ extern struct helps *ThisHelp;
 extern int HelpCount;
 extern char HelpFileName[9];
 
+int HelpTextPaintMsg(WINDOW wnd, PARAM p1, PARAM p2);
+int HelpTextLeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2);
+
 extern FILE *helpfp;
 extern char hline [160];
 extern BOOL Helping;
@@ -54,6 +57,9 @@ int cEditBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 // text.c
 void drawText(WINDOW wnd);
+
+// textbox.c
+int cTextBoxProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 // editor.c
 int EditorKeyboardMsg(WINDOW wnd, PARAM p1, PARAM p2);

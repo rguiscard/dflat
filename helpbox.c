@@ -27,6 +27,9 @@ int HelpStack[MAXHELPSTACK];
 int stacked;
 
 void zReFocus(WINDOW wnd);
+int HelpTextProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
+int HelpTextPaintMsg(WINDOW wnd, PARAM p1, PARAM p2);
+int HelpTextLeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2);
 
 /* --- keywords in the current help text -------- */
 static struct keywords {
@@ -101,7 +104,7 @@ BOOL HelpBoxKeyboardMsg(WINDOW wnd, PARAM p1)
 }
 
 /* ---- PAINT message for the helpbox text editbox ---- */
-static int PaintMsg(WINDOW wnd, PARAM p1, PARAM p2)
+int HelpTextPaintMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     int rtn;
     if (thisword != NULL)    {
@@ -124,7 +127,7 @@ static int PaintMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* ---- LEFT_BUTTON message for the helpbox text editbox ---- */
-static int LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
+int HelpTextLeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
 {
     int rtn, mx, my, i;
 
@@ -155,6 +158,7 @@ static int LeftButtonMsg(WINDOW wnd, PARAM p1, PARAM p2)
 }
 
 /* --- window processing module for HELPBOX's text EDITBOX -- */
+/*
 int HelpTextProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 {
     switch (msg)    {
@@ -172,6 +176,7 @@ int HelpTextProc(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
     }
     return DefaultWndProc(wnd, msg, p1, p2);
 }
+*/
 
 /* -------- read the help text into the editbox ------- */
 void ReadHelp(WINDOW wnd)

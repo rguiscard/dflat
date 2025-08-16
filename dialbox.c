@@ -429,6 +429,7 @@ static void FixColors(WINDOW wnd)
 }
 
 /* -- generic window processor used by dialog box controls -- */
+/*
 int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
 {
     DBOX *db;
@@ -499,6 +500,7 @@ int ControlProc(WINDOW wnd,MESSAGE msg,PARAM p1,PARAM p2)
     }
     return DefaultWndProc(wnd, msg, p1, p2);
 }
+*/
 
 /* ---- change the focus to the first control --- */
 static void FirstFocus(DBOX *db)

@@ -88,6 +88,26 @@ pub export fn HelpBoxProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2:
     return root.BaseWndProc(df.HELPBOX, wnd, message, p1, p2);
 }
 
+// --- window processing module for HELPBOX's text EDITBOX --
+pub export fn HelpTextProc(wnd: df.WINDOW, message: df.MESSAGE, p1: df.PARAM, p2: df.PARAM) callconv(.c) c_int {
+    switch (message) {
+        df.KEYBOARD => {
+        },
+        df.PAINT => {
+            return df.HelpTextPaintMsg(wnd, p1, p2);
+        },
+        df.LEFT_BUTTON => {
+            return df.HelpTextLeftButtonMsg(wnd, p1, p2);
+        },
+        df.DOUBLE_CLICK => {
+            df.PostMessage(wnd, df.KEYBOARD, '\r', 0);
+        },
+        else => {
+        }
+    }
+    return root.DefaultWndProc(wnd, message, p1, p2);
+}
+
 // ---- strip tildes from the help name ----
 fn StripTildes(input: []const u8, buffer: *[30]u8) []const u8 {
     const tilde = '~';

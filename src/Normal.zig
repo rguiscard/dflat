@@ -633,15 +633,17 @@ fn sizeborder(wnd:df.WINDOW, rt:c_int, bt:c_int) void {
     }
 }
 
-//pub fn isDerivedFrom(wnd:df.WINDOW, Class:df.CLASS) bool {
-//    CLASS tclass = GetClass(wnd);
-//    while (tclass != -1)    {
-//        if (tclass == Class)
-//            return TRUE;
-//        tclass = (classdefs[tclass].base);
-//    }
-//    return FALSE;
-//}
+pub export fn isDerivedFrom(wnd:df.WINDOW, klass:df.CLASS) c_int {
+    var tclass = df.GetClass(wnd);
+    while (tclass != -1) {
+        if (tclass == klass) {
+            return df.TRUE;
+        }
+        const cls = Classes.classdefs[@intCast(tclass)];
+        tclass = @intFromEnum(cls[0]);
+    }
+    return df.FALSE;
+}
 
 // -- find the oldest document window ancestor of a window --
 //pub fn df.GetAncestor(wnd:df.WINDOW) df.WINDOW {

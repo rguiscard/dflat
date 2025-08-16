@@ -23,6 +23,7 @@ static WINDOW Cwnd;
 
 int cProcessMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 void StopMsg(void);
+int zSendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2);
 
 void StopMsg(void)
 {
@@ -54,11 +55,15 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
 	LogMessages(wnd, msg, p1, p2);
 #endif
     if (wnd != NULL) {
+	return zSendMessage(wnd, msg, p1, p2);
+        // Let's divert all df.WINDOW to WINDOW in zig so that we can know that it is safe
+	// to convert all df.WINDOW to WINDOW.
+	/*
         switch (msg)    {
             case PAINT:
             case BORDER:
-                /* ------- don't send these messages unless the
-                    window is visible -------- */
+                // ------- don't send these messages unless the
+                //    window is visible --------
                 if (isVisible(wnd))
 	                rtn = (*wnd->wndproc)(wnd, msg, p1, p2);
                 break;
@@ -66,21 +71,22 @@ int SendMessage(WINDOW wnd, MESSAGE msg, PARAM p1, PARAM p2)
             case LEFT_BUTTON:
             case DOUBLE_CLICK:
             case BUTTON_RELEASED:
-                /* --- don't send these messages unless the
-                    window is visible or has captured the mouse -- */
+                // --- don't send these messages unless the
+                //    window is visible or has captured the mouse --
                 if (isVisible(wnd) || wnd == CaptureMouse)
 	                rtn = (*wnd->wndproc)(wnd, msg, p1, p2);
                 break;
             case KEYBOARD:
             case SHIFT_CHANGED:
-                /* ------- don't send these messages unless the
-                    window is visible or has captured the keyboard -- */
+                // ------- don't send these messages unless the
+                //    window is visible or has captured the keyboard -- 
                 if (!(isVisible(wnd) || wnd == CaptureKeyboard))
 	                break;
             default:
                 rtn = (*wnd->wndproc)(wnd, msg, p1, p2);
                 break;
         }
+	*/
     }
     /* ----- window processor returned true or the message was sent
         to no window at all (NULL) ----- */
